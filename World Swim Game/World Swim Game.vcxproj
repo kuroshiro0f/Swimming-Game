@@ -19,14 +19,28 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Actor.cpp" />
+    <ClCompile Include="GameScene.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Nagatomo_Actor.cpp" />
+    <ClCompile Include="Result.cpp" />
+    <ClCompile Include="SceneBase.cpp" />
+    <ClCompile Include="SceneMgr.cpp" />
+    <ClCompile Include="Title.cpp" />
     <ClCompile Include="Ueyama_GameScene.cpp" />
-    <ClCompile Include="Ueyama_main.cpp" />
     <ClCompile Include="Ueyama_Result.cpp" />
     <ClCompile Include="Ueyama_SceneBase.cpp" />
     <ClCompile Include="Ueyama_SceneMgr.cpp" />
     <ClCompile Include="Ueyama_Title.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Actor.h" />
+    <ClInclude Include="GameScene.h" />
+    <ClInclude Include="Nagatomo_Actor.h" />
+    <ClInclude Include="Result.h" />
+    <ClInclude Include="SceneBase.h" />
+    <ClInclude Include="SceneMgr.h" />
+    <ClInclude Include="Title.h" />
     <ClInclude Include="Ueyama_GameScene.h" />
     <ClInclude Include="Ueyama_Result.h" />
     <ClInclude Include="Ueyama_SceneBase.h" />

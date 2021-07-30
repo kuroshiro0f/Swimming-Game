@@ -3,10 +3,10 @@
 // 2016 Takeru Yui All Rights Reserved.
 //-----------------------------------------------------------------------------
 #include "DxLib.h"
-#include "Ueyama_SceneMgr.h"
-#include "Ueyama_Title.h"
-#include "Ueyama_GameScene.h"
-#include "Ueyama_Result.h"
+#include "SceneMgr.h"
+#include "Title.h"
+#include "GameScene.h"
+#include "Result.h"
 
 //-----------------------------------------------------------------------------
 // @brief  メイン関数.
@@ -35,10 +35,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	DeltaTime = 0.000001f;
 
 	//	シーンマネージャークラスのインスタンスを生成
-	Ueyama_SceneMgr* Scene = new Ueyama_SceneMgr;
+	SceneMgr* Scene = new SceneMgr;
 
 	//	タイトルシーンをセット
-	Scene->SetScene(new Ueyama_Title);
+	Scene->SetScene(new Title);
 
 	// エスケープキーが押されるかウインドウが閉じられるまでループ
 	while (ProcessMessage() == 0 && CheckHitKey(KEY_INPUT_ESCAPE) == 0)

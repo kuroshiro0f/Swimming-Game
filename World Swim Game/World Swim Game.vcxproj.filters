@@ -16,6 +16,9 @@
     <Filter Include="ソース ファイル\work">
       <UniqueIdentifier>{5a383940-d7f9-4535-9af7-4b04d97c8fb2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\Scene">
+      <UniqueIdentifier>{27f510f3-0028-44b8-b84e-1dc1abf8be67}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Ueyama_SceneBase.h">
@@ -33,6 +36,27 @@
     <ClInclude Include="Ueyama_SceneMgr.h">
       <Filter>ソース ファイル\work</Filter>
     </ClInclude>
+    <ClInclude Include="Nagatomo_Actor.h">
+      <Filter>ソース ファイル\work</Filter>
+    </ClInclude>
+    <ClInclude Include="Actor.h">
+      <Filter>ソース ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="GameScene.h">
+      <Filter>ソース ファイル\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Result.h">
+      <Filter>ソース ファイル\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneBase.h">
+      <Filter>ソース ファイル\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneMgr.h">
+      <Filter>ソース ファイル\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Title.h">
+      <Filter>ソース ファイル\Scene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Ueyama_SceneBase.cpp">
@@ -44,9 +68,6 @@
     <ClCompile Include="Ueyama_Result.cpp">
       <Filter>ソース ファイル\work</Filter>
     </ClCompile>
-    <ClCompile Include="Ueyama_main.cpp">
-      <Filter>ソース ファイル\work</Filter>
-    </ClCompile>
     <ClCompile Include="Ueyama_GameScene.cpp">
       <Filter>ソース ファイル\work</Filter>
     </ClCompile>
@@ -54,12 +75,28 @@
       <Filter>ソース ファイル\work</Filter>
     </ClCompile>
     <ClCompile Include="Nagatomo_Actor.cpp">
+      <Filter>ソース ファイル\work</Filter>
+    </ClCompile>
+    <ClCompile Include="Actor.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Nagatomo_Actor.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
+    <ClCompile Include="main.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="GameScene.cpp">
+      <Filter>ソース ファイル\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Result.cpp">
+      <Filter>ソース ファイル\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneBase.cpp">
+      <Filter>ソース ファイル\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneMgr.cpp">
+      <Filter>ソース ファイル\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Title.cpp">
+      <Filter>ソース ファイル\Scene</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
