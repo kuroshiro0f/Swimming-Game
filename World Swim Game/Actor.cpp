@@ -1,28 +1,28 @@
-//#include "Nagatomo_Actor.h"
+//#include "Actor.h"
 //
 ////コンストラクタ
-//Nagatomo_Actor::Nagatomo_Actor()
+//Actor::Actor()
 //{
 //}
 //
 ////デストラクタ
-//Nagatomo_Actor::~Nagatomo_Actor()
+//Actor::~Actor()
 //{
 //}
 //
 //// Update関数　Gameからコールされる
-//void Nagatomo_Actor::Update(float _deltaTime)
+//void Actor::Update(float _deltaTime)
 //{
 //	UpdateActor(_deltaTime);
 //}
 //
 ////アクターの更新
-//void Nagatomo_Actor::UpdateActor(float _deltaTime)
+//void Actor::UpdateActor(float _deltaTime)
 //{
 //}
 //
 ////描画
-//void Nagatomo_Actor::DrawActor()
+//void Actor::DrawActor()
 //{
 //	// 3Dモデルの描画
 //	MV1DrawModel(modelHandle);
@@ -32,12 +32,12 @@
 //}
 //
 ////アニメーション再生関数
-//void Nagatomo_Actor::PlayAnim()
+//void Actor::PlayAnim()
 //{
 //}
 //
 ////再生するアニメーションの番号を取得する関数
-//void Nagatomo_Actor::attachAnim(int _animPlay)
+//void Actor::attachAnim(int _animPlay)
 //{
 //	if (animIndex != -1)
 //	{   // アニメーションを削除する
