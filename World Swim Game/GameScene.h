@@ -12,7 +12,7 @@ public:
 		FADE_OUT
 	};
 
-	GameScene();				//	コンストラクタ
+	GameScene();			//	コンストラクタ
 	~GameScene();			//	デストラクタ
 
 	SceneBase* Update(float _deltaTime)override;	//	更新

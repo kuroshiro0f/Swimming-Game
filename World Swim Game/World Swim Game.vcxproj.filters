@@ -51,6 +51,18 @@
     <ClInclude Include="Title.h">
       <Filter>ソース ファイル\Scene</Filter>
     </ClInclude>
+    <ClInclude Include="Yamaoka_Stage.h">
+      <Filter>ソース ファイル\work</Filter>
+    </ClInclude>
+    <ClInclude Include="Yamaoka_GameScene.h">
+      <Filter>ソース ファイル\work</Filter>
+    </ClInclude>
+    <ClInclude Include="Yamaoka_Camera.h">
+      <Filter>ソース ファイル\work</Filter>
+    </ClInclude>
+    <ClInclude Include="Yamaoka_Actor.h">
+      <Filter>ソース ファイル\work</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Ueyama_Result.cpp">
@@ -85,6 +97,24 @@
     </ClCompile>
     <ClCompile Include="Title.cpp">
       <Filter>ソース ファイル\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Yamaoka_Stage.cpp">
+      <Filter>ソース ファイル\work</Filter>
+    </ClCompile>
+    <ClCompile Include="Yamaoka_GameScene.cpp">
+      <Filter>ソース ファイル\work</Filter>
+    </ClCompile>
+    <ClCompile Include="Yamaoka_SceneMgr.cpp">
+      <Filter>ソース ファイル\work</Filter>
+    </ClCompile>
+    <ClCompile Include="Yamaoka_Title.cpp">
+      <Filter>ソース ファイル\work</Filter>
+    </ClCompile>
+    <ClCompile Include="Yamaoka_Camera.cpp">
+      <Filter>ソース ファイル\work</Filter>
+    </ClCompile>
+    <ClCompile Include="Yamaoka_Actor.cpp">
+      <Filter>ソース ファイル\work</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
