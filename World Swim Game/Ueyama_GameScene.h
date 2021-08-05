@@ -1,9 +1,17 @@
 #pragma once
 
 #include "Ueyama_SceneBase.h"
+#include "Nagatomo_PlayerActor.h"
+#include "Nagatomo_Camera.h"
+
+class Nagatomo_PlayerActor;			//PlayerActor‚Ö‚ÌQÆ
+class Nagatomo_Camera;				//Camera‚Ö‚ÌQÆ
 
 class Ueyama_GameScene :public Ueyama_SceneBase
 {
+	Nagatomo_PlayerActor* player;
+	Nagatomo_Camera* camera;
+
 public:
 
 	enum class GAME_SCENE_STATE

@@ -1,5 +1,6 @@
 #include "Ueyama_GameScene.h"
 #include "Ueyama_Result.h"
+#include "Nagatomo_PlayerActor.h"
 
 #include "DxLib.h"
 
@@ -14,18 +15,29 @@ Ueyama_GameScene::Ueyama_GameScene()
 	: m_alphaVal(255)
 	, m_fadeOutFinishFlag(false)
 {
+	player = new Nagatomo_PlayerActor;
+	camera = new Nagatomo_Camera(*player);
+
 	// ステートセット(フェードインから)
 	m_state = GAME_SCENE_STATE::FADE_IN;
+
 }
 
 Ueyama_GameScene::~Ueyama_GameScene()
 {
 	StopSoundMem(m_bgmSoundHandle);
 	DeleteGraph(m_backGraphHandle);
+
+	delete player;
+	delete camera;
 }
 
 Ueyama_SceneBase* Ueyama_GameScene::Update(float _deltaTime)
 {
+
+	player->UpdateActor(_deltaTime);
+	camera->Update(*player);
+
 	switch (m_state)
 	{
 	case GAME_SCENE_STATE::FADE_IN:
@@ -77,8 +89,12 @@ void Ueyama_GameScene::Draw()
 		// 画面全体に任意のカラーの四角形を描画
 		DrawBox(0, 0, SCREEN_SIZE_W, SCREEN_SIZE_H, GetColor(0, 0, 0), TRUE);
 
+
 		// アルファブレンド無効化
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+
+		//プレイヤー
+		player->DrawActor();
 
 		// アルファ値が最大(255)になったらフェードアウト終了
 		if (m_alphaVal <= 0)
