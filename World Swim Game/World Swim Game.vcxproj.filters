@@ -21,9 +21,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Ueyama_SceneBase.h">
-      <Filter>ソース ファイル\work</Filter>
-    </ClInclude>
     <ClInclude Include="Ueyama_Title.h">
       <Filter>ソース ファイル\work</Filter>
     </ClInclude>
@@ -31,9 +28,6 @@
       <Filter>ソース ファイル\work</Filter>
     </ClInclude>
     <ClInclude Include="Ueyama_Result.h">
-      <Filter>ソース ファイル\work</Filter>
-    </ClInclude>
-    <ClInclude Include="Ueyama_SceneMgr.h">
       <Filter>ソース ファイル\work</Filter>
     </ClInclude>
     <ClInclude Include="Nagatomo_Actor.h">
@@ -59,12 +53,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Ueyama_SceneBase.cpp">
-      <Filter>ソース ファイル\work</Filter>
-    </ClCompile>
-    <ClCompile Include="Ueyama_SceneMgr.cpp">
-      <Filter>ソース ファイル\work</Filter>
-    </ClCompile>
     <ClCompile Include="Ueyama_Result.cpp">
       <Filter>ソース ファイル\work</Filter>
     </ClCompile>

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Ueyama_SceneBase.h"
+#include "SceneBase.h"
 
-class Ueyama_GameScene :public Ueyama_SceneBase
+class Ueyama_GameScene :public SceneBase
 {
 public:
 
@@ -16,7 +16,7 @@ public:
 	Ueyama_GameScene();				//	コンストラクタ
 	~Ueyama_GameScene();			//	デストラクタ
 
-	Ueyama_SceneBase* Update(float _deltaTime)override;	//	更新
+	SceneBase* Update(float _deltaTime)override;	//	更新
 	void Draw()override;			//	描画
 	void Sound()override;			//	音楽
 	void Load()override;			//	初期化

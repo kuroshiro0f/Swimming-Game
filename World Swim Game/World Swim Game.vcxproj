@@ -29,8 +29,6 @@
     <ClCompile Include="Title.cpp" />
     <ClCompile Include="Ueyama_GameScene.cpp" />
     <ClCompile Include="Ueyama_Result.cpp" />
-    <ClCompile Include="Ueyama_SceneBase.cpp" />
-    <ClCompile Include="Ueyama_SceneMgr.cpp" />
     <ClCompile Include="Ueyama_Title.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -43,8 +41,6 @@
     <ClInclude Include="Title.h" />
     <ClInclude Include="Ueyama_GameScene.h" />
     <ClInclude Include="Ueyama_Result.h" />
-    <ClInclude Include="Ueyama_SceneBase.h" />
-    <ClInclude Include="Ueyama_SceneMgr.h" />
     <ClInclude Include="Ueyama_Title.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

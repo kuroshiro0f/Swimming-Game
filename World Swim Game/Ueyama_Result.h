@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Ueyama_SceneBase.h"
+#include "SceneBase.h"
 
-class Ueyama_Result : public Ueyama_SceneBase
+class Ueyama_Result : public SceneBase
 {
 public:
 
@@ -16,7 +16,7 @@ public:
 	Ueyama_Result();			//	コンストラクタ
 	~Ueyama_Result();			//　デストラクタ
 
-	Ueyama_SceneBase* Update(float _deltaTime)override;	//	更新
+	SceneBase* Update(float _deltaTime)override;	//	更新
 	void Draw()override;			//	描画
 	void Sound()override;			//	音楽
 	void Load()override;			//	初期化
@@ -27,8 +27,17 @@ private:
 	//	アルファ値
 	int m_alphaVal;
 
-	int m_backGraphHandle;				//	背景のグラフィックハンドル
-	int m_bgmSoundHandle;				//	BGMのサウンドハンドル
-	bool m_checkKeyFlag;				//	キーが押されたままかを判定するフラグ
-	bool m_fadeOutFinishFlag;			//	フェードアウトの終了判定フラグ
+	//	グラフィックハンドル
+	int m_backGraphHandle;				//	背景
+	int m_logoGraphHandle;				//	ロゴ
+	int m_evaluationGraphHandle;		//	評価
+	int m_guidanceGraphHandle;			//	次のシーンへの案内
+	int m_medalGraphHandle;				//	メダル
+
+	//	サウンドハンドル
+	int m_bgmSoundHandle;				//	BGM
+
+	//	フラグ
+	bool m_checkKeyFlag;				//	キーが押されたままか
+	bool m_fadeOutFinishFlag;			//	フェードアウト終了
 };
