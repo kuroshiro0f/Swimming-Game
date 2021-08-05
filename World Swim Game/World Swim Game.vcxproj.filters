@@ -57,6 +57,12 @@
     <ClInclude Include="Title.h">
       <Filter>ソース ファイル\Scene</Filter>
     </ClInclude>
+    <ClInclude Include="Nagatomo_Camera.h">
+      <Filter>ソース ファイル\work</Filter>
+    </ClInclude>
+    <ClInclude Include="Nagatomo_PlayerActor.h">
+      <Filter>ソース ファイル\work</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Ueyama_SceneBase.cpp">
@@ -97,6 +103,12 @@
     </ClCompile>
     <ClCompile Include="Title.cpp">
       <Filter>ソース ファイル\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Nagatomo_Camera.cpp">
+      <Filter>ソース ファイル\work</Filter>
+    </ClCompile>
+    <ClCompile Include="Nagatomo_PlayerActor.cpp">
+      <Filter>ソース ファイル\work</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

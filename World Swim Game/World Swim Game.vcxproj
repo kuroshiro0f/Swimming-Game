@@ -23,6 +23,8 @@
     <ClCompile Include="GameScene.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Nagatomo_Actor.cpp" />
+    <ClCompile Include="Nagatomo_Camera.cpp" />
+    <ClCompile Include="Nagatomo_PlayerActor.cpp" />
     <ClCompile Include="Result.cpp" />
     <ClCompile Include="SceneBase.cpp" />
     <ClCompile Include="SceneMgr.cpp" />
@@ -37,6 +39,8 @@
     <ClInclude Include="Actor.h" />
     <ClInclude Include="GameScene.h" />
     <ClInclude Include="Nagatomo_Actor.h" />
+    <ClInclude Include="Nagatomo_Camera.h" />
+    <ClInclude Include="Nagatomo_PlayerActor.h" />
     <ClInclude Include="Result.h" />
     <ClInclude Include="SceneBase.h" />
     <ClInclude Include="SceneMgr.h" />
