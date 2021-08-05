@@ -5,7 +5,6 @@ class Nagatomo_Actor
 {
 public:
 	Nagatomo_Actor();
-	virtual ~Nagatomo_Actor();
 
 	// UpdateŠÖ”@Game‚©‚çƒR[ƒ‹‚³‚ê‚é
 	void Update(float _deltaTime);					

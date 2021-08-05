@@ -1,9 +1,17 @@
 #pragma once
 
-#include "SceneBase.h"
+#include "Ueyama_SceneBase.h"
+#include "Nagatomo_PlayerActor.h"
+#include "Nagatomo_Camera.h"
 
-class Ueyama_GameScene :public SceneBase
+class Nagatomo_PlayerActor;			//PlayerActorへの参照
+class Nagatomo_Camera;				//Cameraへの参照
+
+class Ueyama_GameScene :public Ueyama_SceneBase
 {
+	Nagatomo_PlayerActor* player;
+	Nagatomo_Camera* camera;
+
 public:
 
 	enum class GAME_SCENE_STATE
@@ -16,7 +24,7 @@ public:
 	Ueyama_GameScene();				//	コンストラクタ
 	~Ueyama_GameScene();			//	デストラクタ
 
-	SceneBase* Update(float _deltaTime)override;	//	更新
+	Ueyama_SceneBase* Update(float _deltaTime)override;	//	更新
 	void Draw()override;			//	描画
 	void Sound()override;			//	音楽
 	void Load()override;			//	初期化
