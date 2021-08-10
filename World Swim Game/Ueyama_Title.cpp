@@ -3,10 +3,13 @@
 
 #include "DxLib.h"
 
+//	ウインドウのサイズ
 const int SCREEN_SIZE_W = 1920;
 const int SCREEN_SIZE_H = 1080;
 
+//	フェードイン・フェードアウトの速度
 const int addAlphaVal = 5;
+
 
 Ueyama_Title::Ueyama_Title()
 	: m_state(TITLE_SCENE_STATE::TITLE)
@@ -23,13 +26,13 @@ Ueyama_Title::Ueyama_Title()
 
 Ueyama_Title::~Ueyama_Title()
 {
-	StopSoundMem(m_soundHandle);
+	StopSoundMem(m_backSoundHandle);
 
 	DeleteGraph(m_backGraphHandle);
-	DeleteSoundMem(m_soundHandle);
+	DeleteSoundMem(m_backSoundHandle);
 }
 
-Ueyama_SceneBase* Ueyama_Title::Update(float _deltaTime)
+SceneBase* Ueyama_Title::Update(float _deltaTime)
 {
 	// ステートメントごとに処理を変更
 	switch (m_state)
@@ -83,8 +86,23 @@ Ueyama_SceneBase* Ueyama_Title::Update(float _deltaTime)
 
 void Ueyama_Title::Draw()
 {
-	// 背景を描画
-	DrawGraph(0, 0, m_backGraphHandle, TRUE);
+	// 描画
+	DrawGraph(0, 0, m_backGraphHandle, TRUE);			//	背景
+	DrawGraph(0, 0, m_logoGraphHandle, TRUE);			//	ロゴ
+	DrawGraph(0, 0, m_startGuideGraphHandle, TRUE);		//	スタートの案内
+	DrawGraph(0, 0, m_manualGuideGraphHandle, TRUE);	//	マニュアルへの案内
+
+
+	//// 画面に映る位置に３Ｄモデルを移動
+	//MV1SetPosition(m_swimModelHandle, VGet(320.0f, -300.0f, 600.0f));
+
+
+	//// 3Dモデルのスケールを拡大
+	//MV1SetScale(m_swimModelHandle, VGet(50.0f, 50.0f, 50.0f));
+
+	////	クロールのモデルを描画
+	//MV1DrawModel(m_swimModelHandle);
+
 
 	if (m_state == TITLE_SCENE_STATE::MANUAL)
 	{
@@ -142,15 +160,25 @@ void Ueyama_Title::Draw()
 void Ueyama_Title::Sound()
 {
 	//	BGMを流す
-	PlaySoundMem(m_soundHandle, DX_PLAYTYPE_BACK, FALSE);
-	ChangeVolumeSoundMem(m_volumePal, m_soundHandle);
+	PlaySoundMem(m_backSoundHandle, DX_PLAYTYPE_BACK, FALSE);
+	ChangeVolumeSoundMem(m_volumePal, m_backSoundHandle);
 }
 
 void Ueyama_Title::Load()
 {
 	//	グラフィックハンドルにセット
-	m_backGraphHandle = LoadGraph("data/Ueyama_img/titleBackTest.png");			//	背景
+	m_backGraphHandle = LoadGraph("data/img/Title/Title_back.png");				//	背景
+	m_logoGraphHandle = LoadGraph("data/img/Title/Title_logo.png");				//	ロゴ
+	m_startGuideGraphHandle = LoadGraph("data/img/Title/Title_start.png");		//	スタートの案内
+	m_manualGuideGraphHandle = LoadGraph("data/img/Title/Title_manual.png");	//	マニュアルへの案内
+
+	//	モデルハンドルにセット
+	m_swimModelHandle = MV1LoadModel("data/asset/swim/natu12b.pmx");			//	泳ぐキャラ
+	m_crawlModelHandle = MV1LoadModel("data/asset/クロール.vmd");				//	クロール
+
+	// アニメーションをアタッチ
+	MV1AttachAnim(m_swimModelHandle,0,m_crawlModelHandle,FALSE);				//	クロール
 
 	//	サウンドハンドルにセット
-	m_soundHandle = LoadSoundMem("data/Ueyama_sound/titleBgmTest.mp3");			//	BGM
+	m_backSoundHandle = LoadSoundMem("data/sound/Title/titleBgmTest.mp3");		//	BGM
 }

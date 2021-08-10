@@ -12,21 +12,25 @@ Ueyama_Result::Ueyama_Result()
 	: m_alphaVal(255)
 	, m_fadeOutFinishFlag(false)
 {
+	// ※キー入力重複対策のフラグ
+	// ENTERキーが押されている間、次のENTERの入力を無効に
 	if (CheckHitKey(KEY_INPUT_RETURN))
 	{
-		m_checkKeyFlag = TRUE;
+		m_checkKeyFlag = true;
 	}
 
+	//	フェードインから始める
 	m_state = RESULT_SCENE_STATE::FADE_IN;
 }
 
 Ueyama_Result::~Ueyama_Result()
 {
+	//	メモリの解放
 	DeleteGraph(m_backGraphHandle);
 	DeleteSoundMem(m_bgmSoundHandle);
 }
 
-Ueyama_SceneBase* Ueyama_Result::Update(float _deltaTime)
+SceneBase* Ueyama_Result::Update(float _deltaTime)
 {
 	switch (m_state)
 	{
@@ -46,11 +50,13 @@ Ueyama_SceneBase* Ueyama_Result::Update(float _deltaTime)
 			// ※キー入力重複対策のフラグ
 			m_checkKeyFlag = true;
 
+			//	ステートをフェードアウトに
 			m_state = RESULT_SCENE_STATE::FADE_OUT;
 		}
 
 		break;
 	case Ueyama_Result::RESULT_SCENE_STATE::FADE_OUT:
+		//	フェードアウトが終わったらタイトルへ
 		if (m_fadeOutFinishFlag)
 		{
 			return new Ueyama_Title();
@@ -65,8 +71,11 @@ Ueyama_SceneBase* Ueyama_Result::Update(float _deltaTime)
 
 void Ueyama_Result::Draw()
 {
-	// 背景
-	DrawGraph(0, 0, m_backGraphHandle, TRUE);
+	DrawGraph(0, 0, m_backGraphHandle, TRUE);			//	背景
+	DrawGraph(0, 0, m_logoGraphHandle, TRUE);			//	ロゴ
+	DrawGraph(0, 0, m_evaluationGraphHandle, TRUE);		//	評価
+	DrawGraph(0, 0, m_guidanceGraphHandle, TRUE);		//	案内
+	DrawGraph(0, 0, m_medalGraphHandle, TRUE);			//	メダル
 
 	//	フェードイン処理
 	if (m_state == RESULT_SCENE_STATE::FADE_IN)
@@ -114,15 +123,20 @@ void Ueyama_Result::Draw()
 
 void Ueyama_Result::Sound()
 {
+	//	BGMを流す
 	PlaySoundMem(m_bgmSoundHandle, DX_PLAYTYPE_BACK, FALSE);
-	ChangeVolumeSoundMem(m_volumePal, m_bgmSoundHandle);
+	ChangeVolumeSoundMem(m_volumePal, m_bgmSoundHandle);			//	音量
 }
 
 void Ueyama_Result::Load()
 {
 	//	グラフィックハンドルにセット
-	m_backGraphHandle = LoadGraph("data/Ueyama_img/resultBackTest.png");			//	背景
+	m_backGraphHandle = LoadGraph("data/img/Result/Result_back.png");			//	背景
+	m_logoGraphHandle = LoadGraph("data/img/Result/Result_logo.png");			//	ロゴ
+	m_evaluationGraphHandle = LoadGraph("data/img/Result/Result_best.png");		//　評価
+	m_guidanceGraphHandle = LoadGraph("data/img/Result/Result_guidance.png");	//	案内
+	m_medalGraphHandle = LoadGraph("data/img/Result/Result_gold.png");			//	メダル
 
 	//	サウンドハンドルにセット
-	m_bgmSoundHandle = LoadSoundMem("data/Ueyama_sound/resultBgmTest.mp3");			//	BGM
+	m_bgmSoundHandle = LoadSoundMem("data/sound/Result/resultBgmTest.mp3");			//	BGM
 }
