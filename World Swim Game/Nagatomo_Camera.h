@@ -10,22 +10,22 @@ class Nagatomo_Camera
 {
 public:
 	// コンストラクタ
-	Nagatomo_Camera(const Nagatomo_PlayerActor& player);
+	Nagatomo_Camera(const Nagatomo_PlayerActor& playerActor);
 	// デストラクタ
 	~Nagatomo_Camera();
 
 	// 更新
-	void Update(const Nagatomo_PlayerActor& player);
+	void Update(const Nagatomo_PlayerActor& playerActor);
 
 	// ポジションの getter/setter
 	const VECTOR& GetPos() const
 	{
-		return pos;
+		return mPos;
 	}
 
 private:
-	VECTOR pos;    // ポジション
+	VECTOR mPos;    // ポジション
+	VECTOR mTempPos;
 };
 
 #endif // !_CAMERA_H_
-

@@ -26,8 +26,9 @@ public:
 	Nagatomo_PlayerActor();
 	~Nagatomo_PlayerActor();
 
-	void UpdateActor(float deltaTime) override;
-	void StartProcess(float deltaTime);
+	void Update(float _deltaTime);
+	void UpdateActor(float _deltaTime) override;
+	void StartProcess(float _deltaTime);
 	void DrawActor();
 	void PlayAnim();
 	void attachAnim(int _animPlay);

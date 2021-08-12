@@ -7,7 +7,7 @@ public:
 	Nagatomo_Actor();
 
 	// Update関数　Gameからコールされる
-	void Update(float _deltaTime);
+	virtual void Update(float _deltaTime);
 	//アクターの更新
 	virtual void UpdateActor(float _deltaTime);
 	//描画

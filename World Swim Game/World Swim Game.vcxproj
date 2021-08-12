@@ -29,7 +29,12 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Nagatomo_Actor.cpp" />
     <ClCompile Include="Nagatomo_Camera.cpp" />
+    <ClCompile Include="Nagatomo_GameScene.cpp" />
     <ClCompile Include="Nagatomo_PlayerActor.cpp" />
+    <ClCompile Include="Nagatomo_Result.cpp" />
+    <ClCompile Include="Nagatomo_SceneMgr.cpp" />
+    <ClCompile Include="Nagatomo_Stage.cpp" />
+    <ClCompile Include="Nagatomo_Title.cpp" />
     <ClCompile Include="Result.cpp" />
     <ClCompile Include="SceneBase.cpp" />
     <ClCompile Include="SceneMgr.cpp">
@@ -41,23 +46,39 @@
     <ClCompile Include="Title.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="Ueyama_GameScene.cpp" />
-    <ClCompile Include="Ueyama_Result.cpp" />
-    <ClCompile Include="Ueyama_Title.cpp" />
-    <ClCompile Include="Yamaoka_Actor.cpp" />
-    <ClCompile Include="Yamaoka_Camera.cpp" />
+    <ClCompile Include="Ueyama_GameScene.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Ueyama_Result.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Ueyama_Title.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Yamaoka_Actor.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Yamaoka_Camera.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="Yamaoka_GameScene.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="Yamaoka_SceneMgr.cpp" />
-    <ClCompile Include="Yamaoka_Stage.cpp" />
-    <ClCompile Include="Yamaoka_Title.cpp" />
+    <ClCompile Include="Yamaoka_SceneMgr.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Yamaoka_Stage.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Yamaoka_Title.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Actor.h" />
@@ -69,14 +90,24 @@
     </ClInclude>
     <ClInclude Include="Nagatomo_Actor.h" />
     <ClInclude Include="Nagatomo_Camera.h" />
+    <ClInclude Include="Nagatomo_GameScene.h" />
     <ClInclude Include="Nagatomo_PlayerActor.h" />
+    <ClInclude Include="Nagatomo_Result.h" />
+    <ClInclude Include="Nagatomo_Stage.h" />
+    <ClInclude Include="Nagatomo_Title.h" />
     <ClInclude Include="Result.h" />
     <ClInclude Include="SceneBase.h" />
     <ClInclude Include="SceneMgr.h" />
     <ClInclude Include="Title.h" />
-    <ClInclude Include="Ueyama_GameScene.h" />
-    <ClInclude Include="Ueyama_Result.h" />
-    <ClInclude Include="Ueyama_Title.h" />
+    <ClInclude Include="Ueyama_GameScene.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Ueyama_Result.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Ueyama_Title.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="Yamaoka_Actor.h" />
     <ClInclude Include="Yamaoka_Camera.h" />
     <ClInclude Include="Yamaoka_GameScene.h">

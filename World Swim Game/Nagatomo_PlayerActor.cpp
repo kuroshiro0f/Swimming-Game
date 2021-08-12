@@ -6,10 +6,14 @@ Nagatomo_PlayerActor::Nagatomo_PlayerActor()
 	,mNowKeyState(STATE_KEY_IDLE)
 	,mPrevKeyState(STATE_KEY_IDLE)
 {
+
 	startFlag = true;
 
+	mPosition = VGet(0, 18, -150);								// 初期位置設定
+	mRotation = VGet(250.0f, 180.0f * DX_PI_F / 180.0f, 0.0f);	// 回転角度
+	mDirection = VGet(0, 0, 1);
 	//モデルのロード
-	modelHandle = MV1LoadModel("data/model/miku.pmx");
+	modelHandle = MV1LoadModel("data/player/player.pmx");
 
 	animTotal = 0.0f;
 	animNowTime = 0.0f;
@@ -23,42 +27,63 @@ Nagatomo_PlayerActor::~Nagatomo_PlayerActor()
 	MV1DeleteModel(modelHandle);
 }
 
+//更新処理
+void Nagatomo_PlayerActor::Update(float _deltaTime)
+{
+	UpdateActor(_deltaTime);
+}
+
 //アクターの更新処理
 void Nagatomo_PlayerActor::UpdateActor(float _deltaTime)
 {
 	int Key = GetJoypadInputState(DX_INPUT_KEY_PAD1);
 
+	//スタート処理
+	if (startFlag)
+	{
+		StartProcess(_deltaTime);
+	}
+
+	//泳ぎ処理
 	if (Key & PAD_INPUT_RIGHT)
 	{
-		mPrevKeyState = mNowKeyState;
-		mNowKeyState = STATE_KEY_RIGHT;
+		mPrevKeyState = mNowKeyState;					//今のキー状態を前回のキー状態に
+		mNowKeyState = STATE_KEY_RIGHT;					//今のキー状態をSTATE_KEY_RIGHTに
 
-		mPosition = VAdd(mPosition, mVelosity);
+		if (mNowKeyState != mPrevKeyState)				//今と前回のキー状態が違うとき
+		{
+			mPosition = VAdd(mPosition, mVelosity);		
+		}
 
 	}
 	if (Key & PAD_INPUT_LEFT)
 	{
-		mPrevKeyState = mNowKeyState;
-		mNowKeyState = STATE_KEY_LEFT;
+		mPrevKeyState = mNowKeyState;					//今のキー状態を前回のキー状態に
+		mNowKeyState = STATE_KEY_LEFT;					//今のキー状態をSTATE_KEY_LEFTに
 
-		mPosition = VAdd(mPosition, mVelosity);
+		if (mNowKeyState != mPrevKeyState)				//今と前回のキー状態が違うとき
+		{
+			mPosition = VAdd(mPosition, mVelosity);
+		}
 	}
+
+	PlayAnim();
+	MV1SetPosition(modelHandle, mPosition);
 }
 
 //スタート処理
 void Nagatomo_PlayerActor::StartProcess(float _deltaTime)
 {
+	startFlag = false;
+
 	//キー入力取得
 	int Key = GetJoypadInputState(DX_INPUT_KEY_PAD1);
 
-	if (mNowPlayerState == STATE_IDLE && timer == 0)
+	if (Key & PAD_INPUT_M)				//スペースキー
 	{
-		startFlag = false;
-	}
+		mNowPlayerState = STATE_SWIM;	//プレイヤーを泳ぎ状態に
 
-	if (Key & PAD_INPUT_M && startFlag == false)	//スペースキー
-	{
-		mNowPlayerState = STATE_SWIM;
+		attachAnim(0);					//アニメーション000をアタッチ
 	}
 }
 
@@ -79,19 +104,19 @@ void Nagatomo_PlayerActor::PlayAnim()
 	if (mNowPlayerState == STATE_SWIM)
 	{   // クロールアニメーション
 		// 再生時間を進める
-		animNowTime += 0.25f;
+		animNowTime += 0.5f;
 		// 再生時間がアニメーションの総再生時間を超えたら
+	}
 		if (animNowTime >= animTotal)
 		{   // 再生時間を0に
 			animNowTime = 0;
 		}
-	}
 
 	// アニメーションの再生時間をセットする
 	MV1SetAttachAnimTime(modelHandle, animIndex, animNowTime);
 }
 
-//アニメーションのアタッチ
+//再生するアニメーションをアタッチする関数
 void Nagatomo_PlayerActor::attachAnim(int _animPlay)
 {
 	if (animIndex != -1)
@@ -99,7 +124,7 @@ void Nagatomo_PlayerActor::attachAnim(int _animPlay)
 		MV1DetachAnim(modelHandle, animIndex);
 	}
 	// アニメーションをアタッチする
-	animIndex = MV1AttachAnim(modelHandle, _animPlay);
+	animIndex = MV1AttachAnim(modelHandle, _animPlay,-1,FALSE);
 	// アニメーションの総再生時間を取得する
 	animTotal = MV1GetAnimTotalTime(modelHandle, animIndex);
 }
