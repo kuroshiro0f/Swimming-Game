@@ -8,7 +8,7 @@ Yamaoka_Camera::Yamaoka_Camera(const Yamaoka_Actor& _actor)
 	SetCameraNearFar(1.0f, 10000.0f);
 
 	// ポジションを設定 
-	m_pos = VGet(0, 60, -200);
+	m_pos = VGet(0, 70, -160);
 }
 
 // デストラクタ

@@ -11,26 +11,24 @@ Yamaoka_Actor::Yamaoka_Actor()
 	mSpeed = 0.0f;
 
 	// ゴールまでの距離 //
-	dCount = 0;       // 進んだ距離
-	maxdCount = 360;  // ゴール  
-	//                 //
+	dCount = 1000;         // 進んだ距離
+	maxdCount = 1000;      // ゴール  
+	NowPos = 0;            // 現在の座標
+	// 調整中          //
 
 	// スタミナゲージ //
-	endStBar = 1150;  // スタミナゲージの長さ(1150 - 780)
-	startStBar = 780; // スタミナゲージの始点（左端）
-	maxSt = 500;      // スタミナ最大値の設定
-	nowSt = 0;        // 現在のスタミナ
-	dSt = 0;          // スタミナの減少値
+	st = 1200;      // スタミナ初期値
+	MaxSt = 1200;   // スタミナ最大値
+	MinSt = 700;    // スタミナ最小値
 
 	// アニメーション生成時間初期化
 	animNowTime = 0;
 	animTotal = 0;
 	animIndex = 0;
 
-	mPosition = VGet(0, 18, -150);     // 初期位置設定
+	mPosition = VGet(-150, 18, 0);     // 初期位置設定
 	mVelocity = VGet(0, 0, 0);         // 初期速度
-	mRotation = VGet(250.0f, 180.0f * DX_PI_F / 180.0f, 0.0f);   // 回転角度
-
+	mRotation = VGet(250.0f, -90.0f * DX_PI_F / 180.0f, 0.0f);   // 回転角度
 }
 
 //デストラクタ
@@ -58,61 +56,77 @@ void Yamaoka_Actor::UpdateActor(float _deltaTime)
 	mVelocity = VAdd(mVelocity, accelVec);
 
 	attachAnim(0);
-	if (CheckHitKey(KEY_INPUT_UP))
+	if (CheckHitKey(KEY_INPUT_RIGHT))
 	{
-		mPosition.z += mSpeed;
-		mSpeed += 0.1;
-		dSt += 0.25;    // スタミナを減らす
-		dCount += 1;
+		mPosition.x += mSpeed;
+		mSpeed += 0.05;
+
+		dCount -= 1;
+		st--;   // スタミナを減らす
 		// 速度が最大値を超えたら
-		if (mSpeed >= 1.5f)
+		if (mSpeed >= 1.1f)
 		{
-			mSpeed = 1.5f;
+			mSpeed = 1.1f;
 		}
 		// 奥まで行くと
-		if (dCount >= 185)
+		//if (dCount <= 741)
+		if(NowPos >= 271)
 		{
-			mSpeed = 0;   // スピードを０に
-			dCount -= 1;  // 距離のカウントを相殺
+			mSpeed = 0;
+			dCount += 1;
+			st++;
 		}
+		// スタミナが0になると
+		if (st <= MinSt)
+		{
+			mSpeed = 0;
+		}
+
+		mPosition = VAdd(mPosition, mVelocity);
+
 		// 奥を向く
-		mRotation = VGet(250.0f, 180.0f * DX_PI_F / 180.0f, 0.0f);
+		mRotation = VGet(250.0f, -90.0f * DX_PI_F / 180.0f, 0.0f);
 	}
-	if (CheckHitKey(KEY_INPUT_DOWN))
+	if (CheckHitKey(KEY_INPUT_LEFT))
 	{
-		mPosition.z -= mSpeed;
-		mSpeed += 0.1;
-		dSt += 0.25;  // スタミナを減らす
-		dCount += 1;
+		mPosition.x -= mSpeed;
+		mSpeed += 0.05;
+
+		dCount -= 1;
+		st--;   // スタミナを減らす
 		// 速度が最大値を超えたら
-		if (mSpeed >= 1.5f)
+		if (mSpeed >= 1.1f)
 		{
-			mSpeed = 1.5f;
-		}
-		// 初期位置に戻ってきたら
-		if (dCount >= 360)
+			mSpeed = 1.1f;
+		}	
+		// スタミナが0になると
+		if (st <= MinSt)
 		{
-			mSpeed = 0;    // スピードを０に
-			dCount = 360;  // 距離のカウントを固定
+			mSpeed = 0;
 		}
+		// スタート位置に戻ったら
+		if (NowPos <= 20)
+		{
+			mSpeed = 0;
+		}
+
+		mPosition = VAdd(mPosition, mVelocity);
+
 		// 手前を向く
-		mRotation = VGet(250.0f, 0.0f * DX_PI_F / 180.0f, 0.0f);
+		mRotation = VGet(250.0f, 90.0f * DX_PI_F / 180.0f, 0.0f);
 	}
 	// アニメーション情報を取得
 	PlayAnim();
 
-	// 現在のスタミナを計算
-	nowSt = maxSt - dSt;
-	// スタミナゲージの長さ     (nowSt / maxSt で比率計算)
-	endStBar = nowSt / maxSt * endStBar;
-	// ボタンを押している間だけスタミナ減少
-	if (endStBar >= 780)
+	// 残り距離
+	if (dCount <= 500)
 	{
-		dSt = 0;
+		dCount = 500;
 	}
 
 	// ポジションを更新
 	mPosition = VAdd(mPosition, mVelocity);
+	NowPos = (int)mPosition.x + 150;
 	MV1SetPosition(modelHandle, mPosition);
 }
 
@@ -124,26 +138,12 @@ void Yamaoka_Actor::DrawActor()
 
 	// 3Dモデルの回転角度 (どの方向を向いているか)
 	MV1SetRotationXYZ(modelHandle, mRotation);
+	
+	// スタミナゲージの描画
+	DrawSt(st, MaxSt, MinSt);
 
-	// 残りの距離の表示
-	DrawFormatString(1500, 850, GetColor(0, 0, 0), "残り  %d m", maxdCount - dCount);
-	// スタミナゲージが０以上の時
-	if (endStBar >= 780)
-	{
-		// スタミナゲージを描画
-		DrawBox(startStBar, 1000, endStBar, 1035, GetColor(0, 255, 0), TRUE);
-		DrawFormatString(780, 1000, GetColor(0, 0, 0)
-			,"%d / 370", (int)endStBar - (int)startStBar);
-	}
-	else
-	{
-		endStBar = 0;
-	}
-	// 一往復したら
-	if (dCount >= 360)
-	{
-		DrawFormatString(900, 700, GetColor(255, 0, 0), "GOAL");
-	}
+	// ゴールまでの距離
+	DrawToGoal(dCount, maxdCount);
 
 	// デバッグ用
 	//DrawFormatString(1100, 850, GetColor(0, 0, 0), "dCount  %d", dCount);
@@ -176,4 +176,46 @@ void Yamaoka_Actor::attachAnim(int _animPlay)
 	animIndex = MV1AttachAnim(modelHandle, _animPlay);
 	// アニメーションの総再生時間を取得する
 	animTotal = MV1GetAnimTotalTime(modelHandle, animIndex);
+}
+
+// スタミナゲージの描画
+void Yamaoka_Actor::DrawSt(int _st, int _MaxSt, int _MinSt)
+{
+	// 色設定
+	int color = GetColor(0, 255, 0);  // 中身(緑)
+	int color2 = GetColor(0, 0, 0);   // 枠 (黒)
+
+	// スタミナゲージが 0 になったら
+	if (st <= MinSt)
+	{
+		// スタミナを最小値に
+		st = MinSt;
+	}
+
+	// ゲージの枠表示
+	DrawBox(MinSt, 1000, 1200, 1035, color2, FALSE);
+	// ゲージの中身表示
+	DrawBox(MinSt, 1000, 1200 * _st / _MaxSt, 1035, color, TRUE);
+	// 数値表示 
+	DrawFormatString(MinSt, 1000, GetColor(0, 0, 0), "%d / 500", 1200 * _st / _MaxSt - MinSt);
+}
+
+// ゴールまでの距離
+void Yamaoka_Actor::DrawToGoal(int _playerPos, int _goalPos)
+{
+	// デバッグ用
+	//DrawFormatString(1300, 500, GetColor(0, 0, 0), "NowPos  %d", NowPos);
+	//DrawFormatString(1300, 550, GetColor(0, 0, 0), "  %d", 600 * _playerPos / _goalPos);
+
+	// 残りの距離の表示
+	DrawBox(1590, 895, 1850, 945, GetColor(0, 255, 255), TRUE);
+	DrawFormatString(1600, 900, GetColor(0, 0, 0), "残り  %d m", 1000 * _playerPos/ _goalPos - 500);
+
+	// 一往復したら
+	if (_playerPos <= 500)
+	{
+		_playerPos = 500;    // 値を固定
+		DrawFormatString(900, 950, GetColor(255, 0, 0), "GOAL");
+	}
+
 }

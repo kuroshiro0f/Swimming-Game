@@ -28,8 +28,9 @@ public:
 private:
 	int m_stageHandle;     // ステージモデル
 	int m_woterHandle;     // 水面のモデル
-	VECTOR m_pos;            // プールのポジション
-	VECTOR m_pos2;           // 水面のポジション
+	VECTOR m_pos;          // プールのポジション
+	VECTOR m_pos2;         // 水面のポジション
+	VECTOR m_rot;          // 回転    
 
 };
 

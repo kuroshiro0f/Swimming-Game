@@ -5,10 +5,6 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;c++;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="ヘッダー ファイル">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
     <Filter Include="リソース ファイル">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
@@ -18,6 +14,13 @@
     </Filter>
     <Filter Include="ソース ファイル\Scene">
       <UniqueIdentifier>{27f510f3-0028-44b8-b84e-1dc1abf8be67}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\work\ヘッダー ファイル">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="ソース ファイル\work\Yamaoka">
+      <UniqueIdentifier>{1b1bfab8-b841-4bc5-b440-e1cd5eff5413}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -51,17 +54,26 @@
     <ClInclude Include="Title.h">
       <Filter>ソース ファイル\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="Yamaoka_Stage.h">
-      <Filter>ソース ファイル\work</Filter>
+    <ClInclude Include="Nagatomo_Camera.h">
+      <Filter>ソース ファイル\work\ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Yamaoka_GameScene.h">
-      <Filter>ソース ファイル\work</Filter>
-    </ClInclude>
-    <ClInclude Include="Yamaoka_Camera.h">
-      <Filter>ソース ファイル\work</Filter>
+    <ClInclude Include="Nagatomo_PlayerActor.h">
+      <Filter>ソース ファイル\work\ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="Yamaoka_Actor.h">
-      <Filter>ソース ファイル\work</Filter>
+      <Filter>ソース ファイル\work\Yamaoka</Filter>
+    </ClInclude>
+    <ClInclude Include="Yamaoka_GameScene.h">
+      <Filter>ソース ファイル\work\Yamaoka</Filter>
+    </ClInclude>
+    <ClInclude Include="Yamaoka_Camera.h">
+      <Filter>ソース ファイル\work\Yamaoka</Filter>
+    </ClInclude>
+    <ClInclude Include="Yamaoka_Result.h">
+      <Filter>ソース ファイル\work\Yamaoka</Filter>
+    </ClInclude>
+    <ClInclude Include="Yamaoka_Stage.h">
+      <Filter>ソース ファイル\work\Yamaoka</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -98,23 +110,32 @@
     <ClCompile Include="Title.cpp">
       <Filter>ソース ファイル\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Yamaoka_Stage.cpp">
+    <ClCompile Include="Nagatomo_Camera.cpp">
       <Filter>ソース ファイル\work</Filter>
     </ClCompile>
-    <ClCompile Include="Yamaoka_GameScene.cpp">
-      <Filter>ソース ファイル\work</Filter>
-    </ClCompile>
-    <ClCompile Include="Yamaoka_SceneMgr.cpp">
-      <Filter>ソース ファイル\work</Filter>
-    </ClCompile>
-    <ClCompile Include="Yamaoka_Title.cpp">
-      <Filter>ソース ファイル\work</Filter>
-    </ClCompile>
-    <ClCompile Include="Yamaoka_Camera.cpp">
+    <ClCompile Include="Nagatomo_PlayerActor.cpp">
       <Filter>ソース ファイル\work</Filter>
     </ClCompile>
     <ClCompile Include="Yamaoka_Actor.cpp">
-      <Filter>ソース ファイル\work</Filter>
+      <Filter>ソース ファイル\work\Yamaoka</Filter>
+    </ClCompile>
+    <ClCompile Include="Yamaoka_Camera.cpp">
+      <Filter>ソース ファイル\work\Yamaoka</Filter>
+    </ClCompile>
+    <ClCompile Include="Yamaoka_GameScene.cpp">
+      <Filter>ソース ファイル\work\Yamaoka</Filter>
+    </ClCompile>
+    <ClCompile Include="Yamaoka_Result.cpp">
+      <Filter>ソース ファイル\work\Yamaoka</Filter>
+    </ClCompile>
+    <ClCompile Include="Yamaoka_SceneMgr.cpp">
+      <Filter>ソース ファイル\work\Yamaoka</Filter>
+    </ClCompile>
+    <ClCompile Include="Yamaoka_Stage.cpp">
+      <Filter>ソース ファイル\work\Yamaoka</Filter>
+    </ClCompile>
+    <ClCompile Include="Yamaoka_Title.cpp">
+      <Filter>ソース ファイル\work\Yamaoka</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
