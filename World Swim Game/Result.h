@@ -10,10 +10,13 @@ public:
 	{
 		FADE_IN,
 		RESULT,
+		TIME,
+		MEDAL,
+		ENTER,
 		FADE_OUT
 	};
 
-	Result();			//	コンストラクタ
+	Result(const int _time);			//	コンストラクタ
 	~Result();			//　デストラクタ
 
 	SceneBase* Update(float _deltaTime)override;	//	更新
@@ -27,8 +30,17 @@ private:
 	//	アルファ値
 	int m_alphaVal;
 
-	int m_backGraphHandle;				//	背景のグラフィックハンドル
-	int m_bgmSoundHandle;				//	BGMのサウンドハンドル
-	bool m_checkKeyFlag;				//	キーが押されたままかを判定するフラグ
-	bool m_fadeOutFinishFlag;			//	フェードアウトの終了判定フラグ
+	//	グラフィックハンドル
+	int m_backGraphHandle;				//	背景
+	int m_logoGraphHandle;				//	ロゴ
+	int m_evaluationGraphHandle;		//	評価
+	int m_guidanceGraphHandle;			//	次のシーンへの案内
+	int m_medalGraphHandle;				//	メダル
+
+	//	サウンドハンドル
+	int m_bgmSoundHandle;				//	BGM
+
+	//	フラグ
+	bool m_checkKeyFlag;				//	キーが押されたままか
+	bool m_fadeOutFinishFlag;			//	フェードアウト終了
 };

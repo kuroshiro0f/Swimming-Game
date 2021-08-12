@@ -1,8 +1,14 @@
 #pragma once
 #include "SceneBase.h"
 
+class PlayerActor;			//PlayerActorへの参照
+class Camera;				//Cameraへの参照
+
 class GameScene :public SceneBase
 {
+	PlayerActor* player;
+	Camera* camera;
+
 public:
 
 	enum class GAME_SCENE_STATE
@@ -30,4 +36,12 @@ private:
 
 	bool m_checkKeyFlag;			//	キーが押されたままかを判定するフラグ
 	bool m_fadeOutFinishFlag;		//	フェードアウトの終了判定フラグ
+
+	class Stage* m_stage;   // ステージクラスへのポインタメンバ変数
+	class Camera* m_camera;	// カメラクラスへのポインタメンバ変数
+	class PlayerActor* m_actor;   // アクタークラスへのポインタメンバ変数
+
+	int m_startTime;                // ゲーム開始時間
+	int m_tmpTime;                  // 現在時間を一時保存
+	int m_countUP;                  // 経過時間
 };

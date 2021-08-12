@@ -1,5 +1,4 @@
 #pragma once
-#pragma once
 #include "SceneBase.h"
 
 class Nagatomo_Title : public SceneBase

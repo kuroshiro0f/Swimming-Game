@@ -5,7 +5,6 @@ class Actor
 {
 public:
 	Actor();
-	virtual ~Actor();
 
 	// UpdateŠÖ”@Game‚©‚çƒR[ƒ‹‚³‚ê‚é
 	void Update(float _deltaTime);
