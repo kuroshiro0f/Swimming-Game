@@ -1,5 +1,6 @@
 #include "Ueyama_Title.h"
 #include "Ueyama_GameScene.h"
+#include "Yamaoka_GameScene.h"
 
 #include "DxLib.h"
 
@@ -109,7 +110,8 @@ SceneBase* Ueyama_Title::Update(float _deltaTime)
 	case TITLE_SCENE_STATE::FADE_OUT:
 		if (m_fadeOutFinishFlag)
 		{
-			return new Ueyama_GameScene();
+			//return new Ueyama_GameScene();
+			return new Yamaoka_GameScene();
 		}
 		break;
 	default:

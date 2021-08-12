@@ -1,5 +1,5 @@
 #include "Yamaoka_GameScene.h"
-#include "Result.h"
+#include "Yamaoka_Result.h"
 #include "Yamaoka_Stage.h"
 #include "Yamaoka_Camera.h"
 #include "Yamaoka_Actor.h"
@@ -53,8 +53,8 @@ SceneBase* Yamaoka_GameScene::Update(float _deltaTime)
 		m_actor->UpdateActor(_deltaTime);
 		//現在時刻を取得
 		m_tmpTime = GetNowCount() / 1000;
-		// 経過時間を計算
-		m_countUP = (m_tmpTime - m_startTime);
+		// 経過時間を計算  (-〇 は応急処置)
+		m_countUP = (m_tmpTime - m_startTime) - 9;
 		
 
 		// ※キー入力重複対策のフラグ
@@ -73,11 +73,19 @@ SceneBase* Yamaoka_GameScene::Update(float _deltaTime)
 			m_state = GAME_SCENE_STATE::FADE_OUT;
 		}
 
+		// プレイヤーがゴールについたら
+		if (m_actor->dCount <= 500)
+		{
+			WaitTimer(600);
+			m_state = GAME_SCENE_STATE::FADE_OUT;
+		}
+
 		break;
 	case GAME_SCENE_STATE::FADE_OUT:
 		if (m_fadeOutFinishFlag)
 		{
-			return new Result();				//	リザルトシーンに切り替える
+			//                        経過時間をリザルトに渡す
+			return new Yamaoka_Result(m_countUP);	//	リザルトシーンに切り替える
 		}
 		break;
 	default:
@@ -95,18 +103,26 @@ void Yamaoka_GameScene::Draw()
 	m_stage->Draw();
 	SetFontSize(40);
 	// 
-	DrawBox(1450, 800, 1750, 890, GetColor(0, 255, 255), TRUE);
-	DrawFormatString(1500, 800, GetColor(0,0,0), "TIME   %d", m_countUP - 11);
+	DrawBox(1550, 830, 1850, 880, GetColor(0, 255, 255), TRUE);
+	DrawFormatString(1600, 835, GetColor(0,0,0), "TIME   %d", m_countUP);
 
 	// プレイヤー描画
 	m_actor->DrawActor();
 
-	// 操作ボタン（仮） プレイヤーの手の斜め上に表示
-	DrawBox(750, 600, 850, 700, GetColor(0, 0, 0), FALSE);
-	DrawBox(1050, 600, 1150, 700, GetColor(0, 0, 0), FALSE);
+	// 操作ボタン（仮）
+	if (CheckHitKey(KEY_INPUT_RIGHT))
+	{
+		DrawBox(1050, 800, 1150, 900, GetColor(255, 255, 255), TRUE);
+	}
+	if (CheckHitKey(KEY_INPUT_LEFT))
+	{
+		DrawBox(750, 800, 850, 900, GetColor(255, 255, 255), TRUE);
+	}
+	DrawBox(750, 800, 850, 900, GetColor(0, 0, 0), FALSE);
+	DrawBox(1050, 800, 1150, 900, GetColor(0, 0, 0), FALSE);
 	SetFontSize(100);
-	DrawFormatString(770, 600, GetColor(0, 0, 0), "A");
-	DrawFormatString(1070, 600, GetColor(0, 0, 0), "D");
+	DrawFormatString(750, 800, GetColor(0, 0, 0), "←");
+	DrawFormatString(1050, 800, GetColor(0, 0, 0), "→");
 
 
 	//	フェードイン処理

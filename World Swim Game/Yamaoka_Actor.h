@@ -18,6 +18,11 @@ public:
 	//再生するアニメーションの番号を取得する関数
 	void attachAnim(int _animPlay);
 
+	// スタミナゲージの描画
+	void DrawSt(int _st, int _MaxSt, int _MinSt);
+	// ゴールまでの距離の描画
+	void DrawToGoal(int _playerPos, int _goalPos);
+
 	// Getters/setters　ゲッター・セッター//
 	//ポジションのGetters/setters
 	const VECTOR& GetPos() const
@@ -50,13 +55,12 @@ public:
 	// ゴールまでの距離 //
 	int dCount;      // どれだけ進んだか        
 	int maxdCount;   // どこまで進めるのか
+	int NowPos;
 	// 未完成 //
 
-	float endStBar;    // スタミナゲージの長さ
-	float startStBar;  // スタミナゲージの始点
-	float maxSt;       // スタミナの最大値
-	float nowSt;       // 現在のスタミナ
-	float dSt;         // スタミナの減少値
+	int st;      // スタミナ
+	int MaxSt;   // スタミナ最大値
+	int MinSt;   // スタミナ最小値
 
 protected:
 	VECTOR mPosition;	//ポジション
