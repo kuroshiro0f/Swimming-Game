@@ -1,13 +1,13 @@
 #pragma once
 
-#include "Ueyama_SceneBase.h"
+#include "SceneBase.h"
 #include "Nagatomo_PlayerActor.h"
 #include "Nagatomo_Camera.h"
 
 class Nagatomo_PlayerActor;			//PlayerActorへの参照
 class Nagatomo_Camera;				//Cameraへの参照
 
-class Ueyama_GameScene :public Ueyama_SceneBase
+class Ueyama_GameScene :public SceneBase
 {
 	Nagatomo_PlayerActor* player;
 	Nagatomo_Camera* camera;
@@ -24,7 +24,7 @@ public:
 	Ueyama_GameScene();				//	コンストラクタ
 	~Ueyama_GameScene();			//	デストラクタ
 
-	Ueyama_SceneBase* Update(float _deltaTime)override;	//	更新
+	SceneBase* Update(float _deltaTime)override;	//	更新
 	void Draw()override;			//	描画
 	void Sound()override;			//	音楽
 	void Load()override;			//	初期化
@@ -39,4 +39,7 @@ private:
 
 	bool m_checkKeyFlag;			//	キーが押されたままかを判定するフラグ
 	bool m_fadeOutFinishFlag;		//	フェードアウトの終了判定フラグ
+
+	//	時間
+	int m_time;
 };

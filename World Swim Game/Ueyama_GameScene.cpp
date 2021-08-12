@@ -20,7 +20,6 @@ Ueyama_GameScene::Ueyama_GameScene()
 
 	// ステートセット(フェードインから)
 	m_state = GAME_SCENE_STATE::FADE_IN;
-
 }
 
 Ueyama_GameScene::~Ueyama_GameScene()
@@ -63,7 +62,8 @@ SceneBase* Ueyama_GameScene::Update(float _deltaTime)
 	case GAME_SCENE_STATE::FADE_OUT:
 		if (m_fadeOutFinishFlag)
 		{
-			return new Ueyama_Result();				//	リザルトシーンに切り替える
+			m_time = GetNowCount();
+			return new Ueyama_Result(m_time);				//	リザルトシーンに切り替える
 		}
 		break;
 	default:
@@ -140,5 +140,5 @@ void Ueyama_GameScene::Load()
 	m_backGraphHandle = LoadGraph("data/img/Game/gameBackTest.png");		//	背景
 
 	//	サウンドハンドルにセット
-	m_bgmSoundHandle = LoadSoundMem("data/sound/Game/gameBgmTest.mp3");			//	BGM
+	m_bgmSoundHandle = LoadSoundMem("data/sound/Game/Game.ogg");			//	BGM
 }

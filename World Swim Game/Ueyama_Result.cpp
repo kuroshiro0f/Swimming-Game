@@ -3,14 +3,27 @@
 
 #include "DxLib.h"
 
+//	スクリーンのサイズ
 const int SCREEN_SIZE_W = 1920;
 const int SCREEN_SIZE_H = 1080;
 
+//	タイム表示する白い四角の場所の座標
+const int SQUARE_START_X = 30;
+const int SQUARE_START_Y = 370;
+const int SQUARE_END_X = 1100;
+const int SQUARE_END_Y = 1030;
+
+// タイムを表示する場所
+const int TIME_X =(SQUARE_END_X - SQUARE_START_X) / 2 - 40;
+const int TIME_Y =(SQUARE_END_Y - SQUARE_START_Y) - 10;
+
+//	フェードイン・フェードアウトの速度
 const int addAlphaVal = 5;
 
-Ueyama_Result::Ueyama_Result()
+Ueyama_Result::Ueyama_Result(const int _time)
 	: m_alphaVal(255)
 	, m_fadeOutFinishFlag(false)
+	, m_time(_time)
 {
 	// ※キー入力重複対策のフラグ
 	// ENTERキーが押されている間、次のENTERの入力を無効に
@@ -76,6 +89,16 @@ void Ueyama_Result::Draw()
 	DrawGraph(0, 0, m_evaluationGraphHandle, TRUE);		//	評価
 	DrawGraph(0, 0, m_guidanceGraphHandle, TRUE);		//	案内
 	DrawGraph(0, 0, m_medalGraphHandle, TRUE);			//	メダル
+	
+	// 透過して描画
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 190);
+	DrawBox(SQUARE_START_X, SQUARE_START_Y, SQUARE_END_X, SQUARE_END_Y, GetColor(255, 255, 255), TRUE);
+	// 透過を元に戻す
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+
+	////	クリアタイムを表示
+	//DrawFormatString(TIME_X, TIME_Y, GetColor(0, 0, 0), "TIME : %d", m_time);
+	
 
 	//	フェードイン処理
 	if (m_state == RESULT_SCENE_STATE::FADE_IN)
@@ -138,5 +161,5 @@ void Ueyama_Result::Load()
 	m_medalGraphHandle = LoadGraph("data/img/Result/Result_gold.png");			//	メダル
 
 	//	サウンドハンドルにセット
-	m_bgmSoundHandle = LoadSoundMem("data/sound/Result/resultBgmTest.mp3");			//	BGM
+	m_bgmSoundHandle = LoadSoundMem("data/sound/Result/Result.ogg");			//	BGM
 }
