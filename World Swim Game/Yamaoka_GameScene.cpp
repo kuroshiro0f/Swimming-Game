@@ -1,8 +1,9 @@
 #include "Yamaoka_GameScene.h"
-#include "Yamaoka_Result.h"
-#include "Yamaoka_Stage.h"
+#include "Result.h"
+#include "Stage.h"
+#include "Actor.h"
 #include "Yamaoka_Camera.h"
-#include "Yamaoka_Actor.h"
+#include "Yamaoka_PlayerActor.h"
 
 #include "DxLib.h"
 
@@ -13,7 +14,7 @@ const int SCREEN_SIZE_H = 1080;
 // フェードイン・フェードアウトの速度
 const int addAlphaVal = 5;
 
-Yamaoka_GameScene::Yamaoka_GameScene()
+GameScene::GameScene()
 	: m_alphaVal(255)
 	, m_fadeOutFinishFlag(false)
 	, m_stage(nullptr)
@@ -30,17 +31,19 @@ Yamaoka_GameScene::Yamaoka_GameScene()
 	m_state = GAME_SCENE_STATE::FADE_IN;
 }
 
-Yamaoka_GameScene::~Yamaoka_GameScene()
+GameScene::~GameScene()
 {
 	delete m_stage;   // ステージのポインタメンバ変数を消去
 	delete m_camera;  // カメラのポインタメンバ変数を消去
 	delete m_actor;   // アクターのポインタメンバ変数を削除
+
 	StopSoundMem(m_bgmSoundHandle);
-	DeleteGraph(m_backGraphHandle);	
+	DeleteGraph(m_backGraphHandle);
 }
 
-SceneBase* Yamaoka_GameScene::Update(float _deltaTime)
+SceneBase* GameScene::Update(float _deltaTime)
 {
+	//	カメラをセット
 	m_camera->Update(*m_actor);
 
 	switch (m_state)
@@ -48,14 +51,17 @@ SceneBase* Yamaoka_GameScene::Update(float _deltaTime)
 	case GAME_SCENE_STATE::FADE_IN:
 		break;
 	case GAME_SCENE_STATE::GAME:
+		//	ステージをセット
 		m_stage->Update();
+
+		//	アクターをセット
 		m_actor->Update(_deltaTime);
 		m_actor->UpdateActor(_deltaTime);
+
 		//現在時刻を取得
 		m_tmpTime = GetNowCount() / 1000;
 		// 経過時間を計算  (-〇 は応急処置)
-		m_countUP = (m_tmpTime - m_startTime) - 9;
-		
+		m_countUP = (m_tmpTime - m_startTime) - 10;
 
 		// ※キー入力重複対策のフラグ
 		// ENTERキーから指を離したら、次のENTERの入力を有効に
@@ -73,19 +79,12 @@ SceneBase* Yamaoka_GameScene::Update(float _deltaTime)
 			m_state = GAME_SCENE_STATE::FADE_OUT;
 		}
 
-		// プレイヤーがゴールについたら
-		if (m_actor->dCount <= 500)
-		{
-			WaitTimer(600);
-			m_state = GAME_SCENE_STATE::FADE_OUT;
-		}
-
 		break;
 	case GAME_SCENE_STATE::FADE_OUT:
 		if (m_fadeOutFinishFlag)
 		{
-			//                        経過時間をリザルトに渡す
-			return new Yamaoka_Result(m_countUP);	//	リザルトシーンに切り替える
+			//	経過時間をリザルトに渡す
+			return new Result(m_countUP);	//	リザルトシーンに切り替える
 		}
 		break;
 	default:
@@ -94,7 +93,7 @@ SceneBase* Yamaoka_GameScene::Update(float _deltaTime)
 	return this;
 }
 
-void Yamaoka_GameScene::Draw()
+void GameScene::Draw()
 {
 	//	背景
 	DrawGraph(0, 0, m_backGraphHandle, TRUE);
@@ -102,9 +101,10 @@ void Yamaoka_GameScene::Draw()
 	// ステージの描画
 	m_stage->Draw();
 	SetFontSize(40);
-	// 
+
+	//	タイムの表示
 	DrawBox(1550, 830, 1850, 880, GetColor(0, 255, 255), TRUE);
-	DrawFormatString(1600, 835, GetColor(0,0,0), "TIME   %d", m_countUP);
+	DrawFormatString(1600, 835, GetColor(0, 0, 0), "TIME   %d", m_countUP);
 
 	// プレイヤー描画
 	m_actor->DrawActor();
@@ -124,6 +124,11 @@ void Yamaoka_GameScene::Draw()
 	DrawFormatString(750, 800, GetColor(0, 0, 0), "←");
 	DrawFormatString(1050, 800, GetColor(0, 0, 0), "→");
 
+	SetFontSize(35);
+	// スタミナゲージの表示
+	m_actor->DrawSt(m_actor->st, m_actor->MaxSt, m_actor->MinSt);
+	// 残り距離の表示
+	m_actor->DrawToGoal(m_actor->dCount, m_actor->maxdCount);
 
 	//	フェードイン処理
 	if (m_state == GAME_SCENE_STATE::FADE_IN)
@@ -169,7 +174,7 @@ void Yamaoka_GameScene::Draw()
 	}
 }
 
-void Yamaoka_GameScene::Sound()
+void GameScene::Sound()
 {
 	if (m_state == GAME_SCENE_STATE::GAME)
 	{
@@ -178,18 +183,18 @@ void Yamaoka_GameScene::Sound()
 	}
 }
 
-void Yamaoka_GameScene::Load()
+void GameScene::Load()
 {
 	// グラフィックハンドルにセット
-	m_backGraphHandle = LoadGraph("data/img/gameBackTest.png");		//	背景
+	m_backGraphHandle = LoadGraph("data/img/Game/gameBackTest.png");		//	背景
 
 	//	サウンドハンドルにセット
-	m_bgmSoundHandle = LoadSoundMem("data/sound/gameBgmTest.mp3");			//	BGM
+	m_bgmSoundHandle = LoadSoundMem("data/sound/Game/Game.ogg");			//	BGM
 
 	// ステージクラスのインスタンスを生成
-	m_stage = new Yamaoka_Stage;
+	m_stage = new Stage();
 	// アクタークラスへのインスタンスを生成
-	m_actor = new Yamaoka_Actor;
+	m_actor = new Yamaoka_PlayerActor();
 	// カメラクラスへのインスタンスを生成
-	m_camera = new Yamaoka_Camera(*m_actor);
+	m_camera = new Camera(*m_actor);
 }

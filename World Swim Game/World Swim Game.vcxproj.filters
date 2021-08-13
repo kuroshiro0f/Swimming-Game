@@ -99,6 +99,9 @@
     <ClInclude Include="Yamaoka_Stage.h">
       <Filter>ソース ファイル\work\Yamaoka</Filter>
     </ClInclude>
+    <ClInclude Include="Yamaoka_PlayerActor.h">
+      <Filter>ソース ファイル\work\Yamaoka</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Actor.cpp">
@@ -181,6 +184,9 @@
     </ClCompile>
     <ClCompile Include="Ueyama_Title.cpp">
       <Filter>ソース ファイル\work\Ueyama</Filter>
+    </ClCompile>
+    <ClCompile Include="Yamaoka_PlayerActor.cpp">
+      <Filter>ソース ファイル\work\Yamaoka</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

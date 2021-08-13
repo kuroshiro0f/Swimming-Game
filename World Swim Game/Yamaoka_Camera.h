@@ -1,29 +1,31 @@
-#ifndef _YAMAOKA_CAMERA_H_
-#define _YAMAOKA_CAMERA_H_
+#ifndef _CAMERA_H_
+#define _CAMERA_H_
 
 #include "DxLib.h"
+#include "Yamaoka_PlayerActor.h"
 
-class Yamaoka_Actor;
+class Yamaoka_PlayerActor;      //プレイヤークラスへの参照
 
-class Yamaoka_Camera
+class Camera
 {
 public:
 	// コンストラクタ
-	Yamaoka_Camera(const Yamaoka_Actor& _actor);
+	Camera(const Yamaoka_PlayerActor& playerActor);
 	// デストラクタ
-	~Yamaoka_Camera();
+	~Camera();
 
 	// 更新
-	void Update(const Yamaoka_Actor& _actor);
+	void Update(const Yamaoka_PlayerActor& playerActor);
 
 	// ポジションの getter/setter
 	const VECTOR& GetPos() const
 	{
-		return m_pos;
+		return mPos;
 	}
+
 private:
-	VECTOR m_pos;     // ポジション
+	VECTOR mPos;    // ポジション
+	VECTOR mTempPos;
 };
 
-#endif // !_YAMAOKA_CAMERA_H_
-
+#endif // !_CAMERA_H_
