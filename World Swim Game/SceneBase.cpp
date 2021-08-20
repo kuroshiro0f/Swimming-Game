@@ -10,4 +10,5 @@ SceneBase::SceneBase()
 	: m_volumePal(VOLUME_PAL)
 	, m_normalFontSize(NORMAL_FONT_SIZE)
 {
+	keifontHandle = CreateFontToHandle("‚¯‚¢‚Ó‚§‚ñ‚Æ", 80, 2, DX_FONTTYPE_ANTIALIASING_4X4);
 }

@@ -1,6 +1,6 @@
 #include "Ueyama_GameScene.h"
 #include "Ueyama_Result.h"
-#include "Nagatomo_PlayerActor.h"
+#include "PlayerActor.h"
 
 #include "DxLib.h"
 
@@ -15,8 +15,8 @@ Ueyama_GameScene::Ueyama_GameScene()
 	: m_alphaVal(255)
 	, m_fadeOutFinishFlag(false)
 {
-	player = new Nagatomo_PlayerActor;
-	camera = new Nagatomo_Camera(*player);
+	player = new PlayerActor;
+	camera = new Camera(*player);
 
 	// ステートセット(フェードインから)
 	m_state = GAME_SCENE_STATE::FADE_IN;

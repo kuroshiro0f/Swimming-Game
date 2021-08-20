@@ -14,16 +14,51 @@ const int SQUARE_END_X = 1100;
 const int SQUARE_END_Y = 1030;
 
 // タイムを表示する場所
-const int TIME_X =(SQUARE_END_X - SQUARE_START_X) / 2 - 40;
-const int TIME_Y =(SQUARE_END_Y - SQUARE_START_Y) - 10;
+const int TIME_X = 370;
+const int TIME_Y = 660;
+
+//	リザルトの遷移する時間
+const int TIME = 100;
+const int MEDAL = 150;
+const int EVA = 200;
+const int ENTER = 250;
+
+//	最大透過量
+const int MAX_TRANSP_VAL = 255;
+//	透過量変化用ベクトル
+const int TRANSP_MODERATION = -1;
+//	最初の透過量
+const int FIRST_TRANS_VAL = 100;
 
 //	フェードイン・フェードアウトの速度
 const int addAlphaVal = 5;
+
+//	星の拡大縮小速度
+//const int STAR_SCALE = 5;
+
+//	評価の基準となる秒数
+const int FIRST = 1;
+const int SECOND = 2;
+const int THIRD = 3;
+
+//	星の拡大縮小範囲
+const int STAR_MIN = -30;
 
 Ueyama_Result::Ueyama_Result(const int _time)
 	: m_alphaVal(255)
 	, m_fadeOutFinishFlag(false)
 	, m_time(_time)
+	, m_resultFlag(0)
+	, m_resultTime(0)
+	, m_bigStarX1(0)
+	, m_bigStarX2(SCREEN_SIZE_W)
+	, m_bigStarY1(0)
+	, m_bigStarY2(SCREEN_SIZE_H)
+	, m_smallStarX1(0)
+	, m_smallStarX2(SCREEN_SIZE_W)
+	, m_smallStarY1(0)
+	, m_smallStarY2(SCREEN_SIZE_H)
+	, m_starScallFlag(TRUE)
 {
 	// ※キー入力重複対策のフラグ
 	// ENTERキーが押されている間、次のENTERの入力を無効に
@@ -32,24 +67,55 @@ Ueyama_Result::Ueyama_Result(const int _time)
 		m_checkKeyFlag = true;
 	}
 
+	// 透過量変数を122に設定
+	m_transpVal = MAX_TRANSP_VAL;
+	m_fadeTransVal = FIRST_TRANS_VAL;
+	// 毎透過量変数を2に設定
+	m_permeationAmount = 2;
+
 	//	フェードインから始める
 	m_state = RESULT_SCENE_STATE::FADE_IN;
+
+	//	デバッグ用
+	m_time = FIRST;
 }
 
 Ueyama_Result::~Ueyama_Result()
 {
 	//	メモリの解放
 	DeleteGraph(m_backGraphHandle);
+	DeleteGraph(m_logoGraphHandle);
+	DeleteGraph(m_guidanceGraphHandle);
+	if (m_time <= FIRST)
+	{
+		DeleteGraph(m_medalGraphHandle);
+		DeleteGraph(m_evaluationGraphHandle);
+		
+	}
+	if (m_time > FIRST && m_time <= SECOND)
+	{
+		DeleteGraph(m_medalGraphHandle);
+		DeleteGraph(m_evaluationGraphHandle);
+	}
+	if (m_time > SECOND)
+	{
+		DeleteGraph(m_medalGraphHandle);
+		DeleteGraph(m_evaluationGraphHandle);
+	}
+	DeleteGraph(m_bigStarGraphHandle);
+	DeleteGraph(m_smallStarGraphHandle);
 	DeleteSoundMem(m_bgmSoundHandle);
 }
 
 SceneBase* Ueyama_Result::Update(float _deltaTime)
 {
+	m_resultTime++;
+
 	switch (m_state)
 	{
-	case Ueyama_Result::RESULT_SCENE_STATE::FADE_IN:
+	case RESULT_SCENE_STATE::FADE_IN:
 		break;
-	case Ueyama_Result::RESULT_SCENE_STATE::RESULT:
+	case RESULT_SCENE_STATE::RESULT:
 		// ※キー入力重複対策のフラグ
 		// ENTERキーから指を離したら、次のENTERの入力を有効に
 		if (!CheckHitKey(KEY_INPUT_RETURN))
@@ -63,12 +129,128 @@ SceneBase* Ueyama_Result::Update(float _deltaTime)
 			// ※キー入力重複対策のフラグ
 			m_checkKeyFlag = true;
 
-			//	ステートをフェードアウトに
+			//	次のシーンへ移行
+			m_resultFlag++;
+
+			//	ステートをタイムに
+			m_state = RESULT_SCENE_STATE::TIME;
+		}
+
+		if (m_resultTime >= TIME)
+		{
+			//	次のシーンへ移行
+			m_resultFlag++;
+			m_state = RESULT_SCENE_STATE::TIME;
+		}
+
+		break;
+	case RESULT_SCENE_STATE::TIME:
+		// ※キー入力重複対策のフラグ
+		// ENTERキーから指を離したら、次のENTERの入力を有効に
+		if (!CheckHitKey(KEY_INPUT_RETURN))
+		{
+			m_checkKeyFlag = false;
+		}
+
+		// ENTERで次のステートへ
+		if (CheckHitKey(KEY_INPUT_RETURN) && m_checkKeyFlag == false)
+		{
+			// ※キー入力重複対策のフラグ
+			m_checkKeyFlag = true;
+
+			//	次のシーンへ移行
+			m_resultFlag++;
+
+			//	ステートをメダルに
+			m_state = RESULT_SCENE_STATE::MEDAL;
+		}
+
+		if (m_resultTime >= MEDAL)
+		{
+			// 次のシーンへ移行
+			m_resultFlag++;
+			m_state = RESULT_SCENE_STATE::MEDAL;
+		}
+
+		break;
+	case RESULT_SCENE_STATE::MEDAL:
+		// ※キー入力重複対策のフラグ
+		// ENTERキーから指を離したら、次のENTERの入力を有効に
+		if (!CheckHitKey(KEY_INPUT_RETURN))
+		{
+			m_checkKeyFlag = false;
+		}
+
+		// ENTERで次のステートへ
+		if (CheckHitKey(KEY_INPUT_RETURN) && m_checkKeyFlag == false)
+		{
+			// ※キー入力重複対策のフラグ
+			m_checkKeyFlag = true;
+
+			//	次のシーンへ移行
+			m_resultFlag++;
+
+			//	ステートをエンターに
+			m_state = RESULT_SCENE_STATE::EVA;
+		}
+
+		if (m_resultTime >= EVA)
+		{
+			//	次のシーンへ移行
+			m_resultFlag++;
+			m_state = RESULT_SCENE_STATE::EVA;
+		}
+
+		break;
+	case RESULT_SCENE_STATE::EVA:
+		// ※キー入力重複対策のフラグ
+		// ENTERキーから指を離したら、次のENTERの入力を有効に
+		if (!CheckHitKey(KEY_INPUT_RETURN))
+		{
+			m_checkKeyFlag = false;
+		}
+
+		// ENTERで次のステートへ
+		if (CheckHitKey(KEY_INPUT_RETURN) && m_checkKeyFlag == false)
+		{
+			// ※キー入力重複対策のフラグ
+			m_checkKeyFlag = true;
+
+			//	次のシーンへ移行
+			m_resultFlag++;
+
+			//	ステートをエンターに
+			m_state = RESULT_SCENE_STATE::ENTER;
+		}
+
+		if (m_resultTime >= ENTER)
+		{
+			//	次のシーンへ移行
+			m_resultFlag++;
+			m_state = RESULT_SCENE_STATE::ENTER;
+		}
+
+		break;
+	case RESULT_SCENE_STATE::ENTER:
+		// ※キー入力重複対策のフラグ
+		// ENTERキーから指を離したら、次のENTERの入力を有効に
+		if (!CheckHitKey(KEY_INPUT_RETURN))
+		{
+			m_checkKeyFlag = false;
+		}
+
+		// ENTERで次のステートへ
+		if (CheckHitKey(KEY_INPUT_RETURN) && m_checkKeyFlag == false)
+		{
+			// ※キー入力重複対策のフラグ
+			m_checkKeyFlag = true;
+
+			//	ステートをタイムに
 			m_state = RESULT_SCENE_STATE::FADE_OUT;
 		}
 
 		break;
-	case Ueyama_Result::RESULT_SCENE_STATE::FADE_OUT:
+	case RESULT_SCENE_STATE::FADE_OUT:
 		//	フェードアウトが終わったらタイトルへ
 		if (m_fadeOutFinishFlag)
 		{
@@ -84,22 +266,76 @@ SceneBase* Ueyama_Result::Update(float _deltaTime)
 
 void Ueyama_Result::Draw()
 {
+	// 透過量更新
+	UpdateTransparent();
+
 	DrawGraph(0, 0, m_backGraphHandle, TRUE);			//	背景
 	DrawGraph(0, 0, m_logoGraphHandle, TRUE);			//	ロゴ
-	DrawGraph(0, 0, m_evaluationGraphHandle, TRUE);		//	評価
-	DrawGraph(0, 0, m_guidanceGraphHandle, TRUE);		//	案内
-	DrawGraph(0, 0, m_medalGraphHandle, TRUE);			//	メダル
-	
+
 	// 透過して描画
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 190);
 	DrawBox(SQUARE_START_X, SQUARE_START_Y, SQUARE_END_X, SQUARE_END_Y, GetColor(255, 255, 255), TRUE);
 	// 透過を元に戻す
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
-	////	クリアタイムを表示
-	//DrawFormatString(TIME_X, TIME_Y, GetColor(0, 0, 0), "TIME : %d", m_time);
-	
 
+	if (m_resultFlag >= 1)
+	{
+		//	クリアタイムを表示
+		DrawFormatStringToHandle(TIME_X, TIME_Y, GetColor(0, 0, 0), keifontHandle, "TIME : %d", m_time);
+	}
+	if (m_resultFlag >= 2)
+	{
+		DrawGraph(0, 0, m_medalGraphHandle, TRUE);			//	メダル
+	}
+	if (m_resultFlag >= 3)
+	{
+		DrawGraph(0, 0, m_evaluationGraphHandle, TRUE);		//	評価
+	}
+	if (m_resultFlag >= 4)
+	{
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, m_transpVal);	//	透過して描画
+		DrawGraph(0, 0, m_guidanceGraphHandle, TRUE);		//	案内
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);			//	透過を元に戻す
+		DrawExtendGraph(m_bigStarX1, m_bigStarY1, m_bigStarX2, m_bigStarY2, m_bigStarGraphHandle, TRUE);			//	大きな星
+		DrawExtendGraph(m_smallStarX1, m_smallStarY1, m_smallStarX2, m_smallStarY2, m_smallStarGraphHandle, TRUE);	//	小さな星
+
+
+		if (m_bigStarX1 <= STAR_MIN)
+		{
+			m_starScallFlag = FALSE;
+		}
+		if (m_bigStarX1 >= 0)
+		{
+			m_starScallFlag = TRUE;
+		}
+
+		if (m_starScallFlag == TRUE)
+		{
+			//	拡大する
+			m_bigStarX1--;
+			m_bigStarX2++;
+			m_bigStarY1--;
+			m_bigStarY2++;
+			m_smallStarX1--;
+			m_smallStarX2++;
+			m_smallStarY1--;
+			m_smallStarY2++;
+		}
+		else if (m_starScallFlag == FALSE)
+		{
+			//	縮小する
+			m_bigStarX1++;
+			m_bigStarX2--;
+			m_bigStarY1++;
+			m_bigStarY2--;
+			m_smallStarX1++;
+			m_smallStarX2--;
+			m_smallStarY1++;
+			m_smallStarY2--;
+		}
+	}
+	
 	//	フェードイン処理
 	if (m_state == RESULT_SCENE_STATE::FADE_IN)
 	{
@@ -154,12 +390,49 @@ void Ueyama_Result::Sound()
 void Ueyama_Result::Load()
 {
 	//	グラフィックハンドルにセット
-	m_backGraphHandle = LoadGraph("data/img/Result/Result_back.png");			//	背景
-	m_logoGraphHandle = LoadGraph("data/img/Result/Result_logo.png");			//	ロゴ
-	m_evaluationGraphHandle = LoadGraph("data/img/Result/Result_best.png");		//　評価
-	m_guidanceGraphHandle = LoadGraph("data/img/Result/Result_guidance.png");	//	案内
-	m_medalGraphHandle = LoadGraph("data/img/Result/Result_gold.png");			//	メダル
+	m_backGraphHandle = LoadGraph("data/img/Result/Result_back.png");				//	背景
+	m_logoGraphHandle = LoadGraph("data/img/Result/Result_logo.png");				//	ロゴ
+	m_guidanceGraphHandle = LoadGraph("data/img/Result/Result_guidance.png");		//	案内
+	if (m_time <= FIRST)
+	{
+		m_medalGraphHandle = LoadGraph("data/img/Result/Result_gold.png");			//	金メダル
+		m_evaluationGraphHandle = LoadGraph("data/img/Result/Result_best.png");		//　CONGRATURATION
+	}
+	if (m_time > FIRST && m_time <= SECOND)
+	{
+		m_medalGraphHandle = LoadGraph("data/img/Result/Result_silver.png");		//	銀メダル
+		m_evaluationGraphHandle = LoadGraph("data/img/Result/Result_great.png");	//	GREAT
+	}
+	if (m_time > SECOND)
+	{
+		m_medalGraphHandle = LoadGraph("data/img/Result/Result_copper.png");		//	銅メダル
+		m_evaluationGraphHandle = LoadGraph("data/img/Result/Result_good.png");		//　GOOD
+	}
+	m_bigStarGraphHandle = LoadGraph("data/img/Result/bigStar.png");				//	大きな星
+	m_smallStarGraphHandle = LoadGraph("data/img/Result/smallStar.png");			//	小さな星
 
 	//	サウンドハンドルにセット
-	m_bgmSoundHandle = LoadSoundMem("data/sound/Result/Result.ogg");			//	BGM
+	m_bgmSoundHandle = LoadSoundMem("data/sound/Result/Result.ogg");				//	BGM
+}
+
+void Ueyama_Result::UpdateTransparent()
+{
+	// 透過量が122より大きくなったら
+	if (m_transpVal >= MAX_TRANSP_VAL)
+	{
+		// 透過量を255に設定
+		m_transpVal = MAX_TRANSP_VAL - 1;
+		// 毎透過量を-1にする
+		m_permeationAmount *= TRANSP_MODERATION;
+	}
+	// 透過量が0より小さければ
+	else if (MAX_TRANSP_VAL / 2 >= m_transpVal)
+	{
+		// 透過量を設定
+		m_transpVal = MAX_TRANSP_VAL / 2 + 1;
+		// 毎透過量を1にする
+		m_permeationAmount *= TRANSP_MODERATION;
+	}
+	// 毎透過量を透過量に加算する
+	m_transpVal += m_permeationAmount;
 }

@@ -1,16 +1,16 @@
 #pragma once
 
 #include "SceneBase.h"
-#include "Nagatomo_PlayerActor.h"
-#include "Nagatomo_Camera.h"
+#include "PlayerActor.h"
+#include "Camera.h"
 
 class Nagatomo_PlayerActor;			//PlayerActor‚Ö‚ÌQÆ
 class Nagatomo_Camera;				//Camera‚Ö‚ÌQÆ
 
 class Ueyama_GameScene :public SceneBase
 {
-	Nagatomo_PlayerActor* player;
-	Nagatomo_Camera* camera;
+	PlayerActor* player;
+	Camera* camera;
 
 public:
 

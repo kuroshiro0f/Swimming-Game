@@ -12,6 +12,7 @@ public:
 		RESULT,
 		TIME,
 		MEDAL,
+		EVA,
 		ENTER,
 		FADE_OUT
 	};
@@ -24,6 +25,8 @@ public:
 	void Sound()override;			//	音楽
 	void Load()override;			//	初期化
 
+	void UpdateTransparent();			//	文字の透過量更新
+
 private:
 	RESULT_SCENE_STATE m_state;
 
@@ -33,17 +36,39 @@ private:
 	//	クリアタイム
 	int m_time;
 
+	//	時間管理
+	int m_resultTime;
+
+	//	星の拡大縮小の管理
+	int m_bigStarX1;
+	int m_bigStarX2;
+	int m_bigStarY1;
+	int m_bigStarY2;
+	int m_smallStarX1;
+	int m_smallStarX2;
+	int m_smallStarY1;
+	int m_smallStarY2;
+
+	// 文字の透過
+	int m_transpVal;				//	透過量
+	int m_fadeTransVal;				//	フェードアウト中の透過量
+	int m_permeationAmount;			//	毎フレーム透過量
+
 	//	グラフィックハンドル
 	int m_backGraphHandle;				//	背景
 	int m_logoGraphHandle;				//	ロゴ
 	int m_evaluationGraphHandle;		//	評価
 	int m_guidanceGraphHandle;			//	次のシーンへの案内
 	int m_medalGraphHandle;				//	メダル
+	int m_bigStarGraphHandle;			//	大きな星
+	int m_smallStarGraphHandle;			//	小さな星
 
 	//	サウンドハンドル
 	int m_bgmSoundHandle;				//	BGM
 
 	//	フラグ
+	int m_resultFlag;					//	リザルトの推移を管理する
+	bool m_starScallFlag;				//	星を拡大するか（しない場合は縮小）
 	bool m_checkKeyFlag;				//	キーが押されたままか
 	bool m_fadeOutFinishFlag;			//	フェードアウト終了
 };

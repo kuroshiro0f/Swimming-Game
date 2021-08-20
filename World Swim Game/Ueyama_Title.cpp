@@ -1,6 +1,6 @@
 #include "Ueyama_Title.h"
 #include "Ueyama_GameScene.h"
-#include "Yamaoka_GameScene.h"
+#include "GameScene.h"
 
 #include "DxLib.h"
 
@@ -19,12 +19,17 @@ const int FIRST_TRANS_VAL = 100;
 const int ADD_ALPHA_VAL = 2;
 const int ADD_ALPHA_VAL_2 = 5;
 
+//	円周率
+const double PI = 3.1415926535897932384626433832795f;
+
 Ueyama_Title::Ueyama_Title()
 	: m_state(TITLE_SCENE_STATE::FIRST)
 	, m_alphaVal(255)
 	, m_fadeOutFinishFlag(false)
 	, m_addAlphaVal(ADD_ALPHA_VAL)
 	, m_addAlphaVal2(ADD_ALPHA_VAL_2)
+	, m_bigDropAngle(PI)
+	, m_smallDropAngle(PI)
 {
 	if (CheckHitKey(KEY_INPUT_RETURN))
 	{
@@ -36,15 +41,21 @@ Ueyama_Title::Ueyama_Title()
 	m_fadeTransVal = FIRST_TRANS_VAL;
 	// 毎透過量変数を2に設定
 	m_permeationAmount = 2;
-
-	SetFontSize(m_normalFontSize);
 }
 
 Ueyama_Title::~Ueyama_Title()
 {
 	StopSoundMem(m_backSoundHandle);
 
+	//	メモリの解放
 	DeleteGraph(m_backGraphHandle);
+	DeleteGraph(m_logoGraphHandle);
+	DeleteGraph(m_startGuideGraphHandle);
+	DeleteGraph(m_manualGuideGraphHandle);
+	DeleteGraph(m_gateGraphHandle);
+	DeleteGraph(m_maouGraphHandle);
+	DeleteGraph(m_bigDropGraphHandle);
+	DeleteGraph(m_smallDropGraphHandle);
 	DeleteSoundMem(m_backSoundHandle);
 }
 
@@ -111,7 +122,7 @@ SceneBase* Ueyama_Title::Update(float _deltaTime)
 		if (m_fadeOutFinishFlag)
 		{
 			//return new Ueyama_GameScene();
-			return new Yamaoka_GameScene();
+			return new Ueyama_GameScene();
 		}
 		break;
 	default:
@@ -133,6 +144,9 @@ void Ueyama_Title::Draw()
 		// 描画
 		DrawGraph(0, 0, m_backGraphHandle, TRUE);			//	背景
 		DrawGraph(0, 0, m_logoGraphHandle, TRUE);			//	ロゴ
+
+		//DrawRotaGraph(0, 0, 1.0, m_bigDropAngle, m_bigDropGraphHandle, TRUE, FALSE);
+		//DrawRotaGraph(0, 0, 1.0, m_smallDropAngle, m_smallDropGraphHandle, TRUE, FALSE);
 
 		// 透過して描画
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, m_transpVal);
@@ -324,12 +338,14 @@ void Ueyama_Title::Sound()
 void Ueyama_Title::Load()
 {
 	//	グラフィックハンドルにセット
-	m_backGraphHandle = LoadGraph("data/img/Title/Title_back.png");				//	背景
+	m_backGraphHandle = LoadGraph("data/img/Title/Title_back2.png");			//	背景
 	m_logoGraphHandle = LoadGraph("data/img/Title/Title_logo.png");				//	ロゴ
 	m_startGuideGraphHandle = LoadGraph("data/img/Title/Title_start.png");		//	スタートの案内
 	m_manualGuideGraphHandle = LoadGraph("data/img/Title/Title_manual.png");	//	マニュアルへの案内
 	m_gateGraphHandle = LoadGraph("data/img/Title/GATE.png");					//	GATE
 	m_maouGraphHandle = LoadGraph("data/img/Title/maou.png");					//	魔王魂
+	m_bigDropGraphHandle = LoadGraph("data/img/Title/drop1.png");				//	大きな水滴
+	m_smallDropGraphHandle = LoadGraph("data/img/Title/drop2.png");				//	小さな水滴
 
 	//	モデルハンドルにセット
 	m_swimModelHandle = MV1LoadModel("data/asset/swim/natu12b.pmx");			//	泳ぐキャラ
