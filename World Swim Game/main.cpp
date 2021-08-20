@@ -6,7 +6,9 @@
 #include "SceneMgr.h"
 #include "Title.h"
 #include "GameScene.h"
-#include "Result.h"
+#include "Ueyama_Title.h"
+#include "Ueyama_GameScene.h"
+#include "Ueyama_Result.h"
 
 //-----------------------------------------------------------------------------
 // @brief  メイン関数.
@@ -38,7 +40,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	SceneMgr* Scene = new SceneMgr;
 
 	//	タイトルシーンをセット
-	Scene->SetScene(new Title());
+	Scene->SetScene(new Ueyama_Title());
 
 	// エスケープキーが押されるかウインドウが閉じられるまでループ
 	while (ProcessMessage() == 0 && CheckHitKey(KEY_INPUT_ESCAPE) == 0)
