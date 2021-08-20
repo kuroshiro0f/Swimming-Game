@@ -35,6 +35,8 @@ private:
 	int m_manualGuideGraphHandle;		//	マニュアルへの案内
 	int m_gateGraphHandle;				//	GATE
 	int m_maouGraphHandle;				//	魔王魂
+	int m_bigDropGraphHandle;			//	大きな水滴
+	int m_smallDropGraphHandle;			//	小さな水滴
 
 	//	サウンドハンドル
 	int m_backSoundHandle;				//	BGM
@@ -44,6 +46,10 @@ private:
 	int m_alphaVal;
 	int m_addAlphaVal;
 	int m_addAlphaVal2;
+
+	//	水滴の動き
+	double m_bigDropAngle;				//	大きな水滴
+	double m_smallDropAngle;			//	小さな水滴
 
 	// 文字の透過
 	int m_transpVal;				//	透過量

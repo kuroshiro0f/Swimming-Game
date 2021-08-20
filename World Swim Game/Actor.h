@@ -27,6 +27,15 @@ public:
 	{
 		mPosition = _set;
 	}
+	//ポジションのX座標のGetters/setters
+	const float& GetPosX() const
+	{
+		return mPosition.x;
+	}
+	void SetPosX(const float _set)
+	{
+		mPosition.x = _set;
+	}
 	//ディレクションのGetters/setters
 	const VECTOR& GetDir() const
 	{

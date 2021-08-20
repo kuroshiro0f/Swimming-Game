@@ -7,8 +7,9 @@ Camera::Camera(const PlayerActor& playerActor)
 	SetCameraNearFar(1.0f, 10000.0f);
 
 	//カメラのポジション設定
-	mPos = VGet(50, 60, 0);
-	mTempPos = mPos;
+	mPos = VGet(0, 60, 80);
+	//プレイヤーのポジションをコピーする用の変数を初期化
+	mTempPos = VGet(0, 0, 0);
 }
 
 // デストラクタ
@@ -20,9 +21,9 @@ Camera::~Camera()
 // 更新
 void Camera::Update(const PlayerActor& playerActor)
 {
-	mPos = VAdd(mTempPos, playerActor.GetPos());
+	//mTempPos = playerActor.GetPos();								//プレイヤーのポジションをmTempPosにコピー
+	mPos.x = playerActor.GetPosX();									//mTempPos(プレイヤー)のx座標をカメラのx座標に代入
 
-	// カメラに位置を反映.
-	SetCameraPositionAndTarget_UpVecY(mPos, playerActor.GetPos());
+	SetCameraPositionAndTarget_UpVecY(mPos, playerActor.GetPos());	// カメラに位置を反映.
 
 }

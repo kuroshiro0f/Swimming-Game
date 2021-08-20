@@ -1,8 +1,7 @@
 #include "GameScene.h"
 #include "Result.h"
 #include "Stage.h"
-#include "Actor.h"
-#include "Camera.h"
+#include "PlayerActor.h"
 
 #include "DxLib.h"
 
@@ -19,25 +18,19 @@ GameScene::GameScene()
 	, m_stage(nullptr)
 	, m_camera(nullptr)
 	, m_actor(nullptr)
-	, m_startTime(0)
-	, m_tmpTime(0)
-	, m_countUP(0)
 {
-	// 開始時の時間を取得
-	m_startTime = GetNowCount() / 1000;
-
 	// ステートセット(フェードインから)
 	m_state = GAME_SCENE_STATE::FADE_IN;
 }
 
 GameScene::~GameScene()
 {
+	StopSoundMem(m_bgmSoundHandle);
+	DeleteGraph(m_backGraphHandle);
+
 	delete m_stage;   // ステージのポインタメンバ変数を消去
 	delete m_camera;  // カメラのポインタメンバ変数を消去
 	delete m_actor;   // アクターのポインタメンバ変数を削除
-
-	StopSoundMem(m_bgmSoundHandle);
-	DeleteGraph(m_backGraphHandle);
 }
 
 SceneBase* GameScene::Update(float _deltaTime)
@@ -48,19 +41,17 @@ SceneBase* GameScene::Update(float _deltaTime)
 	switch (m_state)
 	{
 	case GAME_SCENE_STATE::FADE_IN:
-		break;
-	case GAME_SCENE_STATE::GAME:
 		//	ステージをセット
 		m_stage->Update();
-
 		//	アクターをセット
 		m_actor->Update(_deltaTime);
+		break;
+	case GAME_SCENE_STATE::GAME:
+		//	アクターを更新
 		m_actor->UpdateActor(_deltaTime);
 
-		//現在時刻を取得
-		m_tmpTime = GetNowCount() / 1000;
-		// 経過時間を計算  (-〇 は応急処置)
-		m_countUP = (m_tmpTime - m_startTime) - 9;
+		//	カウントダウン開始
+		m_actor->countDown--;
 
 		// ※キー入力重複対策のフラグ
 		// ENTERキーから指を離したら、次のENTERの入力を有効に
@@ -69,12 +60,9 @@ SceneBase* GameScene::Update(float _deltaTime)
 			m_checkKeyFlag = false;
 		}
 
-		// ENTERで次のステートへ
-		if (CheckHitKey(KEY_INPUT_RETURN) && m_checkKeyFlag == false)
+		//端まで行くと次のステートへ
+		if (m_actor->GetPosX() <= -136)
 		{
-			// ※キー入力重複対策のフラグ
-			m_checkKeyFlag = true;
-
 			m_state = GAME_SCENE_STATE::FADE_OUT;
 		}
 
@@ -83,7 +71,7 @@ SceneBase* GameScene::Update(float _deltaTime)
 		if (m_fadeOutFinishFlag)
 		{
 			//	経過時間をリザルトに渡す
-			return new Result(m_countUP);	//	リザルトシーンに切り替える
+			return new Result(m_actor->countUP);	//	リザルトシーンに切り替える
 		}
 		break;
 	default:
@@ -103,7 +91,7 @@ void GameScene::Draw()
 
 	//	タイムの表示
 	DrawBox(1550, 830, 1850, 880, GetColor(0, 255, 255), TRUE);
-	DrawFormatString(1600, 835, GetColor(0, 0, 0), "TIME   %d", m_countUP);
+	DrawFormatString(1600, 835, GetColor(0, 0, 0), "TIME   %d", m_actor->countUP);
 
 	// プレイヤー描画
 	m_actor->DrawActor();
@@ -122,6 +110,19 @@ void GameScene::Draw()
 	SetFontSize(100);
 	DrawFormatString(750, 800, GetColor(0, 0, 0), "←");
 	DrawFormatString(1050, 800, GetColor(0, 0, 0), "→");
+
+	SetFontSize(35);
+	// スタミナゲージの表示
+	m_actor->DrawSt(m_actor->st, m_actor->MaxSt, m_actor->MinSt);
+	// 残り距離の表示
+	m_actor->DrawToGoal(m_actor->dCount, m_actor->maxdCount);
+
+	// カウントダウンの表示
+	if (m_actor->countDown >= 0)
+	{
+		SetFontSize(150);
+		DrawFormatString(800, 400, GetColor(0, 0, 0), " %d ", m_actor->countDown / 60 + 1);
+	}
 
 	//	フェードイン処理
 	if (m_state == GAME_SCENE_STATE::FADE_IN)

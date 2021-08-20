@@ -30,8 +30,31 @@ public:
 	void UpdateActor(float _deltaTime) override;
 	void StartProcess(float _deltaTime);
 	void DrawActor();
-	void PlayAnim();
+	void PlayAnim(float _deltaTime);
 	void attachAnim(int _animPlay);
+
+	// スタミナゲージの描画
+	void DrawSt(int _st, int _MaxSt, int _MinSt);
+	// ゴールまでの距離の描画
+	void DrawToGoal(float _playerPos, float _goalPos);
+
+
+	// ゴールまでの距離 //
+	float dCount;      // どれだけ進んだか        
+	float maxdCount;   // どこまで進めるのか
+	int NowPos;    // プレイヤーの現在座標
+	// 未完成 //
+
+	int st;      // スタミナ
+	int MaxSt;   // スタミナ最大値
+	int MinSt;   // スタミナ最小値
+
+	int startTime;   // ゲーム開始時間
+	int tmpTime;     // 現在時間を一時保存
+	int countUP;     // 経過時間
+
+	int count;       // 次のシーンに行くまでのカウント    
+	int countDown;
 
 private:
 	PLAYER_STATE_ENUM mNowPlayerState;	//プレイヤーの今の状態

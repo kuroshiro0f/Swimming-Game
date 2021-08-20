@@ -1,5 +1,7 @@
 #pragma once
 #include "SceneBase.h"
+#include "PlayerActor.h"
+#include "Camera.h"
 
 class PlayerActor;			//PlayerActorへの参照
 class Camera;				//Cameraへの参照
@@ -10,6 +12,7 @@ class GameScene :public SceneBase
 	Camera* camera;
 
 public:
+	//int m_countUP;                  // 経過時間
 
 	enum class GAME_SCENE_STATE
 	{
@@ -40,8 +43,4 @@ private:
 	class Stage* m_stage;   // ステージクラスへのポインタメンバ変数
 	class Camera* m_camera;	// カメラクラスへのポインタメンバ変数
 	class PlayerActor* m_actor;   // アクタークラスへのポインタメンバ変数
-
-	int m_startTime;                // ゲーム開始時間
-	int m_tmpTime;                  // 現在時間を一時保存
-	int m_countUP;                  // 経過時間
 };

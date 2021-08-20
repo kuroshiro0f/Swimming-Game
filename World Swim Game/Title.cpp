@@ -18,12 +18,17 @@ const int FIRST_TRANS_VAL = 100;
 const int ADD_ALPHA_VAL = 2;
 const int ADD_ALPHA_VAL_2 = 5;
 
+//	円周率
+const double PI = 3.1415926535897932384626433832795f;
+
 Title::Title()
 	: m_state(TITLE_SCENE_STATE::FIRST)
 	, m_alphaVal(255)
 	, m_fadeOutFinishFlag(false)
 	, m_addAlphaVal(ADD_ALPHA_VAL)
 	, m_addAlphaVal2(ADD_ALPHA_VAL_2)
+	, m_bigDropAngle(PI)
+	, m_smallDropAngle(PI)
 {
 	if (CheckHitKey(KEY_INPUT_RETURN))
 	{
@@ -35,13 +40,10 @@ Title::Title()
 	m_fadeTransVal = FIRST_TRANS_VAL;
 	// 毎透過量変数を2に設定
 	m_permeationAmount = 2;
-
-	SetFontSize(m_normalFontSize);
 }
 
 Title::~Title()
 {
-	//	曲を止める
 	StopSoundMem(m_backSoundHandle);
 
 	//	メモリの解放
@@ -51,6 +53,8 @@ Title::~Title()
 	DeleteGraph(m_manualGuideGraphHandle);
 	DeleteGraph(m_gateGraphHandle);
 	DeleteGraph(m_maouGraphHandle);
+	DeleteGraph(m_bigDropGraphHandle);
+	DeleteGraph(m_smallDropGraphHandle);
 	DeleteSoundMem(m_backSoundHandle);
 }
 
@@ -164,32 +168,6 @@ void Title::Draw()
 
 	if (m_state == TITLE_SCENE_STATE::FIRST)
 	{
-		//	Titleの場合
-
-		////	描画
-		//DrawGraph(0, 0, m_gateGraphHandle, TRUE);			//	GATE
-
-		//// アルファ値の減算
-		//m_alphaVal -= m_addAlphaVal;
-
-		//// アルファブレンド有効化(ここでアルファ値をセット)
-		//SetDrawBlendMode(DX_BLENDMODE_ALPHA, m_alphaVal);
-
-		//// 画面全体に任意のカラーの四角形を描画
-		//DrawBox(0, 0, SCREEN_SIZE_W, SCREEN_SIZE_H, GetColor(0, 0, 0), TRUE);
-
-		//// アルファブレンド無効化
-		//SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-
-		//// アルファ値が最大(255)になったらフェードアウト終了
-		//if (m_alphaVal <= 92)
-		//{
-		//	m_state = TITLE_SCENE_STATE::SECOND;
-		//	m_alphaVal = 255;
-		//}
-
-		//	Title2の場合
-
 		//	描画
 		DrawGraph(0, 0, m_gateGraphHandle, TRUE);			//	GATE
 
@@ -215,32 +193,6 @@ void Title::Draw()
 
 	if (m_state == TITLE_SCENE_STATE::SECOND)
 	{
-		//	Titleの場合
-
-		////	描画
-		//DrawGraph(0, 0, m_maouGraphHandle, TRUE);			//	魔王魂
-
-		//// アルファ値の減算
-		//m_alphaVal -= m_addAlphaVal;
-
-		//// アルファブレンド有効化(ここでアルファ値をセット)
-		//SetDrawBlendMode(DX_BLENDMODE_ALPHA, m_alphaVal);
-
-		//// 画面全体に任意のカラーの四角形を描画
-		//DrawBox(0, 0, SCREEN_SIZE_W, SCREEN_SIZE_H, GetColor(0, 0, 0), TRUE);
-
-		//// アルファブレンド無効化
-		//SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 60);
-
-		//// アルファ値が最大(255)になったらフェードアウト終了
-		//if (m_alphaVal <= 92)
-		//{
-		//	m_state = TITLE_SCENE_STATE::FADE_IN;
-		//	m_alphaVal = 255;
-		//}
-
-		//	Title2の場合
-
 		//	描画
 		DrawGraph(0, 0, m_maouGraphHandle, TRUE);			//	魔王魂
 
@@ -318,12 +270,14 @@ void Title::Sound()
 void Title::Load()
 {
 	//	グラフィックハンドルにセット
-	m_backGraphHandle = LoadGraph("data/img/Title/Title_back.png");				//	背景
+	m_backGraphHandle = LoadGraph("data/img/Title/Title_back2.png");			//	背景
 	m_logoGraphHandle = LoadGraph("data/img/Title/Title_logo.png");				//	ロゴ
 	m_startGuideGraphHandle = LoadGraph("data/img/Title/Title_start.png");		//	スタートの案内
 	m_manualGuideGraphHandle = LoadGraph("data/img/Title/Title_manual.png");	//	マニュアルへの案内
 	m_gateGraphHandle = LoadGraph("data/img/Title/GATE.png");					//	GATE
 	m_maouGraphHandle = LoadGraph("data/img/Title/maou.png");					//	魔王魂
+	m_bigDropGraphHandle = LoadGraph("data/img/Title/drop1.png");				//	大きな水滴
+	m_smallDropGraphHandle = LoadGraph("data/img/Title/drop2.png");				//	小さな水滴
 
 	//	サウンドハンドルにセット
 	m_backSoundHandle = LoadSoundMem("data/sound/Title/Title2.ogg");		//	BGM
