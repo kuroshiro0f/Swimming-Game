@@ -4,14 +4,15 @@
 #include "Nagatomo_Camera.h"
 
 class Nagatomo_PlayerActor;			//PlayerActorへの参照
-class Nagatomo_Camera;				//Cameraへの参照
+class Camera;				//Cameraへの参照
 
-class Nagatomo_GameScene : public SceneBase
+class GameScene : public SceneBase
 {
 	Nagatomo_PlayerActor* player;
-	Nagatomo_Camera* camera;
+	Camera* camera;
 
 public:
+	int m_countUP;                  // 経過時間
 
 	enum class GAME_SCENE_STATE
 	{
@@ -20,8 +21,8 @@ public:
 		FADE_OUT
 	};
 
-	Nagatomo_GameScene();				//	コンストラクタ
-	~Nagatomo_GameScene();			    //	デストラクタ
+	GameScene();				//	コンストラクタ
+	~GameScene();			    //	デストラクタ
 
 	SceneBase* Update(float _deltaTime)override;	//	更新
 	void Draw()override;			//	描画
@@ -41,11 +42,11 @@ private:
 	bool m_checkKeyFlag;			//	キーが押されたままかを判定するフラグ
 	bool m_fadeOutFinishFlag;		//	フェードアウトの終了判定フラグ
 
-	class Nagatomo_Stage* m_stage;   // ステージクラスへのポインタメンバ変数
-	class Nagatomo_Camera* m_camera; // カメラクラスへのポインタメンバ変数
+	class Stage* m_stage;   // ステージクラスへのポインタメンバ変数
+	class Camera* m_camera; // カメラクラスへのポインタメンバ変数
 	class Nagatomo_PlayerActor* m_actor;   // アクタークラスへのポインタメンバ変数
 
 	int m_startTime;                // ゲーム開始時間
 	int m_tmpTime;                  // 現在時間を一時保存
-	int m_countUP;                  // 経過時間
+	//int m_countUP;                  // 経過時間
 };

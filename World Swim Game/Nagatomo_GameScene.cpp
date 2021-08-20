@@ -1,7 +1,7 @@
 #include "Nagatomo_GameScene.h"
 
 #include "Nagatomo_Result.h"
-#include "Nagatomo_Stage.h"
+#include "Stage.h"
 #include "Nagatomo_PlayerActor.h"
 
 #include "DxLib.h"
@@ -13,7 +13,7 @@ const int SCREEN_SIZE_H = 1080;
 // フェードイン・フェードアウトの速度
 const int addAlphaVal = 5;
 
-Nagatomo_GameScene::Nagatomo_GameScene()
+GameScene::GameScene()
 	: m_alphaVal(255)
 	, m_fadeOutFinishFlag(false)
 	, m_stage(nullptr)
@@ -31,7 +31,7 @@ Nagatomo_GameScene::Nagatomo_GameScene()
 
 }
 
-Nagatomo_GameScene::~Nagatomo_GameScene()
+GameScene::~GameScene()
 {
 	StopSoundMem(m_bgmSoundHandle);
 	DeleteGraph(m_backGraphHandle);
@@ -41,7 +41,7 @@ Nagatomo_GameScene::~Nagatomo_GameScene()
 	delete m_actor;   // アクターのポインタメンバ変数を削除
 }
 
-SceneBase* Nagatomo_GameScene::Update(float _deltaTime)
+SceneBase* GameScene::Update(float _deltaTime)
 {
 	m_camera->Update(*m_actor);
 
@@ -53,6 +53,11 @@ SceneBase* Nagatomo_GameScene::Update(float _deltaTime)
 		m_stage->Update();
 		m_actor->Update(_deltaTime);
 		m_actor->UpdateActor(_deltaTime);
+
+		//現在時刻を取得
+		m_tmpTime = GetNowCount() / 1000;
+		// 経過時間を計算  (-〇 は応急処置)
+		m_countUP = (m_tmpTime - m_startTime)-5;
 
 		// ※キー入力重複対策のフラグ
 		// ENTERキーから指を離したら、次のENTERの入力を有効に
@@ -70,12 +75,19 @@ SceneBase* Nagatomo_GameScene::Update(float _deltaTime)
 			m_state = GAME_SCENE_STATE::FADE_OUT;
 		}
 
+		//端まで行くと次のステートへ
+		if (m_actor->GetPosX() <= -136)
+		{
+			m_state = GAME_SCENE_STATE::FADE_OUT;
+		}
+
 		break;
 	case GAME_SCENE_STATE::FADE_OUT:
 		if (m_fadeOutFinishFlag)
 		{
-			return new Nagatomo_Result();				//	リザルトシーンに切り替える
+			return new Result(m_countUP);				//	リザルトシーンに切り替える
 		}
+
 		break;
 	default:
 		break;
@@ -83,7 +95,7 @@ SceneBase* Nagatomo_GameScene::Update(float _deltaTime)
 	return this;
 }
 
-void Nagatomo_GameScene::Draw()
+void GameScene::Draw()
 {
 	//	背景
 	DrawGraph(0, 0, m_backGraphHandle, TRUE);
@@ -93,7 +105,7 @@ void Nagatomo_GameScene::Draw()
 	SetFontSize(40);
 	// 
 	DrawBox(1450, 800, 1750, 890, GetColor(0, 255, 255), TRUE);
-	DrawFormatString(1500, 800, GetColor(0, 0, 0), "TIME   %d", m_countUP - 11);
+	DrawFormatString(1500, 800, GetColor(0, 0, 0), "TIME   %d", m_countUP);
 
 	// プレイヤー描画
 	m_actor->DrawActor();
@@ -102,8 +114,8 @@ void Nagatomo_GameScene::Draw()
 	DrawBox(750, 600, 850, 700, GetColor(0, 0, 0), FALSE);
 	DrawBox(1050, 600, 1150, 700, GetColor(0, 0, 0), FALSE);
 	SetFontSize(100);
-	DrawFormatString(770, 600, GetColor(0, 0, 0), "A");
-	DrawFormatString(1070, 600, GetColor(0, 0, 0), "D");
+	DrawFormatString(770, 600, GetColor(0, 0, 0), "←");
+	DrawFormatString(1070, 600, GetColor(0, 0, 0), "→");
 
 	//	フェードイン処理
 	if (m_state == GAME_SCENE_STATE::FADE_IN)
@@ -153,7 +165,7 @@ void Nagatomo_GameScene::Draw()
 	}
 }
 
-void Nagatomo_GameScene::Sound()
+void GameScene::Sound()
 {
 	if (m_state == GAME_SCENE_STATE::GAME)
 	{
@@ -162,7 +174,7 @@ void Nagatomo_GameScene::Sound()
 	}
 }
 
-void Nagatomo_GameScene::Load()
+void GameScene::Load()
 {
 	// グラフィックハンドルにセット
 	m_backGraphHandle = LoadGraph("data/img/Game/gameBackTest.png");		//	背景
@@ -171,9 +183,9 @@ void Nagatomo_GameScene::Load()
 	m_bgmSoundHandle = LoadSoundMem("data/sound/Game/gameBgmTest.mp3");			//	BGM
 
 	// ステージクラスのインスタンスを生成
-	m_stage = new Nagatomo_Stage;
+	m_stage = new Stage;
 	// アクタークラスへのインスタンスを生成
 	m_actor = new Nagatomo_PlayerActor;
 	// カメラクラスへのインスタンスを生成
-	m_camera = new Nagatomo_Camera(*m_actor);
+	m_camera = new Camera(*m_actor);
 }
