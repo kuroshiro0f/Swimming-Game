@@ -41,7 +41,4 @@ private:
 	class Camera* m_camera;	// カメラクラスへのポインタメンバ変数
 	class Yamaoka_PlayerActor* m_actor;   // アクタークラスへのポインタメンバ変数
 
-	int m_startTime;                // ゲーム開始時間
-	int m_tmpTime;                  // 現在時間を一時保存
-	int m_countUP;                  // 経過時間
 };

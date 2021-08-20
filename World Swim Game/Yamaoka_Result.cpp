@@ -1,23 +1,38 @@
 #include "Yamaoka_Result.h"
-#include "Ueyama_Title.h"
+#include "Title.h"
 
 #include "DxLib.h"
 
+//	スクリーンのサイズ
 const int SCREEN_SIZE_W = 1920;
 const int SCREEN_SIZE_H = 1080;
 
+//	タイム表示する白い四角の場所の座標
+const int SQUARE_START_X = 30;
+const int SQUARE_START_Y = 370;
+const int SQUARE_END_X = 1100;
+const int SQUARE_END_Y = 1030;
+
+// タイムを表示する場所
+const int TIME_X = (SQUARE_END_X - SQUARE_START_X) / 2 - 40;
+const int TIME_Y = (SQUARE_END_Y - SQUARE_START_Y) - 10;
+
+//	フェードイン・フェードアウトの速度
 const int addAlphaVal = 5;
 
-Yamaoka_Result::Yamaoka_Result(const int& _time)
+
+Yamaoka_Result::Yamaoka_Result(const int _time)
 	: m_alphaVal(255)
 	, m_fadeOutFinishFlag(false)
+	//-----------------------//
 	, m_time(_time)
+	//-----------------------//
 {
 	// ※キー入力重複対策のフラグ
 	// ENTERキーが押されている間、次のENTERの入力を無効に
 	if (CheckHitKey(KEY_INPUT_RETURN))
 	{
-		m_checkKeyFlag = true;
+		m_checkKeyFlag = TRUE;
 	}
 
 	//	フェードインから始める
@@ -60,7 +75,7 @@ SceneBase* Yamaoka_Result::Update(float _deltaTime)
 		//	フェードアウトが終わったらタイトルへ
 		if (m_fadeOutFinishFlag)
 		{
-			return new Ueyama_Title();
+			return new Title();
 		}
 
 		break;
@@ -72,11 +87,24 @@ SceneBase* Yamaoka_Result::Update(float _deltaTime)
 
 void Yamaoka_Result::Draw()
 {
+	//	描画
 	DrawGraph(0, 0, m_backGraphHandle, TRUE);			//	背景
 	DrawGraph(0, 0, m_logoGraphHandle, TRUE);			//	ロゴ
 	DrawGraph(0, 0, m_evaluationGraphHandle, TRUE);		//	評価
 	DrawGraph(0, 0, m_guidanceGraphHandle, TRUE);		//	案内
 	DrawGraph(0, 0, m_medalGraphHandle, TRUE);			//	メダル
+
+	// 透過して描画
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 190);
+	DrawBox(SQUARE_START_X, SQUARE_START_Y, SQUARE_END_X, SQUARE_END_Y, GetColor(255, 255, 255), TRUE);
+	// 透過を元に戻す
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+
+	//-------------------------------------------------------------------------//
+	// 時間を表示
+	SetFontSize(40);
+	DrawFormatString(TIME_X, TIME_Y, GetColor(255, 0, 0), "%d  秒", m_time);
+	//-------------------------------------------------------------------------//
 
 	//	フェードイン処理
 	if (m_state == RESULT_SCENE_STATE::FADE_IN)
@@ -99,8 +127,6 @@ void Yamaoka_Result::Draw()
 			m_state = RESULT_SCENE_STATE::RESULT;
 		}
 	}
-
-	DrawFormatString(300, 500, GetColor(255, 255, 0), "YOUR TIME   %d", m_time);
 
 	// フェードアウト処理
 	if (m_state == RESULT_SCENE_STATE::FADE_OUT)
@@ -126,9 +152,8 @@ void Yamaoka_Result::Draw()
 
 void Yamaoka_Result::Sound()
 {
-	//	BGMを流す
 	PlaySoundMem(m_bgmSoundHandle, DX_PLAYTYPE_BACK, FALSE);
-	ChangeVolumeSoundMem(m_volumePal, m_bgmSoundHandle);			//	音量
+	ChangeVolumeSoundMem(m_volumePal, m_bgmSoundHandle);
 }
 
 void Yamaoka_Result::Load()
@@ -141,5 +166,5 @@ void Yamaoka_Result::Load()
 	m_medalGraphHandle = LoadGraph("data/img/Result/Result_gold.png");			//	メダル
 
 	//	サウンドハンドルにセット
-	m_bgmSoundHandle = LoadSoundMem("data/sound/Result/resultBgmTest.mp3");			//	BGM
+	m_bgmSoundHandle = LoadSoundMem("data/sound/Result/Result.ogg");			//	BGM
 }

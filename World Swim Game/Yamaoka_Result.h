@@ -10,10 +10,13 @@ public:
 	{
 		FADE_IN,
 		RESULT,
+		TIME,
+		MEDAL,
+		ENTER,
 		FADE_OUT
 	};
 
-	Yamaoka_Result(const int& _time);			//	コンストラクタ
+	Yamaoka_Result(const int _time);			//	コンストラクタ
 	~Yamaoka_Result();			//　デストラクタ
 
 	SceneBase* Update(float _deltaTime)override;	//	更新
@@ -41,5 +44,7 @@ private:
 	bool m_checkKeyFlag;				//	キーが押されたままか
 	bool m_fadeOutFinishFlag;			//	フェードアウト終了
 
-	int m_time;                        // クリアタイム格納変数
+	//---------------//
+	int m_time;                        // ゲームシーンからの時間を格納
+	//--------------//
 };
