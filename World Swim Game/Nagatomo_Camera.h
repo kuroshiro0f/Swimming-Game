@@ -6,13 +6,13 @@
 
 class Nagatomo_PlayerActor;      //プレイヤークラスへの参照
 
-class Nagatomo_Camera
+class Camera
 {
 public:
 	// コンストラクタ
-	Nagatomo_Camera(const Nagatomo_PlayerActor& playerActor);
+	Camera(const Nagatomo_PlayerActor& playerActor);
 	// デストラクタ
-	~Nagatomo_Camera();
+	~Camera();
 
 	// 更新
 	void Update(const Nagatomo_PlayerActor& playerActor);
