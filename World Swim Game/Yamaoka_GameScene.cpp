@@ -1,8 +1,6 @@
 #include "Yamaoka_GameScene.h"
 #include "Result.h"
 #include "Stage.h"
-#include "Actor.h"
-#include "Yamaoka_Camera.h"
 #include "Yamaoka_PlayerActor.h"
 
 #include "DxLib.h"
@@ -27,12 +25,12 @@ GameScene::GameScene()
 
 GameScene::~GameScene()
 {
+	StopSoundMem(m_bgmSoundHandle);
+	DeleteGraph(m_backGraphHandle);
+
 	delete m_stage;   // ステージのポインタメンバ変数を消去
 	delete m_camera;  // カメラのポインタメンバ変数を消去
 	delete m_actor;   // アクターのポインタメンバ変数を削除
-
-	StopSoundMem(m_bgmSoundHandle);
-	DeleteGraph(m_backGraphHandle);
 }
 
 SceneBase* GameScene::Update(float _deltaTime)
@@ -47,12 +45,12 @@ SceneBase* GameScene::Update(float _deltaTime)
 		m_stage->Update();
 		//	アクターをセット
 		m_actor->Update(_deltaTime);
-
 		break;
 	case GAME_SCENE_STATE::GAME:
-		//	アクターをセット
+		//	アクターを更新
 		m_actor->UpdateActor(_deltaTime);
 
+		//	カウントダウン開始
 		m_actor->countDown--;
 
 		// ※キー入力重複対策のフラグ
@@ -62,12 +60,15 @@ SceneBase* GameScene::Update(float _deltaTime)
 			m_checkKeyFlag = false;
 		}
 
-		// ENTERで次のステートへ
-		if (m_actor->count <= 0)
+		// 端まで行くと次のステートへ
+		/*if (m_actor->dCount <= 0)
 		{
-			// ※キー入力重複対策のフラグ
-			m_checkKeyFlag = true;
+			m_state = GAME_SCENE_STATE::FADE_OUT;
+		}*/
 
+		// デバッグ用
+		if (CheckHitKey(KEY_INPUT_RETURN))
+		{
 			m_state = GAME_SCENE_STATE::FADE_OUT;
 		}
 
@@ -92,9 +93,9 @@ void GameScene::Draw()
 
 	// ステージの描画
 	m_stage->Draw();
-
 	SetFontSize(40);
-	// タイムの表示
+
+	//	タイムの表示
 	DrawBox(1550, 830, 1850, 880, GetColor(0, 255, 255), TRUE);
 	DrawFormatString(1600, 835, GetColor(0, 0, 0), "TIME   %d", m_actor->countUP);
 
@@ -122,13 +123,16 @@ void GameScene::Draw()
 	// 残り距離の表示
 	m_actor->DrawToGoal(m_actor->dCount, m_actor->maxdCount);
 
-	// カウントダウンの表示
+	// スキル
+	m_actor->Skill(m_actor->dCount, m_actor->maxdCount);
+
+	// カウントダウンの表示 ( 3秒 )
 	if (m_actor->countDown >= 0)
 	{
 		SetFontSize(150);
 		DrawFormatString(800, 400, GetColor(0, 0, 0), " %d ", m_actor->countDown / 60 + 1);
 	}
-	
+
 	//	フェードイン処理
 	if (m_state == GAME_SCENE_STATE::FADE_IN)
 	{
@@ -193,7 +197,7 @@ void GameScene::Load()
 	// ステージクラスのインスタンスを生成
 	m_stage = new Stage();
 	// アクタークラスへのインスタンスを生成
-	m_actor = new Yamaoka_PlayerActor();
+	m_actor = new Yamaoka_PlayerActor;
 	// カメラクラスへのインスタンスを生成
 	m_camera = new Camera(*m_actor);
 }
