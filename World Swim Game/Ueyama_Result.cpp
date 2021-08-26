@@ -90,7 +90,7 @@ Ueyama_Result::~Ueyama_Result()
 	{
 		DeleteGraph(m_medalGraphHandle);
 		DeleteGraph(m_evaluationGraphHandle);
-		
+
 	}
 	if (m_time > FIRST && m_time <= SECOND)
 	{
@@ -335,7 +335,7 @@ void Ueyama_Result::Draw()
 			m_smallStarY2--;
 		}
 	}
-	
+
 	//	フェードイン処理
 	if (m_state == RESULT_SCENE_STATE::FADE_IN)
 	{
@@ -385,6 +385,31 @@ void Ueyama_Result::Sound()
 	//	BGMを流す
 	PlaySoundMem(m_bgmSoundHandle, DX_PLAYTYPE_BACK, FALSE);
 	ChangeVolumeSoundMem(m_volumePal, m_bgmSoundHandle);			//	音量
+	switch (m_resultFlag)
+	{
+	case 1:
+		//	効果音を流す
+		PlaySoundMem(m_se1SoundHandle, DX_PLAYTYPE_BACK, FALSE);
+		ChangeVolumeSoundMem(m_volumePal, m_se1SoundHandle);			//	音量
+		break;
+	case 2:
+		//	効果音を流す
+		PlaySoundMem(m_se2SoundHandle, DX_PLAYTYPE_BACK, FALSE);
+		ChangeVolumeSoundMem(m_volumePal, m_se2SoundHandle);			//	音量
+		break;
+	case 3:
+		//	効果音を流す
+		PlaySoundMem(m_se3SoundHandle, DX_PLAYTYPE_BACK, FALSE);
+		ChangeVolumeSoundMem(m_volumePal, m_se3SoundHandle);			//	音量
+		break;
+	case 4:
+		//	効果音を流す
+		PlaySoundMem(m_se4SoundHandle, DX_PLAYTYPE_BACK, FALSE);
+		ChangeVolumeSoundMem(m_volumePal, m_se4SoundHandle);			//	音量
+		break;
+	default:
+		break;
+	}
 }
 
 void Ueyama_Result::Load()
@@ -413,6 +438,10 @@ void Ueyama_Result::Load()
 
 	//	サウンドハンドルにセット
 	m_bgmSoundHandle = LoadSoundMem("data/sound/Result/Result.ogg");				//	BGM
+	m_se1SoundHandle = LoadSoundMem("data/sound/Result/TestSE.mp3");				//	効果音
+	m_se2SoundHandle = LoadSoundMem("data/sound/Result/TestSE.mp3");				//	効果音
+	m_se3SoundHandle = LoadSoundMem("data/sound/Result/TestSE.mp3");				//	効果音
+	m_se4SoundHandle = LoadSoundMem("data/sound/Result/TestSE.mp3");				//	効果音
 }
 
 void Ueyama_Result::UpdateTransparent()

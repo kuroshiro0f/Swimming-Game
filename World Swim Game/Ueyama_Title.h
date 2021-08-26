@@ -48,8 +48,8 @@ private:
 
 	//	アルファ値
 	int m_alphaVal;
-	int m_addAlphaVal;
-	int m_addAlphaVal2;
+	float m_addAlphaVal;
+	float m_addAlphaVal2;
 
 	//	水滴の動き
 	double m_bigDropAngle;				//	大きな水滴
@@ -59,6 +59,9 @@ private:
 	int m_transpVal;				//	透過量
 	int m_fadeTransVal;				//	フェードアウト中の透過量
 	int m_permeationAmount;			//	毎フレーム透過量
+
+	//	デルタタイム
+	float m_deltaTime;
 
 	bool m_checkKeyFlag;			//	キーが押されたままかを判定するフラグ
 	bool m_fadeOutFinishFlag;		//	フェードアウトの終了判定フラグ
