@@ -12,7 +12,7 @@ class GameScene : public SceneBase
 	Camera* camera;
 
 public:
-	int m_countUP;                  // 経過時間
+	//int m_countUP;                  // 経過時間
 
 	enum class GAME_SCENE_STATE
 	{
@@ -46,7 +46,5 @@ private:
 	class Camera* m_camera; // カメラクラスへのポインタメンバ変数
 	class Nagatomo_PlayerActor* m_actor;   // アクタークラスへのポインタメンバ変数
 
-	int m_startTime;                // ゲーム開始時間
-	int m_tmpTime;                  // 現在時間を一時保存
-	//int m_countUP;                  // 経過時間
+
 };
