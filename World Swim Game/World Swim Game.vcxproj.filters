@@ -102,8 +102,11 @@
     <ClInclude Include="Yamaoka_PlayerActor.h">
       <Filter>ソース ファイル\work\Yamaoka</Filter>
     </ClInclude>
-    <ClInclude Include="Yamaoka_Result.h">
-      <Filter>ソース ファイル\work\Yamaoka</Filter>
+    <ClInclude Include="Ueyama_PlayerActor.h">
+      <Filter>ソース ファイル\work\Ueyama</Filter>
+    </ClInclude>
+    <ClInclude Include="Ueyama_Camera.h">
+      <Filter>ソース ファイル\work\Ueyama</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -191,8 +194,11 @@
     <ClCompile Include="Yamaoka_PlayerActor.cpp">
       <Filter>ソース ファイル\work\Yamaoka</Filter>
     </ClCompile>
-    <ClCompile Include="Yamaoka_Result.cpp">
-      <Filter>ソース ファイル\work\Yamaoka</Filter>
+    <ClCompile Include="Ueyama_PlayerActor.cpp">
+      <Filter>ソース ファイル\work\Ueyama</Filter>
+    </ClCompile>
+    <ClCompile Include="Ueyama_Camera.cpp">
+      <Filter>ソース ファイル\work\Ueyama</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

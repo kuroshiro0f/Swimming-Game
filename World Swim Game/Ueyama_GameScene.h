@@ -1,16 +1,16 @@
 #pragma once
 
 #include "SceneBase.h"
-#include "PlayerActor.h"
-#include "Camera.h"
+#include "Ueyama_PlayerActor.h"
+#include "Ueyama_Camera.h"
 
-class Nagatomo_PlayerActor;			//PlayerActorへの参照
-class Nagatomo_Camera;				//Cameraへの参照
+class Ueyama_PlayerActor;			//PlayerActorへの参照
+class Ueyama_Camera;				//Cameraへの参照
 
 class Ueyama_GameScene :public SceneBase
 {
-	PlayerActor* player;
-	Camera* camera;
+	Ueyama_PlayerActor* player;
+	Ueyama_Camera* camera;
 
 public:
 
@@ -32,7 +32,7 @@ public:
 private:
 	GAME_SCENE_STATE m_state;
 	int m_backGraphHandle;			//	背景のグラフィックハンドル
-	int m_bgmSoundHandle;				//	ゲーム画面・サウンドハンドル
+	int m_bgmSoundHandle;			//	ゲーム画面・サウンドハンドル
 
 	//	アルファ値
 	int m_alphaVal;
@@ -40,6 +40,7 @@ private:
 	bool m_checkKeyFlag;			//	キーが押されたままかを判定するフラグ
 	bool m_fadeOutFinishFlag;		//	フェードアウトの終了判定フラグ
 
-	//	時間
-	int m_time;
+	class Stage* m_stage;   // ステージクラスへのポインタメンバ変数
+	class Ueyama_Camera* m_camera;	// カメラクラスへのポインタメンバ変数
+	class Ueyama_PlayerActor* m_actor;   // アクタークラスへのポインタメンバ変数
 };

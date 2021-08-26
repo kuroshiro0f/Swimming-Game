@@ -16,15 +16,14 @@ const int TRANSP_MODERATION = -1;
 const int FIRST_TRANS_VAL = 100;
 
 //	フェードイン・フェードアウトの速度
-const int ADD_ALPHA_VAL = 2;
-const int ADD_ALPHA_VAL_2 = 5;
-
+const float ADD_ALPHA_VAL = 65.0f;
+const float ADD_ALPHA_VAL_2 = 300.0f;
 //	円周率
 const double PI = 3.1415926535897932384626433832795f;
 
 Ueyama_Title::Ueyama_Title()
 	: m_state(TITLE_SCENE_STATE::FIRST)
-	, m_alphaVal(255)
+	, m_alphaVal(300)
 	, m_fadeOutFinishFlag(false)
 	, m_addAlphaVal(ADD_ALPHA_VAL)
 	, m_addAlphaVal2(ADD_ALPHA_VAL_2)
@@ -128,6 +127,9 @@ SceneBase* Ueyama_Title::Update(float _deltaTime)
 	default:
 		break;
 	}
+
+	m_deltaTime = _deltaTime;
+
 	return this;
 }
 
@@ -181,91 +183,41 @@ void Ueyama_Title::Draw()
 		// 透過を元に戻す
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 	}
-	
+
 	if (m_state == TITLE_SCENE_STATE::FIRST)
 	{
-		//	Titleの場合
-
-		////	描画
-		//DrawGraph(0, 0, m_gateGraphHandle, TRUE);			//	GATE
-
-		//// アルファ値の減算
-		//m_alphaVal -= m_addAlphaVal;
-
-		//// アルファブレンド有効化(ここでアルファ値をセット)
-		//SetDrawBlendMode(DX_BLENDMODE_ALPHA, m_alphaVal);
-
-		//// 画面全体に任意のカラーの四角形を描画
-		//DrawBox(0, 0, SCREEN_SIZE_W, SCREEN_SIZE_H, GetColor(0, 0, 0), TRUE);
-
-		//// アルファブレンド無効化
-		//SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-
-		//// アルファ値が最大(255)になったらフェードアウト終了
-		//if (m_alphaVal <= 92)
-		//{
-		//	m_state = TITLE_SCENE_STATE::SECOND;
-		//	m_alphaVal = 255;
-		//}
-
-		//	Title2の場合
-
-		//	描画
-		DrawGraph(0, 0, m_gateGraphHandle, TRUE);			//	GATE
-
 		// アルファ値の減算
-		m_alphaVal -= m_addAlphaVal;
-
-		// アルファブレンド有効化(ここでアルファ値をセット)
-		SetDrawBlendMode(DX_BLENDMODE_ALPHA, m_alphaVal);
-
-		// 画面全体に任意のカラーの四角形を描画
-		DrawBox(0, 0, SCREEN_SIZE_W, SCREEN_SIZE_H, GetColor(0, 0, 0), TRUE);
-
-		// アルファブレンド無効化
-		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-
-		// アルファ値が最大(255)になったらフェードアウト終了
-		if (m_alphaVal <= 70)
+		m_alphaVal -= m_addAlphaVal * m_deltaTime;
+		if (m_alphaVal <= 255)
 		{
-			m_state = TITLE_SCENE_STATE::SECOND;
-			m_alphaVal = 255;
+			//	描画
+			DrawGraph(0, 0, m_gateGraphHandle, TRUE);			//	GATE
+
+			// アルファブレンド有効化(ここでアルファ値をセット)
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, m_alphaVal);
+
+			// 画面全体に任意のカラーの四角形を描画
+			DrawBox(0, 0, SCREEN_SIZE_W, SCREEN_SIZE_H, GetColor(0, 0, 0), TRUE);
+
+			// アルファブレンド無効化
+			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+
+			// アルファ値が70になったらフェードイン終了
+			if (m_alphaVal <= 70)
+			{
+				m_state = TITLE_SCENE_STATE::SECOND;
+				m_alphaVal = 255;
+			}
 		}
 	}
 
 	if (m_state == TITLE_SCENE_STATE::SECOND)
 	{
-		//	Titleの場合
-
-		////	描画
-		//DrawGraph(0, 0, m_maouGraphHandle, TRUE);			//	魔王魂
-
-		//// アルファ値の減算
-		//m_alphaVal -= m_addAlphaVal;
-
-		//// アルファブレンド有効化(ここでアルファ値をセット)
-		//SetDrawBlendMode(DX_BLENDMODE_ALPHA, m_alphaVal);
-
-		//// 画面全体に任意のカラーの四角形を描画
-		//DrawBox(0, 0, SCREEN_SIZE_W, SCREEN_SIZE_H, GetColor(0, 0, 0), TRUE);
-
-		//// アルファブレンド無効化
-		//SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 60);
-
-		//// アルファ値が最大(255)になったらフェードアウト終了
-		//if (m_alphaVal <= 92)
-		//{
-		//	m_state = TITLE_SCENE_STATE::FADE_IN;
-		//	m_alphaVal = 255;
-		//}
-
-		//	Title2の場合
-
 		//	描画
 		DrawGraph(0, 0, m_maouGraphHandle, TRUE);			//	魔王魂
 
 		// アルファ値の減算
-		m_alphaVal -= m_addAlphaVal;
+		m_alphaVal -= m_addAlphaVal * m_deltaTime;
 
 		// アルファブレンド有効化(ここでアルファ値をセット)
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, m_alphaVal);
@@ -276,7 +228,7 @@ void Ueyama_Title::Draw()
 		// アルファブレンド無効化
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 60);
 
-		// アルファ値が最大(255)になったらフェードアウト終了
+		// アルファ値が70になったらフェードイン終了
 		if (m_alphaVal <= 70)
 		{
 			m_state = TITLE_SCENE_STATE::FADE_IN;
@@ -288,7 +240,7 @@ void Ueyama_Title::Draw()
 	if (m_state == TITLE_SCENE_STATE::FADE_IN)
 	{
 		// アルファ値の減算
-		m_alphaVal -= m_addAlphaVal;
+		m_alphaVal -= m_addAlphaVal * m_deltaTime;
 
 		// アルファブレンド有効化(ここでアルファ値をセット)
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, m_alphaVal);
@@ -310,7 +262,7 @@ void Ueyama_Title::Draw()
 	if (m_state == TITLE_SCENE_STATE::FADE_OUT)
 	{
 		// アルファ値の加算
-		m_alphaVal += m_addAlphaVal2;
+		m_alphaVal += m_addAlphaVal2 * m_deltaTime;
 		// アルファブレンド有効化(ここでアルファ値をセット)
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, m_alphaVal);
 
@@ -352,7 +304,7 @@ void Ueyama_Title::Load()
 	m_crawlModelHandle = MV1LoadModel("data/asset/クロール.vmd");				//	クロール
 
 	// アニメーションをアタッチ
-	MV1AttachAnim(m_swimModelHandle,0,m_crawlModelHandle,FALSE);				//	クロール
+	MV1AttachAnim(m_swimModelHandle, 0, m_crawlModelHandle, FALSE);				//	クロール
 
 	//	サウンドハンドルにセット
 	m_backSoundHandle = LoadSoundMem("data/sound/Title/Title2.ogg");		//	BGM
