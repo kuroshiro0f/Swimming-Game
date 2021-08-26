@@ -2,16 +2,24 @@
 
 const float D_COUNT = 0.355f;
 
+//	スタミナゲージの色が変わる残りゲージ量
+const int GREEN = 950;
+const int ORANGE = 800;
+//const int RED = 3;
+
+
 //コンストラクタ
 PlayerActor::PlayerActor()
 	:mNowPlayerState(STATE_IDLE)
 	, mNowKeyState(STATE_KEY_IDLE)
 	, mPrevKeyState(STATE_KEY_IDLE)
+	, mEvlt(NONE)
 	, startTime(0)
 	, tmpTime(0)
 	, countUP(0)
 {
 	startFlag = false;
+	turnFlag = false;
 
 	mPosition = VGet(150, 18, 0);								// 初期位置設定
 	mRotation = VGet(250.0f, 90.0f * DX_PI_F / 180.0f, 0.0f);	// 回転角度
@@ -40,6 +48,8 @@ PlayerActor::PlayerActor()
 	count = 30;      // 次のシーンに行くまでのカウント
 
 	countDown = 120; // カウントダウン（ 3秒 ）
+
+	skillCount = 0;  // スキルの使用カウント
 }
 
 //デストラクタ
@@ -95,7 +105,7 @@ void PlayerActor::UpdateActor(float _deltaTime)
 			if (mNowKeyState != mPrevKeyState)				//今と前回のキー状態が違うとき
 			{
 				mPosition.x -= mVelosity.x * _deltaTime;	//mPositionにmVelosityを加算
-				st--;										// スタミナを減らす
+				st -= 15;										// スタミナを減らす
 				dCount -= D_COUNT;							// 残り距離を減らす
 			}
 		}
@@ -135,12 +145,52 @@ void PlayerActor::UpdateActor(float _deltaTime)
 			countDown = 0;
 		}
 
-		//ターン処理
-		/*if (mPosition.x <= -132 && mPosition.x >= -140 && Key & PAD_INPUT_M)					//端まで行くと
+		//スペースが押されたとき
+		if (Key & PAD_INPUT_M)
 		{
-			mRotation = VGet(250.0f, 270.0f * DX_PI_F / 180.0f, 0.0f);							//プレイヤーを反転
-			mVelosity = VGet(-100, 0, 0);														//速度を反転
-		}*/
+
+			mPosX = mPosition.x;				//押された時のプレイヤーの座標を補完
+
+			if (-90 >= mPosX && mPosX > -120)
+			{
+				mEvlt = BAD;					//入力が早かったらBAD評価
+
+			}
+			if (-120 >= mPosX && mPosX > -130)
+			{
+				mEvlt = NORMAL;					//入力が少し早かったらNORMALE評価
+
+			}
+			if (-130 >= mPosX && mPosX > -140)
+			{
+				mEvlt = GOOD;					//入力がちょうどだったらGOOD評価
+
+			}
+		}
+
+		//プールの端まで来たら
+		if (mPosition.x <= -136)
+		{
+			mRotation = VGet(250.0f, 270.0f * DX_PI_F / 180.0f, 0.0f);							//プレイヤーの向きを反転
+
+			switch (mEvlt)
+			{
+			case BAD:
+				mVelosity = VGet(-50, 0, 0);
+				st -= 15;
+
+			case NORMAL:
+				mVelosity = VGet(-80, 0, 0);
+				st -= 10;
+
+			case GOOD:
+				mVelosity = VGet(-100, 0, 0);
+				st -= 5;
+
+			default:
+				break;
+			}													//速度を反転
+		}
 
 		PlayAnim(_deltaTime);						// アニメーション情報を取得
 		MV1SetPosition(modelHandle, mPosition);		// ポジション更新
@@ -212,9 +262,21 @@ void PlayerActor::attachAnim(int _animPlay)
 // スタミナゲージの描画
 void PlayerActor::DrawSt(int _st, int _MaxSt, int _MinSt)
 {
+	int color;							//	スタミナゲージの中身の色
 	// 色設定
-	int color = GetColor(0, 255, 0);  // 中身(緑)
-	int color2 = GetColor(0, 0, 0);   // 枠 (黒)
+	if (_st >= GREEN)
+	{
+		color = GetColor(0, 255, 0);		//	中身(緑)
+	}
+	if (_st < GREEN && _st >= ORANGE)
+	{
+		color = GetColor(255, 177, 27);	//	中身（オレンジ）
+	}
+	if (_st < ORANGE)
+	{
+		color = GetColor(255, 0, 0);		//	中身（赤）
+	}
+	int frame_color = GetColor(0, 0, 0);	//	枠 (黒)
 
 	// スタミナゲージが 0 になったら
 	if (_st <= _MinSt)
@@ -224,11 +286,11 @@ void PlayerActor::DrawSt(int _st, int _MaxSt, int _MinSt)
 	}
 
 	// ゲージの枠表示
-	DrawBox(_MinSt, 1000, _MaxSt, 1035, color2, FALSE);
+	DrawBox(_MinSt, 1000, _MaxSt, 1035, frame_color, FALSE);
 	// ゲージの中身表示
-	DrawBox(_MinSt, 1000, _MaxSt * _st / _MaxSt, 1035, color, TRUE);
+	DrawBox(_MinSt, 1000, _st, 1035, color, TRUE);
 	// 数値表示 
-	DrawFormatString(_MinSt, 1000, GetColor(0, 0, 0), "%d / 600", _MaxSt * _st / _MaxSt - _MinSt);
+	DrawFormatString(_MinSt, 1000, GetColor(0, 0, 0), "%d / 600", _st - _MinSt);
 }
 
 // ゴールまでの距離
@@ -250,4 +312,70 @@ void PlayerActor::DrawToGoal(float _playerPos, float _goalPos)
 		DrawFormatString(900, 450, GetColor(255, 0, 0), "GOAL");
 	}
 
+}
+
+// 必殺技
+void PlayerActor::Skill(float _playerPos, float _goalPos)
+{
+	// 数値表示
+	//DrawFormatString(850, 800, GetColor(255, 0, 0), "skillcount   %d", skillCount);
+
+	SetFontSize(40);
+
+	// 必殺技のアイコン（枠）を表示
+	DrawBox(850, 100, 950, 200, GetColor(0, 0, 0), FALSE);
+
+	// turnFlag = true でスキルカウントが 0 のとき
+	if (/*turnFlag &&*/ skillCount == 0)
+	{
+		DrawFormatString(680, 60, GetColor(255, 0, 0), "ひっさつわざ つかえる");
+		// 必殺技のアイコン（枠）を塗りつぶす
+		DrawBox(850, 100, 950, 200, GetColor(255, 0, 0), TRUE);
+		DrawFormatString(800, 200, GetColor(0, 255, 255), "PUSH SPACE");
+	}
+	else
+	{
+		DrawFormatString(680, 60, GetColor(255, 0, 0), "ひっさつわざ つかえない");
+	}
+
+	// プレイヤーがターンしたら
+	if (/*turnFlag &&*/ (int)(_goalPos * _playerPos / _goalPos) <= 25)
+	{
+		// Space を押すと必殺技を使う(スタミナを回復)
+		if (CheckHitKey(KEY_INPUT_SPACE))
+		{
+			mPrevKeyState = mNowKeyState;		// 今のキー状態を前回のキー状態に
+			mNowKeyState = STATE_KEY_SPACE;		// 今のキー状態をSTATE_KEY_SPACEに
+
+			// 必殺技の処理
+			// 今と前回のキー状態が違うとき
+			if (mNowKeyState != mPrevKeyState && skillCount <= 0)
+			{
+				// スタミナを回復する
+				st = st + 30;
+				// スキルカウントを 1 に
+				skillCount = 1;
+				// turnFlag を false に
+				turnFlag = false;
+			}
+		}
+	}
+
+	// A を押すと必殺技を使う(スピードアップ １～３秒くらいの予定)
+	if (CheckHitKey(KEY_INPUT_A))
+	{
+		mPrevKeyState = mNowKeyState;		// 今のキー状態を前回のキー状態に
+		mNowKeyState = STATE_KEY_SPACE;		// 今のキー状態をSTATE_KEY_SPACEに
+
+		// 必殺技の処理
+		// 今と前回のキー状態が違うとき
+		if (mNowKeyState != mPrevKeyState)
+		{
+			// スピードアップ
+			mVelosity.x = mVelosity.x * 1.005;
+			// スタミナの消費量を２倍に
+			st -= 2;
+		}
+	}
+	// 制作中
 }

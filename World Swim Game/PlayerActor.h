@@ -19,9 +19,19 @@ public:
 		STATE_KEY_IDLE,
 		STATE_KEY_RIGHT,
 		STATE_KEY_LEFT,
+		STATE_KEY_SPACE,
 
 		STATE_KEY_ENUM,
 	}KEY_STATE_ENUM;
+
+	//評価
+	typedef enum Evaluation
+	{
+		NONE,
+		BAD,
+		NORMAL,
+		GOOD
+	}Evaluation;
 
 	PlayerActor();
 	~PlayerActor();
@@ -38,6 +48,11 @@ public:
 	// ゴールまでの距離の描画
 	void DrawToGoal(float _playerPos, float _goalPos);
 
+	// 必殺技
+	void Skill(float _playerPos, float _goalPos);
+
+	//リターンの評価するためのプレイヤーの座標を補完
+	float mPosX;
 
 	// ゴールまでの距離 //
 	float dCount;      // どれだけ進んだか        
@@ -54,7 +69,8 @@ public:
 	int countUP;     // 経過時間
 
 	int count;       // 次のシーンに行くまでのカウント    
-	int countDown;
+	int countDown;		// スタートまでのカウントダウン
+	int skillCount;  // スキルの使用カウント
 
 private:
 	PLAYER_STATE_ENUM mNowPlayerState;	//プレイヤーの今の状態
@@ -62,6 +78,8 @@ private:
 	KEY_STATE_ENUM mNowKeyState;		//キーの今の状態
 	KEY_STATE_ENUM mPrevKeyState;		//キーの1つ前の状態
 
-	int timer;
+	Evaluation	   mEvlt;				//評価
+
 	bool startFlag;
+	bool turnFlag;        // ターンフラグ
 };

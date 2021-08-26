@@ -56,6 +56,9 @@ private:
 	int m_fadeTransVal;				//	フェードアウト中の透過量
 	int m_permeationAmount;			//	毎フレーム透過量
 
+	//	デルタタイム
+	float m_deltaTime;
+
 	//	フラグ
 	bool m_checkKeyFlag;			//	キーが押されたままかを判定するフラグ
 	bool m_fadeOutFinishFlag;		//	フェードアウトの終了判定フラグ

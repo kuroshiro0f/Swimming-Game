@@ -380,6 +380,31 @@ void Result::Sound()
 {
 	PlaySoundMem(m_bgmSoundHandle, DX_PLAYTYPE_BACK, FALSE);
 	ChangeVolumeSoundMem(m_volumePal, m_bgmSoundHandle);
+	switch (m_resultFlag)
+	{
+	case 1:
+		//	効果音を流す
+		PlaySoundMem(m_se1SoundHandle, DX_PLAYTYPE_BACK, FALSE);
+		ChangeVolumeSoundMem(m_volumePal, m_se1SoundHandle);			//	音量
+		break;
+	case 2:
+		//	効果音を流す
+		PlaySoundMem(m_se2SoundHandle, DX_PLAYTYPE_BACK, FALSE);
+		ChangeVolumeSoundMem(m_volumePal, m_se2SoundHandle);			//	音量
+		break;
+	case 3:
+		//	効果音を流す
+		PlaySoundMem(m_se3SoundHandle, DX_PLAYTYPE_BACK, FALSE);
+		ChangeVolumeSoundMem(m_volumePal, m_se3SoundHandle);			//	音量
+		break;
+	case 4:
+		//	効果音を流す
+		PlaySoundMem(m_se4SoundHandle, DX_PLAYTYPE_BACK, FALSE);
+		ChangeVolumeSoundMem(m_volumePal, m_se4SoundHandle);			//	音量
+		break;
+	default:
+		break;
+	}
 }
 
 void Result::Load()
@@ -408,6 +433,10 @@ void Result::Load()
 
 	//	サウンドハンドルにセット
 	m_bgmSoundHandle = LoadSoundMem("data/sound/Result/Result.ogg");				//	BGM
+	m_se1SoundHandle = LoadSoundMem("data/sound/Result/TestSE.mp3");				//	効果音
+	m_se2SoundHandle = LoadSoundMem("data/sound/Result/TestSE.mp3");				//	効果音
+	m_se3SoundHandle = LoadSoundMem("data/sound/Result/TestSE.mp3");				//	効果音
+	m_se4SoundHandle = LoadSoundMem("data/sound/Result/TestSE.mp3");				//	効果音
 }
 
 void Result::UpdateTransparent()

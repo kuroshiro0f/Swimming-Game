@@ -60,12 +60,18 @@ SceneBase* GameScene::Update(float _deltaTime)
 			m_checkKeyFlag = false;
 		}
 
-		//端まで行くと次のステートへ
-		if (m_actor->GetPosX() <= -136)
+		////端まで行くと次のステートへ
+		//if (m_actor->GetPosX() <= -136)
+		//{
+		//	m_state = GAME_SCENE_STATE::FADE_OUT;
+		//}
+
+
+		//	デバッグ用
+		if (CheckHitKey(KEY_INPUT_RETURN))
 		{
 			m_state = GAME_SCENE_STATE::FADE_OUT;
 		}
-
 		break;
 	case GAME_SCENE_STATE::FADE_OUT:
 		if (m_fadeOutFinishFlag)
@@ -90,7 +96,7 @@ void GameScene::Draw()
 	SetFontSize(40);
 
 	//	タイムの表示
-	DrawBox(1550, 830, 1850, 880, GetColor(0, 255, 255), TRUE);
+	DrawBox(1550, 830, 1850, 880, GetColor(255, 255, 0), TRUE);
 	DrawFormatString(1600, 835, GetColor(0, 0, 0), "TIME   %d", m_actor->countUP);
 
 	// プレイヤー描画
@@ -99,23 +105,26 @@ void GameScene::Draw()
 	// 操作ボタン（仮）
 	if (CheckHitKey(KEY_INPUT_RIGHT))
 	{
-		DrawBox(1050, 800, 1150, 900, GetColor(255, 255, 255), TRUE);
+		DrawBox(1050, 600, 1150, 700, GetColor(255, 255, 255), TRUE);
 	}
 	if (CheckHitKey(KEY_INPUT_LEFT))
 	{
-		DrawBox(750, 800, 850, 900, GetColor(255, 255, 255), TRUE);
+		DrawBox(750, 600, 850, 700, GetColor(255, 255, 255), TRUE);
 	}
-	DrawBox(750, 800, 850, 900, GetColor(0, 0, 0), FALSE);
-	DrawBox(1050, 800, 1150, 900, GetColor(0, 0, 0), FALSE);
+	DrawBox(750, 600, 850, 700, GetColor(0, 0, 0), FALSE);
+	DrawBox(1050, 600, 1150, 700, GetColor(0, 0, 0), FALSE);
 	SetFontSize(100);
-	DrawFormatString(750, 800, GetColor(0, 0, 0), "←");
-	DrawFormatString(1050, 800, GetColor(0, 0, 0), "→");
+	DrawFormatString(750, 600, GetColor(0, 0, 0), "←");
+	DrawFormatString(1050, 600, GetColor(0, 0, 0), "→");
 
 	SetFontSize(35);
 	// スタミナゲージの表示
 	m_actor->DrawSt(m_actor->st, m_actor->MaxSt, m_actor->MinSt);
 	// 残り距離の表示
 	m_actor->DrawToGoal(m_actor->dCount, m_actor->maxdCount);
+
+	// スキル
+	m_actor->Skill(m_actor->dCount, m_actor->maxdCount);
 
 	// カウントダウンの表示
 	if (m_actor->countDown >= 0)

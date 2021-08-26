@@ -65,6 +65,10 @@ private:
 
 	//	サウンドハンドル
 	int m_bgmSoundHandle;				//	BGM
+	int m_se1SoundHandle;				//	効果音
+	int m_se2SoundHandle;				//	効果音
+	int m_se3SoundHandle;				//	効果音
+	int m_se4SoundHandle;				//	効果音
 
 	//	フラグ
 	int m_resultFlag;					//	リザルトの推移を管理する
