@@ -19,13 +19,7 @@ GameScene::GameScene()
 	, m_stage(nullptr)
 	, m_camera(nullptr)
 	, m_actor(nullptr)
-	, m_startTime(0)
-	, m_tmpTime(0)
-	, m_countUP(0)
 {
-	// 開始時の時間を取得
-	m_startTime = GetNowCount() / 1000;
-
 	// ステートセット(フェードインから)
 	m_state = GAME_SCENE_STATE::FADE_IN;
 
@@ -48,16 +42,17 @@ SceneBase* GameScene::Update(float _deltaTime)
 	switch (m_state)
 	{
 	case GAME_SCENE_STATE::FADE_IN:
+		//	ステージをセット
+		m_stage->Update();
+		//	アクターをセット
+		m_actor->Update(_deltaTime);
 		break;
 	case GAME_SCENE_STATE::GAME:
-		m_stage->Update();
-		m_actor->Update(_deltaTime);
+		//	アクターを更新
 		m_actor->UpdateActor(_deltaTime);
 
-		//現在時刻を取得
-		m_tmpTime = GetNowCount() / 1000;
-		// 経過時間を計算  (-〇 は応急処置)
-		m_countUP = (m_tmpTime - m_startTime)-5;
+		//	カウントダウン開始
+		m_actor->countDown--;
 
 		// ※キー入力重複対策のフラグ
 		// ENTERキーから指を離したら、次のENTERの入力を有効に
@@ -76,16 +71,16 @@ SceneBase* GameScene::Update(float _deltaTime)
 		}
 
 		//端まで行くと次のステートへ
-		if (m_actor->GetPosX() <= -136)
+		/*if (m_actor->GetPosX() >= 134)
 		{
 			m_state = GAME_SCENE_STATE::FADE_OUT;
-		}
+		}*/
 
 		break;
 	case GAME_SCENE_STATE::FADE_OUT:
 		if (m_fadeOutFinishFlag)
 		{
-			return new Result(m_countUP);				//	リザルトシーンに切り替える
+			return new Result(m_actor->countUP);				//	リザルトシーンに切り替える
 		}
 
 		break;
@@ -103,19 +98,41 @@ void GameScene::Draw()
 	// ステージの描画
 	m_stage->Draw();
 	SetFontSize(40);
-	// 
-	DrawBox(1450, 800, 1750, 890, GetColor(0, 255, 255), TRUE);
-	DrawFormatString(1500, 800, GetColor(0, 0, 0), "TIME   %d", m_countUP);
+
+	//	タイムの表示
+	DrawBox(1550, 830, 1850, 880, GetColor(0, 255, 255), TRUE);
+	DrawFormatString(1600, 835, GetColor(0, 0, 0), "TIME   %d", m_actor->countUP);
 
 	// プレイヤー描画
 	m_actor->DrawActor();
 
-	// 操作ボタン（仮） プレイヤーの手の斜め上に表示
-	DrawBox(750, 600, 850, 700, GetColor(0, 0, 0), FALSE);
-	DrawBox(1050, 600, 1150, 700, GetColor(0, 0, 0), FALSE);
+	// 操作ボタン（仮）
+	if (CheckHitKey(KEY_INPUT_RIGHT))
+	{
+		DrawBox(1050, 800, 1150, 900, GetColor(255, 255, 255), TRUE);
+	}
+	if (CheckHitKey(KEY_INPUT_LEFT))
+	{
+		DrawBox(750, 800, 850, 900, GetColor(255, 255, 255), TRUE);
+	}
+	DrawBox(750, 800, 850, 900, GetColor(0, 0, 0), FALSE);
+	DrawBox(1050, 800, 1150, 900, GetColor(0, 0, 0), FALSE);
 	SetFontSize(100);
-	DrawFormatString(770, 600, GetColor(0, 0, 0), "←");
-	DrawFormatString(1070, 600, GetColor(0, 0, 0), "→");
+	DrawFormatString(750, 800, GetColor(0, 0, 0), "←");
+	DrawFormatString(1050, 800, GetColor(0, 0, 0), "→");
+
+	SetFontSize(35);
+	// スタミナゲージの表示
+	m_actor->DrawSt(m_actor->st, m_actor->MaxSt, m_actor->MinSt);
+	// 残り距離の表示
+	m_actor->DrawToGoal(m_actor->dCount, m_actor->maxdCount);
+
+	// カウントダウンの表示
+	if (m_actor->countDown >= 0)
+	{
+		SetFontSize(150);
+		DrawFormatString(800, 400, GetColor(0, 0, 0), " %d ", m_actor->countDown / 60 + 1);
+	}
 
 	//	フェードイン処理
 	if (m_state == GAME_SCENE_STATE::FADE_IN)
@@ -129,12 +146,8 @@ void GameScene::Draw()
 		// 画面全体に任意のカラーの四角形を描画
 		DrawBox(0, 0, SCREEN_SIZE_W, SCREEN_SIZE_H, GetColor(0, 0, 0), TRUE);
 
-
 		// アルファブレンド無効化
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-
-		//プレイヤー
-		m_actor->DrawActor();
 
 		// アルファ値が最大(255)になったらフェードアウト終了
 		if (m_alphaVal <= 0)
