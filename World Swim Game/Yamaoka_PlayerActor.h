@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Actor.h"
+#include "Yamaoka_Actor.h"
 
 class Yamaoka_PlayerActor : public Actor
 {
@@ -24,6 +24,15 @@ public:
 		STATE_KEY_ENUM,
 	}KEY_STATE_ENUM;
 
+	//評価
+	typedef enum Evaluation
+	{
+		NONE,
+		BAD,
+		NORMAL,
+		GOOD
+	}Evaluation;
+
 	Yamaoka_PlayerActor();
 	~Yamaoka_PlayerActor();
 
@@ -40,12 +49,16 @@ public:
 	void DrawToGoal(float _playerPos, float _goalPos);
 
 	// 必殺技
-	void Skill(float _playerPos, float _goalPos);
+	void healSkill(float _playerPos, float _goalPos);
+	void speedUpSkill(float _deltaTime);
 
+	//リターンの評価するためのプレイヤーの座標を補完
+	float mPosX;
 
 	// ゴールまでの距離
-	float dCount;      // どれだけ進んだか
+	float dCount;      // どれだけ進んだか        
 	float maxdCount;   // どこまで進めるのか
+
 
 	int st;      // スタミナ
 	int MaxSt;   // スタミナ最大値
@@ -55,9 +68,10 @@ public:
 	int tmpTime;     // 現在時間を一時保存
 	int countUP;     // 経過時間
 
-	int count;       // 次のシーンに行くまでのカウント
-	int countDown;   // スタートまでのカウントダウン
+	int count;       // 次のシーンに行くまでのカウント    
+	int countDown;		// スタートまでのカウントダウン
 	int skillCount;  // スキルの使用カウント
+	int framcount;
 
 private:
 	PLAYER_STATE_ENUM mNowPlayerState;	//プレイヤーの今の状態
@@ -65,6 +79,10 @@ private:
 	KEY_STATE_ENUM mNowKeyState;		//キーの今の状態
 	KEY_STATE_ENUM mPrevKeyState;		//キーの1つ前の状態
 
-	bool startFlag;       // スタートフラグ
+	Evaluation	   mEvlt;				//評価
+
+	bool startFlag;
 	bool turnFlag;        // ターンフラグ
+
+	int testModel;
 };

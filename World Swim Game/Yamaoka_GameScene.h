@@ -3,7 +3,7 @@
 #include "Yamaoka_PlayerActor.h"
 #include "Yamaoka_Camera.h"
 
-class Yamaoka_PlayerActor;			//PlayerActorへの参照
+class Yamaoka_PlayerActor;	//PlayerActorへの参照
 class Camera;				//Cameraへの参照
 
 class GameScene :public SceneBase
@@ -12,8 +12,6 @@ class GameScene :public SceneBase
 	Camera* camera;
 
 public:
-	//int m_countUP;                  // 経過時間
-
 	enum class GAME_SCENE_STATE
 	{
 		FADE_IN,
