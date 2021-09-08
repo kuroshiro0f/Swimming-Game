@@ -25,7 +25,6 @@ public:
 
 private:
 	VECTOR mPos;    // ƒ|ƒWƒVƒ‡ƒ“
-	VECTOR mTempPos;
 };
 
 #endif // !_CAMERA_H_

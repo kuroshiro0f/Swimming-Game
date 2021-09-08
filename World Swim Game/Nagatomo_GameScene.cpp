@@ -70,11 +70,11 @@ SceneBase* GameScene::Update(float _deltaTime)
 			m_state = GAME_SCENE_STATE::FADE_OUT;
 		}
 
-		//端まで行くと次のステートへ
-		/*if (m_actor->GetPosX() >= 134)
+		//端まで戻ってきてかつ、turnFlag が true なら次のステートへ
+		if (m_actor->GetPosX() >= 130 && m_actor->GetTurnFlag() == true)
 		{
 			m_state = GAME_SCENE_STATE::FADE_OUT;
-		}*/
+		}
 
 		break;
 	case GAME_SCENE_STATE::FADE_OUT:
@@ -107,7 +107,7 @@ void GameScene::Draw()
 	m_actor->DrawActor();
 
 	// 操作ボタン（仮）
-	if (CheckHitKey(KEY_INPUT_RIGHT))
+	/*if (CheckHitKey(KEY_INPUT_RIGHT))
 	{
 		DrawBox(1050, 800, 1150, 900, GetColor(255, 255, 255), TRUE);
 	}
@@ -115,17 +115,102 @@ void GameScene::Draw()
 	{
 		DrawBox(750, 800, 850, 900, GetColor(255, 255, 255), TRUE);
 	}
-	DrawBox(750, 800, 850, 900, GetColor(0, 0, 0), FALSE);
-	DrawBox(1050, 800, 1150, 900, GetColor(0, 0, 0), FALSE);
+	DrawBox(750, 800, 850, 900, GetColor(0, 0, 0), FALSE);				//ボックスの表示(2つ用)
+	DrawBox(1050, 800, 1150, 900, GetColor(0, 0, 0), FALSE);			//ボックスの表示(2つ用)
+	*/
+	DrawBox(900, 800, 1000, 900, GetColor(0, 0, 0), FALSE);				//ボックスの表示(1つ用)
 	SetFontSize(100);
-	DrawFormatString(750, 800, GetColor(0, 0, 0), "←");
-	DrawFormatString(1050, 800, GetColor(0, 0, 0), "→");
+
+	//DrawFormatString(750, 800, GetColor(0, 0, 0), "←");
+	//DrawFormatString(1050, 800, GetColor(0, 0, 0), "→");
+
+	//ランダムに矢印を表示
+	if (m_actor->randomKeyNumber == 1)		//ランダムに生成した数が STATE_KEY_UP(1) と同じとき
+	{
+		if (CheckHitKey(KEY_INPUT_UP))
+		{
+			DrawBox(900, 800, 1000, 900, GetColor(255, 255, 255), TRUE);
+		}
+		else if(CheckHitKey(KEY_INPUT_DOWN) || CheckHitKey(KEY_INPUT_RIGHT) || CheckHitKey(KEY_INPUT_LEFT))
+		{
+			DrawBox(900, 800, 1000, 900, GetColor(255, 0, 0), TRUE);
+		}
+		DrawFormatString(900, 800, GetColor(0, 0, 0), "↑");
+	}
+	if (m_actor->randomKeyNumber == 2)		//ランダムに生成した数が STATE_KEY_DOWN(1) と同じとき
+	{
+		if (CheckHitKey(KEY_INPUT_DOWN))
+		{
+			DrawBox(900, 800, 1000, 900, GetColor(255, 255, 255), TRUE);
+		}
+		else if (CheckHitKey(KEY_INPUT_UP) || CheckHitKey(KEY_INPUT_RIGHT) || CheckHitKey(KEY_INPUT_LEFT))
+		{
+			DrawBox(900, 800, 1000, 900, GetColor(255, 0, 0), TRUE);
+		}
+		DrawFormatString(900, 800, GetColor(0, 0, 0), "↓");
+	}
+	if (m_actor->randomKeyNumber == 3)		//ランダムに生成した数が STATE_KEY_LEFT(1) と同じとき
+	{
+		if (CheckHitKey(KEY_INPUT_RIGHT))
+		{
+			DrawBox(900, 800, 1000, 900, GetColor(255, 255, 255), TRUE);
+		}
+		else if (CheckHitKey(KEY_INPUT_UP) || CheckHitKey(KEY_INPUT_DOWN) || CheckHitKey(KEY_INPUT_LEFT))
+		{
+			DrawBox(900, 800, 1000, 900, GetColor(255, 0, 0), TRUE);
+		}
+		DrawFormatString(900, 800, GetColor(0, 0, 0), "→");
+	}
+	if (m_actor->randomKeyNumber == 4)		//ランダムに生成した数が STATE_KEY_RIGHT(1) と同じとき
+	{
+		if (CheckHitKey(KEY_INPUT_LEFT))
+		{
+			DrawBox(900, 800, 1000, 900, GetColor(255, 255, 255), TRUE);
+		}
+		else if (CheckHitKey(KEY_INPUT_UP) || CheckHitKey(KEY_INPUT_DOWN) || CheckHitKey(KEY_INPUT_RIGHT))
+		{
+			DrawBox(900, 800, 1000, 900, GetColor(255, 0, 0), TRUE);
+		}
+		DrawFormatString(900, 800, GetColor(0, 0, 0), "←");
+	}
+
+	//スペースキーのBOX描画
+	if (-90 >= m_actor->GetPosX() && m_actor->GetPosX() > -136 && m_actor->GetTurnFlag() == false)
+	{
+		//αブレンドモード
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 128);
+
+		if (CheckHitKey(KEY_INPUT_SPACE))
+		{
+			DrawBox(810, 900, 1100, 1000, GetColor(255, 255, 255), TRUE);
+		}
+		//ターンの評価が BAD の範囲
+		if (-90 >= m_actor->GetPosX() && m_actor->GetPosX() > -120)
+		{
+			DrawBox(810, 900, 1100, 1000, GetColor(255, 0, 0), TRUE);
+		}
+		//ターンの評価が NORMAL の範囲
+		if (-120 >= m_actor->GetPosX() && m_actor->GetPosX() > -130)
+		{
+			DrawBox(810, 900, 1100, 1000, GetColor(255, 255, 0), TRUE);
+		}
+		//ターンの評価が GOOD の範囲
+		if (-130 >= m_actor->GetPosX() && m_actor->GetPosX() > -140)
+		{
+			DrawBox(810, 900, 1100, 1000, GetColor(0, 100, 0), TRUE);
+		}
+
+		//ブレンドモードをデフォルトに戻す
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
+
+		DrawFormatString(820, 900, GetColor(0, 0, 0), "SPACE");
+	}
 
 	SetFontSize(35);
 	// スタミナゲージの表示
 	m_actor->DrawSt(m_actor->st, m_actor->MaxSt, m_actor->MinSt);
 	// 残り距離の表示
-	m_actor->DrawToGoal(m_actor->dCount, m_actor->maxdCount);
+	m_actor->DrawToGoal(m_actor->dCount);
 
 	// カウントダウンの表示
 	if (m_actor->countDown >= 0)
