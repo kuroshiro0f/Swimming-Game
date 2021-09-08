@@ -1,18 +1,26 @@
 #include "Yamaoka_PlayerActor.h"
 
-const float D_COUNT = 0.36f;      //　学校（上モニター）
-//const float D_COUNT = 0.235f;      //　学校（下モニター）
+const float D_COUNT = 0.355f;
+//const float D_COUNT = 0.27f;
 
-// コンストラクタ
+//	スタミナゲージの色が変わる残りゲージ量
+const int GREEN = 950;
+const int ORANGE = 800;
+//const int RED = 3;
+
+
+//コンストラクタ
 Yamaoka_PlayerActor::Yamaoka_PlayerActor()
 	: mNowPlayerState(STATE_IDLE)
 	, mNowKeyState(STATE_KEY_IDLE)
 	, mPrevKeyState(STATE_KEY_IDLE)
+	, mEvlt(NONE)
 	, startTime(0)
 	, tmpTime(0)
 	, countUP(0)
+	, mPosX(0)
 {
-	// フラグを false に
+	// フラグをfalseに
 	startFlag = false;
 	turnFlag = false;
 
@@ -22,72 +30,64 @@ Yamaoka_PlayerActor::Yamaoka_PlayerActor()
 	mVelosity = VGet(250, 0, 0);
 
 	// モデルのロード
-	modelHandle = MV1LoadModel("data/player/player.pmx");
+	// テストモデル
+	//modelHandle = MV1LoadModel("data/player/player.pmx");
 
+	// 自作モデル
+	modelHandle = MV1LoadModel("data/swimmer/player.pmx");
+
+	// アニメーション時間、再生番号の初期化
 	animTotal = 0.0f;
 	animNowTime = 0.0f;
 	animIndex = 0;
 
-	//NowPos = 0;            // 現在の座標
+	// ゴールまでの距離 
+	//dCount = 25.0f;         // 進むことのできる距離
+	//maxdCount = 25.0f;      // ゴール
 
-	// ゴールまでの距離　( 25m ) 
-	//dCount = 25.0f;         // 進んだ距離
-	//maxdCount = 25.0f;      // ゴール  
+	dCount = 50.0f;         // 進むことのできる距離
+	maxdCount = 50.0f;      // ゴール
 
-	dCount = 50.0f;         // 進んだ距離
-	maxdCount = 50.0f;      // ゴール  
-
-	// スタミナゲージ  (MaxSt - MinSt ) //
-	st = 1100;      // スタミナ初期値
-	MaxSt = 1100;   // スタミナ最大値
-	MinSt = 700;    // スタミナ最小値
+	// スタミナゲージ //
+	st = 1250;      // スタミナ初期値
+	MaxSt = 1250;   // スタミナ最大値
+	MinSt = 650;    // スタミナ最小値
 
 	count = 30;      // 次のシーンに行くまでのカウント
 
-	countDown = 120; // カウントダウン
+	countDown = 120; // カウントダウン（ 3秒 ）
 
 	skillCount = 0;  // スキルの使用カウント
 
+	framcount = 30;  // 加速スキルのカウント
 }
 
-// デストラクタ
+//デストラクタ
 Yamaoka_PlayerActor::~Yamaoka_PlayerActor()
 {
 	// モデルのアンロード
 	MV1DeleteModel(modelHandle);
 }
 
-// 更新処理
+//更新処理
 void Yamaoka_PlayerActor::Update(float _deltaTime)
 {
 	UpdateActor(_deltaTime);
 }
 
-// アクターの更新処理
+//アクターの更新処理
 void Yamaoka_PlayerActor::UpdateActor(float _deltaTime)
 {
 	int Key = GetJoypadInputState(DX_INPUT_KEY_PAD1);
-
-	//// スタート処理
-	////startFlagがtrueのとき
-	//if (startFlag)
-	//{
-	//	PlayAnim(_deltaTime);								// アニメーション情報を取得
-	//	MV1SetPosition(modelHandle, mPosition);				// ポジション更新
-	//	StartProcess(_deltaTime);
-	//}
 
 	// カウントダウンが終了したら開始
 	if (!startFlag && countDown <= 0)
 	{
 		// 開始時の時間を取得
 		startTime = GetNowCount() / 1000;
-		// ポジション更新
-		MV1SetPosition(modelHandle, mPosition);
-		// スタート処理
+		MV1SetPosition(modelHandle, mPosition);				// ポジション更新
 		StartProcess(_deltaTime);
 	}
-
 	//	ステートが泳ぎの時
 	if (mNowPlayerState == STATE_SWIM)
 	{
@@ -105,7 +105,7 @@ void Yamaoka_PlayerActor::UpdateActor(float _deltaTime)
 			if (mNowKeyState != mPrevKeyState)				//今と前回のキー状態が違うとき
 			{
 				mPosition.x -= mVelosity.x * _deltaTime;	//mPositionにmVelosityを加算
-				st--;										// スタミナを減らす
+				st -= 2.25;									// スタミナを減らす
 				dCount -= D_COUNT;							// 残り距離を減らす
 			}
 		}
@@ -118,25 +118,19 @@ void Yamaoka_PlayerActor::UpdateActor(float _deltaTime)
 			if (mNowKeyState != mPrevKeyState)				//今と前回のキー状態が違うとき
 			{
 				mPosition.x -= mVelosity.x * _deltaTime;	//mPositionにmVelosityを加算
-				st--;										// スタミナを減らす
+				st -= 2.25;									// スタミナを減らす
 				dCount -= D_COUNT;							// 残り距離を減らす
 			}
 
 		}
-		// 端まで行ったらplayerを止める
-		if (mPosition.x <= -136)
-		{
-			mPosition.x = -134;
-		}
-
-		// 引き戻し処理
+		//引き戻し処理
 		if (mPosition.x >= 150)
 		{
-			mPosition.x = 150;
+			mPosition.x = 145;
 		}
 
 		// 残り距離
-		if (dCount <= 0.0f)
+		if (dCount <= 0.9)
 		{
 			// 端までついたら距離カウントを 0 にする
 			dCount = 0;
@@ -151,38 +145,70 @@ void Yamaoka_PlayerActor::UpdateActor(float _deltaTime)
 			countDown = 0;
 		}
 
-		// ターン処理
-		/*if (mPosition.x <= -132 && mPosition.x >= -140 && Key & PAD_INPUT_M)					//端まで行くと
+		// スペースが押されたとき
+		if (Key & PAD_INPUT_M)
 		{
-			mRotation = VGet(250.0f, 270.0f * DX_PI_F / 180.0f, 0.0f);							//プレイヤーを反転
-			mVelosity = VGet(-100, 0, 0);														//速度を反転
-		}*/
+
+			mPosX = mPosition.x;				// 押された時のプレイヤーの座標を補完
+
+			if (-90 >= mPosX && mPosX > -120)
+			{
+				mEvlt = BAD;					// 入力が早かったらBAD評価
+
+			}
+			if (-120 >= mPosX && mPosX > -130)
+			{
+				mEvlt = NORMAL;					// 入力が少し早かったらNORMALE評価
+
+			}
+			if (-130 >= mPosX && mPosX > -140)
+			{
+				mEvlt = GOOD;					// 入力がちょうどだったらGOOD評価
+
+			}
+		}
+
+		// プールの端まで来たら
+		if (mPosition.x <= -136)
+		{
+			// プレイヤーの向きを反転
+			mRotation = VGet(250.0f, 270.0f * DX_PI_F / 180.0f, 0.0f);
+			turnFlag = true;
+
+			// スタミナの調整用
+			if (st <= 0)
+			{
+				st = 0;
+			}
+
+			switch (mEvlt)
+			{
+			case BAD:
+				mVelosity = VGet(-50, 0, 0);
+				//st -= 15;
+
+			case NORMAL:
+				mVelosity = VGet(-80, 0, 0);
+				//st -= 10;
+
+			case GOOD:
+				mVelosity = VGet(-100, 0, 0);
+				//st -= 5;
+			default:
+				break;
+			}			//速度を反転
+		}
 
 		PlayAnim(_deltaTime);						// アニメーション情報を取得
 		MV1SetPosition(modelHandle, mPosition);		// ポジション更新
-	}
-
-	// 半分を超えたら => ターンをしたら
-	if (dCount <= 25.0f)
-	{
-		// ターンフラグを true に
-		turnFlag = true;
 	}
 }
 
 // スタート処理
 void Yamaoka_PlayerActor::StartProcess(float _deltaTime)
 {
-	// キー入力取得
+	//キー入力取得
 	int Key = GetJoypadInputState(DX_INPUT_KEY_PAD1);
-
-	//if (Key & PAD_INPUT_M)				// スペースキー
-	//{
-	//	mNowPlayerState = STATE_SWIM;	// プレイヤーを泳ぎ状態に
-
-	//	startFlag = false;
-	//	attachAnim(0);					// アニメーション000をアタッチ
-	//}
 
 	mNowPlayerState = STATE_SWIM;	// プレイヤーを泳ぎ状態に
 
@@ -191,7 +217,7 @@ void Yamaoka_PlayerActor::StartProcess(float _deltaTime)
 	startFlag = true;               // スタートフラグを true に	
 }
 
-//描画
+// 描画
 void Yamaoka_PlayerActor::DrawActor()
 {
 	// 3Dモデルの描画
@@ -200,10 +226,9 @@ void Yamaoka_PlayerActor::DrawActor()
 	// 3Dモデルの回転角度 (どの方向を向いているか)
 	MV1SetRotationXYZ(modelHandle, mRotation);
 
-	//DrawFormatString(800, 400, GetColor(255, 0, 0), "%d", mPosition.x);
 }
 
-// アニメーションの再生時間を取得
+// アニメーション再生時間の設定
 void Yamaoka_PlayerActor::PlayAnim(float _deltaTime)
 {
 	// 泳いでるいるとき
@@ -222,7 +247,7 @@ void Yamaoka_PlayerActor::PlayAnim(float _deltaTime)
 	MV1SetAttachAnimTime(modelHandle, animIndex, animNowTime);
 }
 
-// アニメーション情報を取得
+// 再生するアニメーション番号を取得
 void Yamaoka_PlayerActor::attachAnim(int _animPlay)
 {
 	if (animIndex != -1)
@@ -238,9 +263,21 @@ void Yamaoka_PlayerActor::attachAnim(int _animPlay)
 // スタミナゲージの描画
 void Yamaoka_PlayerActor::DrawSt(int _st, int _MaxSt, int _MinSt)
 {
+	int color;							//	スタミナゲージの中身の色
 	// 色設定
-	int color = GetColor(0, 255, 0);  // 中身(緑)
-	int color2 = GetColor(0, 0, 0);   // 枠 (黒)
+	if (_st >= GREEN)
+	{
+		color = GetColor(0, 255, 0);		//	中身(緑)
+	}
+	if (_st < GREEN && _st >= ORANGE)
+	{
+		color = GetColor(255, 177, 27);	//	中身（オレンジ）
+	}
+	if (_st < ORANGE)
+	{
+		color = GetColor(255, 0, 0);		//	中身（赤）
+	}
+	int frame_color = GetColor(0, 0, 0);	//	枠 (黒)
 
 	// スタミナゲージが 0 になったら
 	if (_st <= _MinSt)
@@ -250,20 +287,17 @@ void Yamaoka_PlayerActor::DrawSt(int _st, int _MaxSt, int _MinSt)
 	}
 
 	// ゲージの枠表示
-	DrawBox(_MinSt, 1000, _MaxSt, 1035, color2, FALSE);
+	DrawBox(_MinSt, 1000, _MaxSt, 1035, frame_color, FALSE);
 	// ゲージの中身表示
-	DrawBox(_MinSt, 1000, _MaxSt * _st / _MaxSt, 1035, color, TRUE);
+	DrawBox(_MinSt, 1000, _st, 1035, color, TRUE);
 	// 数値表示 
-	DrawFormatString(_MinSt, 1000, GetColor(0, 0, 0), "%d / 400", _MaxSt * _st / _MaxSt - _MinSt);
+	DrawFormatString(_MinSt, 1000, GetColor(0, 0, 0), "%d / %d",
+		                                            _st - _MinSt, _MaxSt - _MinSt);
 }
 
 // ゴールまでの距離
 void Yamaoka_PlayerActor::DrawToGoal(float _playerPos, float _goalPos)
 {
-	// デバッグ用
-	//DrawFormatString(1300, 500, GetColor(0, 0, 0), "NowPos  %d", count);
-	//DrawFormatString(1300, 550, GetColor(0, 0, 0), "  %d", 600 * _playerPos / _goalPos);
-
 	// 残りの距離の表示
 	DrawBox(1590, 895, 1850, 945, GetColor(0, 255, 255), TRUE);
 	DrawFormatString(1600, 900, GetColor(0, 0, 0), "残り  %d m", (int)(_goalPos * _playerPos / _goalPos));
@@ -276,16 +310,16 @@ void Yamaoka_PlayerActor::DrawToGoal(float _playerPos, float _goalPos)
 		DrawFormatString(900, 450, GetColor(255, 0, 0), "GOAL");
 	}
 
+	// デバッグ用
+	//DrawFormatString(1300, 500, GetColor(0, 0, 0), "NowPos  %d", count);
+	//DrawFormatString(1300, 550, GetColor(0, 0, 0), "  %d", 600 * _playerPos / _goalPos);
 }
 
 // 必殺技
-void Yamaoka_PlayerActor::Skill(float _playerPos, float _goalPos)
+// 回復技
+void Yamaoka_PlayerActor::healSkill(float _playerPos, float _goalPos)
 {
-	// 数値表示
-	//DrawFormatString(850, 800, GetColor(255, 0, 0), "skillcount   %d", skillCount);
-
 	SetFontSize(40);
-
 	// 必殺技のアイコン（枠）を表示
 	DrawBox(850, 100, 950, 200, GetColor(0, 0, 0), FALSE);
 
@@ -295,7 +329,7 @@ void Yamaoka_PlayerActor::Skill(float _playerPos, float _goalPos)
 		DrawFormatString(680, 60, GetColor(255, 0, 0), "ひっさつわざ つかえる");
 		// 必殺技のアイコン（枠）を塗りつぶす
 		DrawBox(850, 100, 950, 200, GetColor(255, 0, 0), TRUE);
-		DrawFormatString(800, 200, GetColor(0, 255, 255), "PUSH SPACE");
+		DrawFormatString(800, 200, GetColor(0, 255, 255), "PUSH S KEY");
 	}
 	else
 	{
@@ -305,8 +339,8 @@ void Yamaoka_PlayerActor::Skill(float _playerPos, float _goalPos)
 	// プレイヤーがターンしたら
 	if (turnFlag && (int)(_goalPos * _playerPos / _goalPos) <= 25)
 	{
-		// Space を押すと必殺技を使う(スタミナを回復)
-		if (CheckHitKey(KEY_INPUT_SPACE))
+		// Sキー を押すと必殺技を使う(スタミナを回復)
+		if (CheckHitKey(KEY_INPUT_S))
 		{
 			mPrevKeyState = mNowKeyState;		// 今のキー状態を前回のキー状態に
 			mNowKeyState = STATE_KEY_SPACE;		// 今のキー状態をSTATE_KEY_SPACEに
@@ -316,7 +350,7 @@ void Yamaoka_PlayerActor::Skill(float _playerPos, float _goalPos)
 			if (mNowKeyState != mPrevKeyState && skillCount <= 0)
 			{
 				// スタミナを回復する
-				st = st + 30;
+				st += 30;
 				// スキルカウントを 1 に
 				skillCount = 1;
 				// turnFlag を false に
@@ -324,22 +358,31 @@ void Yamaoka_PlayerActor::Skill(float _playerPos, float _goalPos)
 			}
 		}
 	}
+	// 数値表示
+	//DrawFormatString(850, 800, GetColor(255, 0, 255), "st   %d", st);
+	//DrawFormatString(850, 850, GetColor(255, 0, 255), "skill  %d", skillCount);
+}
 
-	// A を押すと必殺技を使う(スピードアップ １～３秒くらいの予定)
-	if (CheckHitKey(KEY_INPUT_A))
+// 加速技
+void Yamaoka_PlayerActor::speedUpSkill(float _deltaTime)
+{
+	// Aキー　を押したら発動
+	if (CheckHitKey(KEY_INPUT_A) && /*dCount <= 25 &&*/ framcount >= 0)
 	{
-		mPrevKeyState = mNowKeyState;		// 今のキー状態を前回のキー状態に
-		mNowKeyState = STATE_KEY_SPACE;		// 今のキー状態をSTATE_KEY_SPACEに
+		// 技の発動時間のカウント
+		framcount--;
+		// プレイヤーの速度を倍にする
+		mPosition.x -= mVelosity.x * _deltaTime * 2.0f;
+		// 残り距離を減らす
+		//dCount -= D_COUNT * 2;
 
-		// 必殺技の処理
-		// 今と前回のキー状態が違うとき
-		if (mNowKeyState != mPrevKeyState)
+		// カウントが０以下になったら
+		if (framcount <= 0)
 		{
-			// スピードアップ
-			mVelosity.x = mVelosity.x * 1.005;
-			// スタミナの消費量を２倍に
-			st -= 2;
+			// 値を -1 で固定する
+			framcount = -1;
 		}
 	}
-	// 制作中
+	//DrawFormatString(850, 850, GetColor(255, 0, 255), "mvelosity.x  %d", playerSpeed.x);
 }
+

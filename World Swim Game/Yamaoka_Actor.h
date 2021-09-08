@@ -1,11 +1,10 @@
 #pragma once
 #include "DxLib.h"
 
-class Yamaoka_Actor
+class Actor
 {
 public:
-	Yamaoka_Actor();
-	virtual ~Yamaoka_Actor();
+	Actor();
 
 	// Update関数　Gameからコールされる
 	void Update(float _deltaTime);
@@ -18,11 +17,6 @@ public:
 	//再生するアニメーションの番号を取得する関数
 	void attachAnim(int _animPlay);
 
-	// スタミナゲージの描画
-	void DrawSt(int _st, int _MaxSt, int _MinSt);
-	// ゴールまでの距離の描画
-	void DrawToGoal(int _playerPos, int _goalPos);
-
 	// Getters/setters　ゲッター・セッター//
 	//ポジションのGetters/setters
 	const VECTOR& GetPos() const
@@ -32,6 +26,15 @@ public:
 	void SetPos(const VECTOR _set)
 	{
 		mPosition = _set;
+	}
+	//ポジションのX座標のGetters/setters
+	const float& GetPosX() const
+	{
+		return mPosition.x;
+	}
+	void SetPosX(const float _set)
+	{
+		mPosition.x = _set;
 	}
 	//ディレクションのGetters/setters
 	const VECTOR& GetDir() const
@@ -51,22 +54,22 @@ public:
 	{
 		mRotation = _set;
 	}
+	// Velosity の Getters/setters
+	const float& GetVelosity()const
+	{
+		return mVelosity.x;
+	}
+	void SetVelosity(const float _set)
+	{
+		mVelosity.x = _set;
+	}
 
-	// ゴールまでの距離 //
-	int dCount;      // どれだけ進んだか        
-	int maxdCount;   // どこまで進めるのか
-	int NowPos;
-	// 未完成 //
-
-	int st;      // スタミナ
-	int MaxSt;   // スタミナ最大値
-	int MinSt;   // スタミナ最小値
 
 protected:
 	VECTOR mPosition;	//ポジション
 	VECTOR mDirection;	//方向
 	VECTOR mRotation;	//回転
-	VECTOR mVelocity;	//速度
+	VECTOR mVelosity;	//速度
 	float mSpeed;		//移動速度
 
 	//キャラモデル

@@ -53,6 +53,9 @@ SceneBase* GameScene::Update(float _deltaTime)
 		//	カウントダウン開始
 		m_actor->countDown--;
 
+		// 加速技
+		m_actor->speedUpSkill(_deltaTime);
+
 		// ※キー入力重複対策のフラグ
 		// ENTERキーから指を離したら、次のENTERの入力を有効に
 		if (!CheckHitKey(KEY_INPUT_RETURN))
@@ -105,17 +108,17 @@ void GameScene::Draw()
 	// 操作ボタン（仮）
 	if (CheckHitKey(KEY_INPUT_RIGHT))
 	{
-		DrawBox(1050, 800, 1150, 900, GetColor(255, 255, 255), TRUE);
+		DrawBox(1050, 600, 1150, 700, GetColor(255, 255, 255), TRUE);
 	}
 	if (CheckHitKey(KEY_INPUT_LEFT))
 	{
-		DrawBox(750, 800, 850, 900, GetColor(255, 255, 255), TRUE);
+		DrawBox(750, 600, 850, 700, GetColor(255, 255, 255), TRUE);
 	}
-	DrawBox(750, 800, 850, 900, GetColor(0, 0, 0), FALSE);
-	DrawBox(1050, 800, 1150, 900, GetColor(0, 0, 0), FALSE);
+	DrawBox(750, 600, 850, 700, GetColor(0, 0, 0), FALSE);
+	DrawBox(1050, 600, 1150, 700, GetColor(0, 0, 0), FALSE);
 	SetFontSize(100);
-	DrawFormatString(750, 800, GetColor(0, 0, 0), "←");
-	DrawFormatString(1050, 800, GetColor(0, 0, 0), "→");
+	DrawFormatString(750, 600, GetColor(0, 0, 0), "←");
+	DrawFormatString(1050, 600, GetColor(0, 0, 0), "→");
 
 	SetFontSize(35);
 	// スタミナゲージの表示
@@ -124,7 +127,7 @@ void GameScene::Draw()
 	m_actor->DrawToGoal(m_actor->dCount, m_actor->maxdCount);
 
 	// スキル
-	m_actor->Skill(m_actor->dCount, m_actor->maxdCount);
+	m_actor->healSkill(m_actor->dCount, m_actor->maxdCount);
 
 	// カウントダウンの表示 ( 3秒 )
 	if (m_actor->countDown >= 0)

@@ -4,7 +4,7 @@ int Actor::modelHandle = NULL;
 
 //コンストラクタ
 Actor::Actor()
-	:mPosition(VGet(0, 0, 0))
+	: mPosition(VGet(0, 0, 0))
 	, mVelosity(VGet(1, 0, 0))
 {
 }
