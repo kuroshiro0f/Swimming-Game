@@ -16,9 +16,11 @@ public:
 
 	typedef enum KEY_STATE_ENUM
 	{
-		STATE_KEY_IDLE,
-		STATE_KEY_RIGHT,
-		STATE_KEY_LEFT,
+		STATE_KEY_IDLE  = 0,
+		STATE_KEY_UP    = 1,
+		STATE_KEY_DOWN  = 2,
+		STATE_KEY_RIGHT = 3,
+		STATE_KEY_LEFT  = 4,
 
 		STATE_KEY_ENUM,
 	}KEY_STATE_ENUM;
@@ -45,7 +47,13 @@ public:
 	// スタミナゲージの描画
 	void DrawSt(int _st, int _MaxSt, int _MinSt);
 	// ゴールまでの距離の描画
-	void DrawToGoal(float _playerPos, float _goalPos);
+	void DrawToGoal(int _dCount);
+
+	//ランダムキー
+	void RandomKey();
+
+	//turnFlagのゲッター
+	bool GetTurnFlag() { return turnFlag; };
 
 	//リターンの評価するためのプレイヤーの座標を補完
 	float mPosX;
@@ -66,14 +74,24 @@ public:
 	int count;       // 次のシーンに行くまでのカウント    
 	int countDown;
 
+	int randomKeyNumber;
+	bool randomFlag;
+
 private:
+	int inputTime;
+	int inputStartTime;
+	int inputEndTime;
+
+	VECTOR mPrevPosition;
+
 	PLAYER_STATE_ENUM mNowPlayerState;	//プレイヤーの今の状態
 
 	KEY_STATE_ENUM mNowKeyState;		//キーの今の状態
 	KEY_STATE_ENUM mPrevKeyState;		//キーの1つ前の状態
+	//KEY_STATE_ENUM mRandomKeyState;		//ランダムキーの状態
 
 	Evaluation	   mEvlt;				//評価
 
 	bool startFlag;
-
+	bool turnFlag;        // ターンフラグ
 };
