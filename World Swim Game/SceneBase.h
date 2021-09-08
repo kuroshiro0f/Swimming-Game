@@ -16,10 +16,11 @@ public:
 	int getVolume() { return m_volumePal; }
 	void setVolume(int _volume) { m_volumePal = _volume; }
 	int keifontHandle;
+	int loadFontHandle;
 
 protected:
 	int m_volumePal;
 	int m_loadFontSize;
 	int m_normalFontSize;
-	
+
 };

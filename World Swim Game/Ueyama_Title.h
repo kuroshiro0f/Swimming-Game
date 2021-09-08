@@ -1,6 +1,13 @@
 #pragma once
 #include "SceneBase.h"
 
+//-----------------------------------------------------------------------------
+//	変更点
+//	水滴関連
+//	マニュアル関連
+//-----------------------------------------------------------------------------
+
+
 class Ueyama_Title : public SceneBase
 {
 public:
@@ -41,10 +48,12 @@ private:
 	int m_maouGraphHandle;				//	魔王魂
 	int m_bigDropGraphHandle;			//	大きな水滴
 	int m_smallDropGraphHandle;			//	小さな水滴
+	int m_manualGraphHandle;			//	マニュアル
 
 	//	サウンドハンドル
 	int m_backSoundHandle;				//	BGM
-	int m_click_sound_handle;			//  ボタンを押したときの音
+	int m_entClickSoundHandle;			//  ENTキーを押したときの音
+	int m_spaClickSoundHandle;			//	SPACEキーを押したときの音
 
 	//	アルファ値
 	int m_alphaVal;
@@ -63,6 +72,9 @@ private:
 	//	デルタタイム
 	float m_deltaTime;
 
+	//	フラグ
+	int m_bigDropFlag;				//	大きな水滴の状態管理
+	int m_smallDropFlag;			//	小さな水滴の状態管理
 	bool m_checkKeyFlag;			//	キーが押されたままかを判定するフラグ
 	bool m_fadeOutFinishFlag;		//	フェードアウトの終了判定フラグ
 };

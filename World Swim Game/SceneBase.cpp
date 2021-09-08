@@ -11,4 +11,5 @@ SceneBase::SceneBase()
 	, m_normalFontSize(NORMAL_FONT_SIZE)
 {
 	keifontHandle = CreateFontToHandle("‚¯‚¢‚Ó‚§‚ñ‚Æ", 80, 2, DX_FONTTYPE_ANTIALIASING_4X4);
+	loadFontHandle = CreateFontToHandle("Comic Sans MS", 60, 3, DX_FONTTYPE_ANTIALIASING_4X4);
 }

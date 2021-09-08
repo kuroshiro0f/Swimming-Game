@@ -142,7 +142,6 @@ void Title::Draw()
 
 	if (m_state != TITLE_SCENE_STATE::FIRST && m_state != TITLE_SCENE_STATE::SECOND)
 	{
-
 		// ï`âÊ
 		DrawGraph(0, 0, m_backGraphHandle, TRUE);			//	îwåi
 		DrawGraph(0, 0, m_logoGraphHandle, TRUE);			//	ÉçÉS

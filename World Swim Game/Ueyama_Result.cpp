@@ -3,6 +3,11 @@
 
 #include "DxLib.h"
 
+//-----------------------------------------------------------------------------
+//	・変更点
+//	　音量の位置調整
+//-----------------------------------------------------------------------------
+
 //	スクリーンのサイズ
 const int SCREEN_SIZE_W = 1920;
 const int SCREEN_SIZE_H = 1080;
@@ -75,9 +80,6 @@ Ueyama_Result::Ueyama_Result(const int _time)
 
 	//	フェードインから始める
 	m_state = RESULT_SCENE_STATE::FADE_IN;
-
-	//	デバッグ用
-	m_time = FIRST;
 }
 
 Ueyama_Result::~Ueyama_Result()
@@ -203,6 +205,7 @@ SceneBase* Ueyama_Result::Update(float _deltaTime)
 
 		break;
 	case RESULT_SCENE_STATE::EVA:
+		m_resultFlag++;
 		// ※キー入力重複対策のフラグ
 		// ENTERキーから指を離したら、次のENTERの入力を有効に
 		if (!CheckHitKey(KEY_INPUT_RETURN))
@@ -384,28 +387,23 @@ void Ueyama_Result::Sound()
 {
 	//	BGMを流す
 	PlaySoundMem(m_bgmSoundHandle, DX_PLAYTYPE_BACK, FALSE);
-	ChangeVolumeSoundMem(m_volumePal, m_bgmSoundHandle);			//	音量
 	switch (m_resultFlag)
 	{
 	case 1:
 		//	効果音を流す
 		PlaySoundMem(m_se1SoundHandle, DX_PLAYTYPE_BACK, FALSE);
-		ChangeVolumeSoundMem(m_volumePal, m_se1SoundHandle);			//	音量
 		break;
 	case 2:
 		//	効果音を流す
-		PlaySoundMem(m_se2SoundHandle, DX_PLAYTYPE_BACK, FALSE);
-		ChangeVolumeSoundMem(m_volumePal, m_se2SoundHandle);			//	音量
+		PlaySoundMem(m_se2SoundHandle, DX_PLAYTYPE_BACK, FALSE);	
 		break;
 	case 3:
 		//	効果音を流す
 		PlaySoundMem(m_se3SoundHandle, DX_PLAYTYPE_BACK, FALSE);
-		ChangeVolumeSoundMem(m_volumePal, m_se3SoundHandle);			//	音量
 		break;
 	case 4:
 		//	効果音を流す
-		PlaySoundMem(m_se4SoundHandle, DX_PLAYTYPE_BACK, FALSE);
-		ChangeVolumeSoundMem(m_volumePal, m_se4SoundHandle);			//	音量
+		PlaySoundMem(m_se4SoundHandle, DX_PLAYTYPE_BACK, FALSE);	
 		break;
 	default:
 		break;
@@ -442,6 +440,13 @@ void Ueyama_Result::Load()
 	m_se2SoundHandle = LoadSoundMem("data/sound/Result/TestSE.mp3");				//	効果音
 	m_se3SoundHandle = LoadSoundMem("data/sound/Result/TestSE.mp3");				//	効果音
 	m_se4SoundHandle = LoadSoundMem("data/sound/Result/TestSE.mp3");				//	効果音
+
+	//	音量調整
+	ChangeVolumeSoundMem(m_volumePal, m_bgmSoundHandle);
+	ChangeVolumeSoundMem(m_volumePal, m_se1SoundHandle);
+	ChangeVolumeSoundMem(m_volumePal, m_se2SoundHandle);
+	ChangeVolumeSoundMem(m_volumePal, m_se3SoundHandle);
+	ChangeVolumeSoundMem(m_volumePal, m_se4SoundHandle);
 }
 
 void Ueyama_Result::UpdateTransparent()
