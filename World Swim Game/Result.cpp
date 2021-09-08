@@ -101,6 +101,10 @@ Result::~Result()
 	DeleteGraph(m_bigStarGraphHandle);
 	DeleteGraph(m_smallStarGraphHandle);
 	DeleteSoundMem(m_bgmSoundHandle);
+	DeleteSoundMem(m_se1SoundHandle);
+	DeleteSoundMem(m_se2SoundHandle);
+	DeleteSoundMem(m_se3SoundHandle);
+	DeleteSoundMem(m_se4SoundHandle);
 }
 
 SceneBase* Result::Update(float _deltaTime)
@@ -199,6 +203,7 @@ SceneBase* Result::Update(float _deltaTime)
 
 		break;
 	case RESULT_SCENE_STATE::EVA:
+		m_resultFlag++;
 		// ※キー入力重複対策のフラグ
 		// ENTERキーから指を離したら、次のENTERの入力を有効に
 		if (!CheckHitKey(KEY_INPUT_RETURN))
@@ -379,28 +384,23 @@ void Result::Draw()
 void Result::Sound()
 {
 	PlaySoundMem(m_bgmSoundHandle, DX_PLAYTYPE_BACK, FALSE);
-	ChangeVolumeSoundMem(m_volumePal, m_bgmSoundHandle);
 	switch (m_resultFlag)
 	{
 	case 1:
 		//	効果音を流す
 		PlaySoundMem(m_se1SoundHandle, DX_PLAYTYPE_BACK, FALSE);
-		ChangeVolumeSoundMem(m_volumePal, m_se1SoundHandle);			//	音量
 		break;
 	case 2:
 		//	効果音を流す
 		PlaySoundMem(m_se2SoundHandle, DX_PLAYTYPE_BACK, FALSE);
-		ChangeVolumeSoundMem(m_volumePal, m_se2SoundHandle);			//	音量
 		break;
 	case 3:
 		//	効果音を流す
 		PlaySoundMem(m_se3SoundHandle, DX_PLAYTYPE_BACK, FALSE);
-		ChangeVolumeSoundMem(m_volumePal, m_se3SoundHandle);			//	音量
 		break;
 	case 4:
 		//	効果音を流す
 		PlaySoundMem(m_se4SoundHandle, DX_PLAYTYPE_BACK, FALSE);
-		ChangeVolumeSoundMem(m_volumePal, m_se4SoundHandle);			//	音量
 		break;
 	default:
 		break;
@@ -437,6 +437,13 @@ void Result::Load()
 	m_se2SoundHandle = LoadSoundMem("data/sound/Result/TestSE.mp3");				//	効果音
 	m_se3SoundHandle = LoadSoundMem("data/sound/Result/TestSE.mp3");				//	効果音
 	m_se4SoundHandle = LoadSoundMem("data/sound/Result/TestSE.mp3");				//	効果音
+
+	//	音量調整
+	ChangeVolumeSoundMem(m_volumePal, m_bgmSoundHandle);
+	ChangeVolumeSoundMem(m_volumePal, m_se1SoundHandle);
+	ChangeVolumeSoundMem(m_volumePal, m_se2SoundHandle);
+	ChangeVolumeSoundMem(m_volumePal, m_se3SoundHandle);
+	ChangeVolumeSoundMem(m_volumePal, m_se4SoundHandle);
 }
 
 void Result::UpdateTransparent()

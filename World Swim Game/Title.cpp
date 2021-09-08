@@ -7,6 +7,9 @@
 const int SCREEN_SIZE_W = 1920;
 const int SCREEN_SIZE_H = 1080;
 
+//	効果音音量調整
+int DECVOLUMEPAL = 40;
+
 //	最大透過量
 const int MAX_TRANSP_VAL = 255;
 //	透過量変化用ベクトル
@@ -15,11 +18,11 @@ const int TRANSP_MODERATION = -1;
 const int FIRST_TRANS_VAL = 100;
 
 //	フェードイン・フェードアウトの速度
-const float ADD_ALPHA_VAL = 65.0f;
+const float ADD_ALPHA_VAL = 60.0f;
 const float ADD_ALPHA_VAL_2 = 300.0f;
 
-//	円周率
-const double PI = 3.1415926535897932384626433832795f;
+////	円周率
+//const double PI = 3.1415926535897932384626433832795f;
 
 Title::Title()
 	: m_state(TITLE_SCENE_STATE::FIRST)
@@ -27,8 +30,8 @@ Title::Title()
 	, m_fadeOutFinishFlag(false)
 	, m_addAlphaVal(ADD_ALPHA_VAL)
 	, m_addAlphaVal2(ADD_ALPHA_VAL_2)
-	, m_bigDropAngle(PI)
-	, m_smallDropAngle(PI)
+	/*, m_bigDropAngle(PI)
+	, m_smallDropAngle(PI)*/
 {
 	if (CheckHitKey(KEY_INPUT_RETURN))
 	{
@@ -55,7 +58,10 @@ Title::~Title()
 	DeleteGraph(m_maouGraphHandle);
 	DeleteGraph(m_bigDropGraphHandle);
 	DeleteGraph(m_smallDropGraphHandle);
+	DeleteGraph(m_manualGraphHandle);
 	DeleteSoundMem(m_backSoundHandle);
+	DeleteSoundMem(m_entClickSoundHandle);
+	DeleteSoundMem(m_spaClickSoundHandle);
 }
 
 SceneBase* Title::Update(float _deltaTime)
@@ -81,6 +87,9 @@ SceneBase* Title::Update(float _deltaTime)
 			// ※キー入力重複対策のフラグ
 			m_checkKeyFlag = true;
 
+			//	SEを流す
+			PlaySoundMem(m_entClickSoundHandle, DX_PLAYTYPE_BACK, TRUE);
+
 			m_state = TITLE_SCENE_STATE::FADE_OUT;
 		}
 		break;
@@ -92,29 +101,44 @@ SceneBase* Title::Update(float _deltaTime)
 			m_checkKeyFlag = false;
 		}
 
+		// SPACEでマニュアルへ
+		if (CheckHitKey(KEY_INPUT_SPACE) && m_checkKeyFlag == false)
+		{
+			// ※キー入力重複対策のフラグ
+			m_checkKeyFlag = true;
+
+			//	SEを流す
+			PlaySoundMem(m_spaClickSoundHandle, DX_PLAYTYPE_BACK, TRUE);
+
+			m_state = TITLE_SCENE_STATE::MANUAL;
+		}
+
 		// ENTERで次のステートへ
 		if (CheckHitKey(KEY_INPUT_RETURN) && m_checkKeyFlag == false)
 		{
 			// ※キー入力重複対策のフラグ
 			m_checkKeyFlag = true;
+
+			//	SEを流す
+			PlaySoundMem(m_entClickSoundHandle, DX_PLAYTYPE_BACK, TRUE);
 
 			m_state = TITLE_SCENE_STATE::FADE_OUT;
 		}
 
 		break;
 	case TITLE_SCENE_STATE::MANUAL:
-		// ※キー入力重複対策のフラグ
-		// ENTERキーから指を離したら、次のENTERの入力を有効に
 		if (!CheckHitKey(KEY_INPUT_RETURN))
 		{
 			m_checkKeyFlag = false;
 		}
 
-		// ENTERで次のステートへ
 		if (CheckHitKey(KEY_INPUT_RETURN) && m_checkKeyFlag == false)
 		{
 			// ※キー入力重複対策のフラグ
 			m_checkKeyFlag = true;
+
+			//	SEを流す
+			PlaySoundMem(m_spaClickSoundHandle, DX_PLAYTYPE_BACK, TRUE);
 
 			m_state = TITLE_SCENE_STATE::TITLE;
 		}
@@ -123,6 +147,7 @@ SceneBase* Title::Update(float _deltaTime)
 	case TITLE_SCENE_STATE::FADE_OUT:
 		if (m_fadeOutFinishFlag)
 		{
+			//return new Ueyama_GameScene();
 			return new GameScene();
 		}
 		break;
@@ -144,19 +169,22 @@ void Title::Draw()
 	{
 		// 描画
 		DrawGraph(0, 0, m_backGraphHandle, TRUE);			//	背景
-		DrawGraph(0, 0, m_logoGraphHandle, TRUE);			//	ロゴ
+		if (m_state != TITLE_SCENE_STATE::MANUAL)
+		{
+			DrawGraph(0, 0, m_logoGraphHandle, TRUE);			//	ロゴ
 
-		// 透過して描画
-		SetDrawBlendMode(DX_BLENDMODE_ALPHA, m_transpVal);
-		DrawGraph(0, 0, m_startGuideGraphHandle, TRUE);		//	スタートの案内
-		// 透過を元に戻す
-		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+			// 透過して描画
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, m_transpVal);
+			DrawGraph(0, 0, m_startGuideGraphHandle, TRUE);		//	スタートの案内
+			// 透過を元に戻す
+			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
-		// 透過して描画
-		SetDrawBlendMode(DX_BLENDMODE_ALPHA, m_transpVal);
-		DrawGraph(0, 0, m_manualGuideGraphHandle, TRUE);	//	マニュアルへの案内
-		// 透過を元に戻す
-		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+			// 透過して描画
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, m_transpVal);
+			DrawGraph(0, 0, m_manualGuideGraphHandle, TRUE);	//	マニュアルへの案内
+			// 透過を元に戻す
+			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+		}
 	}
 
 	if (m_state == TITLE_SCENE_STATE::MANUAL)
@@ -166,6 +194,9 @@ void Title::Draw()
 		DrawBox(0, 0, SCREEN_SIZE_W, SCREEN_SIZE_H, GetColor(0, 0, 0), TRUE);
 		// 透過を元に戻す
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+
+		//	描画
+		DrawGraph(0, 0, m_manualGraphHandle, TRUE);
 	}
 
 	if (m_state == TITLE_SCENE_STATE::FIRST)
@@ -187,7 +218,7 @@ void Title::Draw()
 			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
 			// アルファ値が70になったらフェードイン終了
-			if (m_alphaVal <= 70)
+			if (m_alphaVal <= 0)
 			{
 				m_state = TITLE_SCENE_STATE::SECOND;
 				m_alphaVal = 255;
@@ -213,7 +244,7 @@ void Title::Draw()
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 60);
 
 		// アルファ値が70になったらフェードイン終了
-		if (m_alphaVal <= 70)
+		if (m_alphaVal <= 0)
 		{
 			m_state = TITLE_SCENE_STATE::FADE_IN;
 			m_alphaVal = 255;
@@ -268,7 +299,6 @@ void Title::Sound()
 {
 	//	BGMを流す
 	PlaySoundMem(m_backSoundHandle, DX_PLAYTYPE_BACK, FALSE);
-	ChangeVolumeSoundMem(m_volumePal, m_backSoundHandle);
 }
 
 void Title::Load()
@@ -280,11 +310,19 @@ void Title::Load()
 	m_manualGuideGraphHandle = LoadGraph("data/img/Title/Title_manual.png");	//	マニュアルへの案内
 	m_gateGraphHandle = LoadGraph("data/img/Title/GATE.png");					//	GATE
 	m_maouGraphHandle = LoadGraph("data/img/Title/maou.png");					//	魔王魂
-	m_bigDropGraphHandle = LoadGraph("data/img/Title/drop1.png");				//	大きな水滴
-	m_smallDropGraphHandle = LoadGraph("data/img/Title/drop2.png");				//	小さな水滴
+	//m_bigDropGraphHandle = LoadGraph("data/img/Title/drop1.png");				//	大きな水滴
+	//m_smallDropGraphHandle = LoadGraph("data/img/Title/drop2.png");				//	小さな水滴
+	m_manualGraphHandle = LoadGraph("data/img/Manual/Manual.png");			//	マニュアル
 
 	//	サウンドハンドルにセット
-	m_backSoundHandle = LoadSoundMem("data/sound/Title/Title2.ogg");		//	BGM
+	m_backSoundHandle = LoadSoundMem("data/sound/Title/Title4.ogg");			//	BGM
+	m_entClickSoundHandle = LoadSoundMem("data/sound/Title/SE2.mp3");		//	ENTERキーを押したとき
+	m_spaClickSoundHandle = LoadSoundMem("data/sound/Title/SE1.mp3");		//	SPACEキーを押したとき
+
+	//	音量調整
+	ChangeVolumeSoundMem(m_volumePal, m_backSoundHandle);
+	ChangeVolumeSoundMem(m_volumePal + DECVOLUMEPAL, m_spaClickSoundHandle);
+	ChangeVolumeSoundMem(m_volumePal + DECVOLUMEPAL, m_entClickSoundHandle);
 }
 
 /// 点滅エフェクトに用いる透過量の更新処理
