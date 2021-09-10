@@ -125,47 +125,84 @@ void GameScene::Draw()
 	//DrawFormatString(1050, 800, GetColor(0, 0, 0), "→");
 
 	//ランダムに矢印を表示
-	if (m_actor->randomKeyNumber == 1)		//ランダムに生成した数が STATE_KEY_UP(1) と同じとき
+	switch (m_actor->randomKeyNumber)
 	{
+	case 1:		//ランダムに生成した数が STATE_KEY_UP(1) と同じとき
 		if (CheckHitKey(KEY_INPUT_UP))
+		{
+			m_actor->inputArrowFlag = true;
+		}
+
+		if (m_actor->inputArrowFlag && m_actor->randomFlag)
 		{
 			DrawBox(900, 800, 1000, 900, GetColor(255, 255, 255), TRUE);
 		}
-		else if(CheckHitKey(KEY_INPUT_DOWN) || CheckHitKey(KEY_INPUT_RIGHT) || CheckHitKey(KEY_INPUT_LEFT))
+		else if (!m_actor->randomFlag)
+		{
+			m_actor->inputArrowFlag = false;
+		}
+		else if (CheckHitKey(KEY_INPUT_DOWN) || CheckHitKey(KEY_INPUT_RIGHT) || CheckHitKey(KEY_INPUT_LEFT))
 		{
 			DrawBox(900, 800, 1000, 900, GetColor(255, 0, 0), TRUE);
 		}
 		DrawFormatString(900, 800, GetColor(0, 0, 0), "↑");
-	}
-	if (m_actor->randomKeyNumber == 2)		//ランダムに生成した数が STATE_KEY_DOWN(1) と同じとき
-	{
+		break;
+
+	case 2:		//ランダムに生成した数が STATE_KEY_DOWN(2) と同じとき
 		if (CheckHitKey(KEY_INPUT_DOWN))
 		{
+			m_actor->inputArrowFlag = true;
+		}
+
+		if (m_actor->inputArrowFlag && m_actor->randomFlag)
+		{
 			DrawBox(900, 800, 1000, 900, GetColor(255, 255, 255), TRUE);
+		}
+		else if (!m_actor->randomFlag)
+		{
+			m_actor->inputArrowFlag = false;
 		}
 		else if (CheckHitKey(KEY_INPUT_UP) || CheckHitKey(KEY_INPUT_RIGHT) || CheckHitKey(KEY_INPUT_LEFT))
 		{
 			DrawBox(900, 800, 1000, 900, GetColor(255, 0, 0), TRUE);
 		}
 		DrawFormatString(900, 800, GetColor(0, 0, 0), "↓");
-	}
-	if (m_actor->randomKeyNumber == 3)		//ランダムに生成した数が STATE_KEY_LEFT(1) と同じとき
-	{
+		break;
+
+	case 3:		//ランダムに生成した数が STATE_KEY_RIGHT(3) と同じとき
 		if (CheckHitKey(KEY_INPUT_RIGHT))
 		{
+			m_actor->inputArrowFlag = true;
+		}
+
+		if (m_actor->inputArrowFlag && m_actor->randomFlag)
+		{
 			DrawBox(900, 800, 1000, 900, GetColor(255, 255, 255), TRUE);
+		}
+		else if (!m_actor->randomFlag)
+		{
+			m_actor->inputArrowFlag = false;
 		}
 		else if (CheckHitKey(KEY_INPUT_UP) || CheckHitKey(KEY_INPUT_DOWN) || CheckHitKey(KEY_INPUT_LEFT))
 		{
 			DrawBox(900, 800, 1000, 900, GetColor(255, 0, 0), TRUE);
 		}
 		DrawFormatString(900, 800, GetColor(0, 0, 0), "→");
-	}
-	if (m_actor->randomKeyNumber == 4)		//ランダムに生成した数が STATE_KEY_RIGHT(1) と同じとき
-	{
+		break;
+
+	case 4:		//ランダムに生成した数が STATE_KEY_LEFT(4) と同じとき
 		if (CheckHitKey(KEY_INPUT_LEFT))
 		{
+			m_actor->inputArrowFlag = true;
+		}
+
+		if (m_actor->inputArrowFlag && m_actor->randomFlag)
+		{
 			DrawBox(900, 800, 1000, 900, GetColor(255, 255, 255), TRUE);
+		}
+		else if (!m_actor->randomFlag)
+		{
+			m_actor->inputArrowFlag = false;
 		}
 		else if (CheckHitKey(KEY_INPUT_UP) || CheckHitKey(KEY_INPUT_DOWN) || CheckHitKey(KEY_INPUT_RIGHT))
 		{
@@ -175,7 +212,7 @@ void GameScene::Draw()
 	}
 
 	//スペースキーのBOX描画
-	if (-90 >= m_actor->GetPosX() && m_actor->GetPosX() > -136 && m_actor->GetTurnFlag() == false)
+	if (-90 >= m_actor->GetPosX() && m_actor->GetPosX() > -136 && m_actor->GetInputSpaceFlag() == false)
 	{
 		//αブレンドモード
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 128);

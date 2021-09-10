@@ -55,11 +55,17 @@ public:
 	//turnFlagのゲッター
 	bool GetTurnFlag() { return turnFlag; };
 
+	//inputSpaceFlagのゲッター
+	bool GetInputSpaceFlag() { return inputSpaceFlag; };
+
+	//inputArrowFlagのゲッター
+	bool GetInputArrpwFlag() { return inputArrowFlag; };
+
 	//リターンの評価するためのプレイヤーの座標を補完
 	float mPosX;
 
 	// ゴールまでの距離 //
-	int dCount;      // どれだけ進んだか        
+	float dCount;      // どれだけ進んだか        
 	int maxdCount;   // どこまで進めるのか
 	int NowPos;		 // プレイヤーの現在座標
 
@@ -74,11 +80,13 @@ public:
 	int count;       // 次のシーンに行くまでのカウント    
 	int countDown;
 
+	int inputTime;
+
 	int randomKeyNumber;
 	bool randomFlag;
+	bool inputArrowFlag;				//矢印キー入力フラグ
 
 private:
-	int inputTime;
 	int inputStartTime;
 	int inputEndTime;
 
@@ -88,10 +96,11 @@ private:
 
 	KEY_STATE_ENUM mNowKeyState;		//キーの今の状態
 	KEY_STATE_ENUM mPrevKeyState;		//キーの1つ前の状態
-	//KEY_STATE_ENUM mRandomKeyState;		//ランダムキーの状態
+	//KEY_STATE_ENUM mRandomKeyState;	//ランダムキーの状態
 
 	Evaluation	   mEvlt;				//評価
 
 	bool startFlag;
-	bool turnFlag;        // ターンフラグ
+	bool turnFlag;						//ターンフラグ
+	bool inputSpaceFlag;				//SPACE入力フラグ
 };
