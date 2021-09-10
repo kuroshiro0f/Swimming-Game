@@ -1,5 +1,6 @@
 #include "Ueyama_Result.h"
 #include "Ueyama_Title.h"
+#include "Ueyama_Save.h"
 
 #include "DxLib.h"
 
@@ -18,9 +19,21 @@ const int SQUARE_START_Y = 370;
 const int SQUARE_END_X = 1100;
 const int SQUARE_END_Y = 1030;
 
+//// タイムを表示する場所
+//const int TIME_X = 370;
+//const int TIME_Y = 660;
+
 // タイムを表示する場所
 const int TIME_X = 370;
-const int TIME_Y = 660;
+const int TIME_Y = 460;
+
+// RECORDを表示する場所
+const int RECORD_X = 200;				//	RECORDの文字	
+const int RECORD_Y = 660;				
+const int RECORD_TIME_X = 150;			//	歴代タイムのX座標
+const int FIRST_TIME_Y = 760;			//	一位の場所
+const int SECOND_TIME_Y = 860;			//	二位の場所
+const int THIRD_TIME_Y = 960;			//	三位の場所
 
 //	リザルトの遷移する時間
 const int TIME = 100;
@@ -107,11 +120,19 @@ Ueyama_Result::~Ueyama_Result()
 	DeleteGraph(m_bigStarGraphHandle);
 	DeleteGraph(m_smallStarGraphHandle);
 	DeleteSoundMem(m_bgmSoundHandle);
+	DeleteSoundMem(m_se1SoundHandle);
+	DeleteSoundMem(m_se2SoundHandle);
+	DeleteSoundMem(m_se3SoundHandle);
+	DeleteSoundMem(m_se4SoundHandle);
 }
 
 SceneBase* Ueyama_Result::Update(float _deltaTime)
 {
+	//	リザルトの経過時間を進める
 	m_resultTime++;
+
+	//	タイムをセーブ
+	//m_save->SetTime(m_time);
 
 	switch (m_state)
 	{
@@ -285,7 +306,11 @@ void Ueyama_Result::Draw()
 	if (m_resultFlag >= 1)
 	{
 		//	クリアタイムを表示
-		DrawFormatStringToHandle(TIME_X, TIME_Y, GetColor(0, 0, 0), keifontHandle, "TIME : %d", m_time);
+		DrawFormatStringToHandle(TIME_X, TIME_Y, GetColor(0, 0, 0), nowTimeHandle, "TIME : %d", m_time);
+		/*DrawFormatStringToHandle(RECORD_X, RECORD_Y, GetColor(0, 0, 0), recordHandle, "RECORD");
+		DrawFormatStringToHandle(RECORD_TIME_X, FIRST_TIME_Y, GetColor(0, 0, 0), recordHandle, "1位 : %d", m_save->GetFirstTime());
+		DrawFormatStringToHandle(RECORD_TIME_X, SECOND_TIME_Y, GetColor(0, 0, 0), recordHandle, "2位 : %d", m_save->GetSecondTime());
+		DrawFormatStringToHandle(RECORD_TIME_X, THIRD_TIME_Y, GetColor(0, 0, 0), recordHandle, "3位 : %d", m_save->GetThirdTime());*/
 	}
 	if (m_resultFlag >= 2)
 	{

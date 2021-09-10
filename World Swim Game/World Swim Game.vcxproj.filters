@@ -108,6 +108,9 @@
     <ClInclude Include="Ueyama_Camera.h">
       <Filter>ソース ファイル\work\Ueyama</Filter>
     </ClInclude>
+    <ClInclude Include="Ueyama_Save.h">
+      <Filter>ソース ファイル\work\Ueyama</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Actor.cpp">
@@ -198,6 +201,9 @@
       <Filter>ソース ファイル\work\Ueyama</Filter>
     </ClCompile>
     <ClCompile Include="Ueyama_Camera.cpp">
+      <Filter>ソース ファイル\work\Ueyama</Filter>
+    </ClCompile>
+    <ClCompile Include="Ueyama_Save.cpp">
       <Filter>ソース ファイル\work\Ueyama</Filter>
     </ClCompile>
   </ItemGroup>

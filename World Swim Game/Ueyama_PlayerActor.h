@@ -1,8 +1,6 @@
 #pragma once
 #include "Actor.h"
 
-#include "DxLib.h"
-
 //-----------------------------------------------------------------------------
 // 　変更なし
 //-----------------------------------------------------------------------------
@@ -21,9 +19,11 @@ public:
 
 	typedef enum KEY_STATE_ENUM
 	{
-		STATE_KEY_IDLE,
-		STATE_KEY_RIGHT,
-		STATE_KEY_LEFT,
+		STATE_KEY_IDLE = 0,
+		STATE_KEY_UP = 1,
+		STATE_KEY_DOWN = 2,
+		STATE_KEY_RIGHT = 3,
+		STATE_KEY_LEFT = 4,
 		STATE_KEY_SPACE,
 
 		STATE_KEY_ENUM,
@@ -53,7 +53,8 @@ public:
 	// ゴールまでの距離の描画
 	void DrawToGoal(float _playerPos, float _goalPos);
 
-	bool GetTurnFlag() { return turnFlag; }
+	//turnFlagのゲッター
+	bool GetTurnFlag() { return turnFlag; };
 
 	// 必殺技
 	void Skill(float _playerPos, float _goalPos);
@@ -76,10 +77,21 @@ public:
 	int countUP;     // 経過時間
 
 	int count;       // 次のシーンに行くまでのカウント    
-	int countDown;
+	int countDown;	// スタートまでのカウントダウン
 	int skillCount;  // スキルの使用カウント
 
+	int randomKeyNumber;
+	bool randomFlag;
+
+	bool countDownFinishFlag;		//	カウントダウンが終わったか
+
 private:
+	int inputTime;
+	int inputStartTime;
+	int inputEndTime;
+
+	VECTOR mPrevPosition;
+
 	PLAYER_STATE_ENUM mNowPlayerState;	//プレイヤーの今の状態
 
 	KEY_STATE_ENUM mNowKeyState;		//キーの今の状態

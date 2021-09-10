@@ -18,6 +18,9 @@ const int SCREEN_SIZE_H = 1080;
 // フェードイン・フェードアウトの速度
 const int addAlphaVal = 5;
 
+//	カウントダウンの速度
+const int COUNTDOWN_SPEED = 50;
+
 //	ロードするファイル数
 const int LOAD_FAILE_NUM = 5;
 
@@ -30,32 +33,29 @@ const int LOADING_SPEED = 60;
 //	男の子の移動範囲
 const int BOY_MIN_Y = -50;
 
-////	文字の移動速度
-//const int MOJI_SPEED = 10;
-//
-////	文字の座標の限界
-//const int MAX_MOJI_X = 1550;
-//const int MIN_MOJI_X = 0;
-//const int MAX_MOJI_Y = 1000;
-//const int MIN_MOJI_Y = 0;
+//	効果音音量調整
+const int SE_VOLUME_PAL = 50;
 
 Ueyama_GameScene::Ueyama_GameScene()
 	: m_alphaVal(255)
 	, m_fadeOutFinishFlag(false)
-	, m_mojiXPlusFlag(true)
-	, m_mojiYPlusFlag(true)
 	, m_loadFlag(true)
+	, m_loadFinishFlag(false)
+	, m_loadingFlag(0)
+	, m_boyPlusFlag(false)
+	, m_whistleFinishFlag(false)
+	, m_startFinishFlag(false)
+	, m_gameFinishFlag(false)
+	, m_fadeOutFlag(false)
 	, m_stage(nullptr)
 	, m_camera(nullptr)
 	, m_actor(nullptr)
 	, m_mojiX(1450)
 	, m_mojiY(1000)
 	, m_boyY(0)
-	, m_loadFinishFlag(false)
-	, m_tipsFlag(GetRand(TIPS_NUM - 1))
-	, m_loadingFlag(0)
-	, m_boyPlusFlag(false)
 {
+	m_tipsFlag = GetRand(TIPS_NUM - 1);
+
 	// ステートセット(フェードインから)
 	m_state = GAME_SCENE_STATE::LOAD;
 }
@@ -64,6 +64,10 @@ Ueyama_GameScene::~Ueyama_GameScene()
 {
 	StopSoundMem(m_bgmSoundHandle);
 	DeleteGraph(m_backGraphHandle);
+	DeleteGraph(m_tips1GraphHandle);
+	DeleteGraph(m_tips2GraphHandle);
+	DeleteGraph(m_tips3GraphHandle);
+	DeleteGraph(m_boyGraphHandle);
 
 	delete m_stage;   // ステージのポインタメンバ変数を消去
 	delete m_camera;  // カメラのポインタメンバ変数を消去
@@ -108,7 +112,10 @@ SceneBase* Ueyama_GameScene::Update(float _deltaTime)
 		m_actor->UpdateActor(_deltaTime);
 
 		//	カウントダウン開始
-		m_actor->countDown--;
+		if (m_actor->countDown >= 0)
+		{
+			m_actor->countDown -= COUNTDOWN_SPEED * _deltaTime;
+		}
 
 		// ※キー入力重複対策のフラグ
 		// ENTERキーから指を離したら、次のENTERの入力を有効に
@@ -123,7 +130,13 @@ SceneBase* Ueyama_GameScene::Update(float _deltaTime)
 		//	m_state = GAME_SCENE_STATE::FADE_OUT;
 		//}
 
+		//端まで戻ってきてかつ、turnFlag が true ならゴールの文字を表示
 		if (m_actor->GetPosX() >= 130 && m_actor->GetTurnFlag() == true)
+		{
+			m_gameFinishFlag = true;
+		}
+
+		if (m_fadeOutFlag)
 		{
 			m_state = GAME_SCENE_STATE::FADE_OUT;
 		}
@@ -144,6 +157,9 @@ SceneBase* Ueyama_GameScene::Update(float _deltaTime)
 	default:
 		break;
 	}
+
+	m_deltaTime = _deltaTime;
+
 	return this;
 }
 
@@ -163,10 +179,13 @@ void Ueyama_GameScene::Draw()
 			{
 			case 0:
 				DrawGraph(0, 0, m_tips1GraphHandle, TRUE);
+				break;
 			case 1:
 				DrawGraph(0, 0, m_tips2GraphHandle, TRUE);
+				break;
 			case 2:
 				DrawGraph(0, 0, m_tips3GraphHandle, TRUE);
+				break;
 			default:
 				break;
 			}
@@ -214,44 +233,6 @@ void Ueyama_GameScene::Draw()
 		{
 			DrawFormatStringToHandle(m_mojiX, m_mojiY, GetColor(255, 255, 0), loadFontHandle, "PLEASE ENTER");
 		}
-		////	デバッグ用の文字移動
-		//if (m_mojiXPlusFlag)
-		//{
-		//	m_mojiX += MOJI_SPEED;
-		//	if (m_mojiX >= MAX_MOJI_X)
-		//	{
-		//		m_mojiX = MAX_MOJI_X;
-		//		m_mojiXPlusFlag = false;
-		//	}
-		//}
-		//else if (!m_mojiXPlusFlag)
-		//{
-		//	m_mojiX -= MOJI_SPEED;
-		//	if (m_mojiX <= MIN_MOJI_X)
-		//	{
-		//		m_mojiX = MIN_MOJI_X;
-		//		m_mojiXPlusFlag = true;
-		//	}
-		//}
-
-		//if (m_mojiYPlusFlag)
-		//{
-		//	m_mojiY += MOJI_SPEED;
-		//	if (m_mojiY >= MAX_MOJI_Y)
-		//	{
-		//		m_mojiY = MAX_MOJI_Y;
-		//		m_mojiYPlusFlag = false;
-		//	}
-		//}
-		//else if (!m_mojiYPlusFlag)
-		//{
-		//	m_mojiY -= MOJI_SPEED;
-		//	if (m_mojiY <= MIN_MOJI_Y)
-		//	{
-		//		m_mojiY = MIN_MOJI_Y;
-		//		m_mojiYPlusFlag = true;
-		//	}
-		//}
 	}
 	else
 	{
@@ -269,28 +250,103 @@ void Ueyama_GameScene::Draw()
 		// プレイヤー描画
 		m_actor->DrawActor();
 
-		// 操作ボタン（仮）
-		if (CheckHitKey(KEY_INPUT_RIGHT))
-		{
-			DrawBox(1050, 600, 1150, 700, GetColor(255, 255, 255), TRUE);
-		}
-		if (CheckHitKey(KEY_INPUT_LEFT))
-		{
-			DrawBox(750, 600, 850, 700, GetColor(255, 255, 255), TRUE);
-		}
-		DrawBox(750, 600, 850, 700, GetColor(0, 0, 0), FALSE);
-		DrawBox(1050, 600, 1150, 700, GetColor(0, 0, 0), FALSE);
-		SetFontSize(100);
-		DrawFormatString(750, 600, GetColor(0, 0, 0), "←");
-		DrawFormatString(1050, 600, GetColor(0, 0, 0), "→");
+		//// 操作ボタン（仮）
+		//if (CheckHitKey(KEY_INPUT_RIGHT))
+		//{
+		//	DrawBox(1050, 600, 1150, 700, GetColor(255, 255, 255), TRUE);
+		//}
+		//if (CheckHitKey(KEY_INPUT_LEFT))
+		//{
+		//	DrawBox(750, 600, 850, 700, GetColor(255, 255, 255), TRUE);
+		//}
+		//DrawBox(750, 600, 850, 700, GetColor(0, 0, 0), FALSE);
+		//DrawBox(1050, 600, 1150, 700, GetColor(0, 0, 0), FALSE);
+		//SetFontSize(100);
+		//DrawFormatString(750, 600, GetColor(0, 0, 0), "←");
+		//DrawFormatString(1050, 600, GetColor(0, 0, 0), "→");
 
-		if (-90 >= m_actor->GetPosX() && m_actor->GetPosX() >= -136)
+		DrawBox(900, 800, 1000, 900, GetColor(0, 0, 0), FALSE);				//ボックスの表示(1つ用)
+		SetFontSize(100);
+
+		//ランダムに矢印を表示
+		if (m_actor->randomKeyNumber == 1)		//ランダムに生成した数が STATE_KEY_UP(1) と同じとき
 		{
+			if (CheckHitKey(KEY_INPUT_UP))
+			{
+				DrawBox(900, 800, 1000, 900, GetColor(255, 255, 255), TRUE);
+			}
+			else if (CheckHitKey(KEY_INPUT_DOWN) || CheckHitKey(KEY_INPUT_RIGHT) || CheckHitKey(KEY_INPUT_LEFT))
+			{
+				DrawBox(900, 800, 1000, 900, GetColor(255, 0, 0), TRUE);
+			}
+			DrawFormatString(900, 800, GetColor(0, 0, 0), "↑");
+		}
+		if (m_actor->randomKeyNumber == 2)		//ランダムに生成した数が STATE_KEY_DOWN(1) と同じとき
+		{
+			if (CheckHitKey(KEY_INPUT_DOWN))
+			{
+				DrawBox(900, 800, 1000, 900, GetColor(255, 255, 255), TRUE);
+			}
+			else if (CheckHitKey(KEY_INPUT_UP) || CheckHitKey(KEY_INPUT_RIGHT) || CheckHitKey(KEY_INPUT_LEFT))
+			{
+				DrawBox(900, 800, 1000, 900, GetColor(255, 0, 0), TRUE);
+			}
+			DrawFormatString(900, 800, GetColor(0, 0, 0), "↓");
+		}
+		if (m_actor->randomKeyNumber == 3)		//ランダムに生成した数が STATE_KEY_LEFT(1) と同じとき
+		{
+			if (CheckHitKey(KEY_INPUT_RIGHT))
+			{
+				DrawBox(900, 800, 1000, 900, GetColor(255, 255, 255), TRUE);
+			}
+			else if (CheckHitKey(KEY_INPUT_UP) || CheckHitKey(KEY_INPUT_DOWN) || CheckHitKey(KEY_INPUT_LEFT))
+			{
+				DrawBox(900, 800, 1000, 900, GetColor(255, 0, 0), TRUE);
+			}
+			DrawFormatString(900, 800, GetColor(0, 0, 0), "→");
+		}
+		if (m_actor->randomKeyNumber == 4)		//ランダムに生成した数が STATE_KEY_RIGHT(1) と同じとき
+		{
+			if (CheckHitKey(KEY_INPUT_LEFT))
+			{
+				DrawBox(900, 800, 1000, 900, GetColor(255, 255, 255), TRUE);
+			}
+			else if (CheckHitKey(KEY_INPUT_UP) || CheckHitKey(KEY_INPUT_DOWN) || CheckHitKey(KEY_INPUT_RIGHT))
+			{
+				DrawBox(900, 800, 1000, 900, GetColor(255, 0, 0), TRUE);
+			}
+			DrawFormatString(900, 800, GetColor(0, 0, 0), "←");
+		}
+
+		//スペースキーのBOX描画
+		if (-90 >= m_actor->GetPosX() && m_actor->GetPosX() > -136 && m_actor->GetTurnFlag() == false)
+		{
+			//αブレンドモード
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 128);
+
 			if (CheckHitKey(KEY_INPUT_SPACE))
 			{
 				DrawBox(810, 900, 1100, 1000, GetColor(255, 255, 255), TRUE);
 			}
-			DrawBox(810, 900, 1100, 1000, GetColor(0, 0, 0), FALSE);
+			//ターンの評価が BAD の範囲
+			if (-90 >= m_actor->GetPosX() && m_actor->GetPosX() > -120)
+			{
+				DrawBox(810, 900, 1100, 1000, GetColor(255, 0, 0), TRUE);
+			}
+			//ターンの評価が NORMAL の範囲
+			if (-120 >= m_actor->GetPosX() && m_actor->GetPosX() > -130)
+			{
+				DrawBox(810, 900, 1100, 1000, GetColor(255, 255, 0), TRUE);
+			}
+			//ターンの評価が GOOD の範囲
+			if (-130 >= m_actor->GetPosX() && m_actor->GetPosX() > -140)
+			{
+				DrawBox(810, 900, 1100, 1000, GetColor(0, 100, 0), TRUE);
+			}
+
+			//ブレンドモードをデフォルトに戻す
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
+
 			DrawFormatString(820, 900, GetColor(0, 0, 0), "SPACE");
 		}
 
@@ -304,10 +360,32 @@ void Ueyama_GameScene::Draw()
 		m_actor->Skill(m_actor->dCount, m_actor->maxdCount);
 
 		// カウントダウンの表示
-		if (m_actor->countDown >= 0)
+		if (m_actor->countDown > 0 && m_actor->countDown <= 150)
 		{
 			SetFontSize(150);
 			DrawFormatString(800, 400, GetColor(0, 0, 0), " %d ", m_actor->countDown / 60 + 1);
+		}
+
+		//	START!!の表示
+		if (m_actor->countDown <= 0 && !m_startFinishFlag)
+		{
+			DrawFormatStringToHandle(700, 400, GetColor(255, 0, 0), startHandle, "START!!");
+			m_startCount++;
+			if (m_startCount >= 50)
+			{
+				m_startFinishFlag = true;
+			}
+		}
+
+		//	GOAL!!の表示
+		if (m_gameFinishFlag)
+		{
+			DrawFormatStringToHandle(700, 400, GetColor(255, 0, 0), startHandle, "GOAL!!");
+			m_finishCount++;
+			if (m_startCount >= 50)
+			{
+				m_fadeOutFlag = true;
+			}
 		}
 
 		//	フェードイン処理
@@ -357,10 +435,29 @@ void Ueyama_GameScene::Draw()
 
 void Ueyama_GameScene::Sound()
 {
-	if (m_state == GAME_SCENE_STATE::GAME)
+	if (m_state == GAME_SCENE_STATE::GAME && !m_whistleFinishFlag)
+	{
+		PlaySoundMem(m_countDownSoundHandle, DX_PLAYTYPE_BACK, FALSE);
+		ChangeVolumeSoundMem(m_volumePal + SE_VOLUME_PAL, m_countDownSoundHandle);
+	}
+	//	カウントダウン終了後、笛を鳴らす
+	if (m_actor->countDownFinishFlag)
+	{
+		PlaySoundMem(m_whistleSoundHandle, DX_PLAYTYPE_BACK, FALSE);
+		ChangeVolumeSoundMem(m_volumePal + SE_VOLUME_PAL, m_whistleSoundHandle);
+		m_actor->countDownFinishFlag = false;
+		m_whistleFinishFlag = true;
+	}
+	//	笛が鳴り終わったら、BGMを流す
+	if (m_state == GAME_SCENE_STATE::GAME && m_whistleFinishFlag)
 	{
 		PlaySoundMem(m_bgmSoundHandle, DX_PLAYTYPE_BACK, FALSE);
 		ChangeVolumeSoundMem(m_volumePal, m_bgmSoundHandle);
+	}
+	if (m_gameFinishFlag)
+	{
+		PlaySoundMem(m_goalSoundHandle, DX_PLAYTYPE_BACK, FALSE);
+		ChangeVolumeSoundMem(m_volumePal + SE_VOLUME_PAL, m_goalSoundHandle);
 	}
 }
 
@@ -375,10 +472,13 @@ void Ueyama_GameScene::Load()
 	SetUseASyncLoadFlag(TRUE);
 
 	// グラフィックハンドルにセット
-	m_backGraphHandle = LoadGraph("data/img/Game/gameBackTest.png");		//	背景
+	m_backGraphHandle = LoadGraph("data/img/Game/gameBackTest.png");			//	背景
 
 	//	サウンドハンドルにセット
-	m_bgmSoundHandle = LoadSoundMem("data/sound/Game/Game.ogg");			//	BGM
+	m_bgmSoundHandle = LoadSoundMem("data/sound/Game/Game.ogg");				//	BGM
+	m_whistleSoundHandle = LoadSoundMem("data/sound/Game/whistle.ogg");			//	笛
+	m_countDownSoundHandle = LoadSoundMem("data/sound/Game/Countdown2.ogg");	//	カウントダウン
+	m_goalSoundHandle = LoadSoundMem("data/sound/Game/goalWhistle.ogg");		//	ゴール
 
 	// ステージクラスのインスタンスを生成
 	m_stage = new Stage();
