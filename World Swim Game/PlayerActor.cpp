@@ -19,10 +19,13 @@ PlayerActor::PlayerActor()
 	, startTime(0)
 	, tmpTime(0)
 	, countUP(0)
+	, countDownFinishFlag(false)
 {
 	startFlag = false;
 	turnFlag = false;
 	randomFlag = false;
+	inputSpaceFlag = false;
+	inputArrowFlag = false;
 
 	mPosition = VGet(150, 18, 0);								// 初期位置設定
 	mRotation = VGet(250.0f, 90.0f * DX_PI_F / 180.0f, 0.0f);	// 回転角度
@@ -54,7 +57,7 @@ PlayerActor::PlayerActor()
 
 	count = 30;      // 次のシーンに行くまでのカウント
 
-	countDown = 120; // カウントダウン（ 3秒 ）
+	countDown = 170; // カウントダウン（ 3秒 ）
 	inputTime = 0;
 
 	skillCount = 0;  // スキルの使用カウント
@@ -78,15 +81,6 @@ void PlayerActor::UpdateActor(float _deltaTime)
 {
 	int Key = GetJoypadInputState(DX_INPUT_KEY_PAD1);
 
-	////スタート処理
-	////startFlagがtrueのとき
-	//if (startFlag)
-	//{
-	//	PlayAnim(_deltaTime);								// アニメーション情報を取得
-	//	MV1SetPosition(modelHandle, mPosition);				// ポジション更新
-	//	StartProcess(_deltaTime);
-	//}
-
 	// カウントダウンが終了したら開始
 	if (!startFlag && countDown <= 0)
 	{
@@ -94,6 +88,7 @@ void PlayerActor::UpdateActor(float _deltaTime)
 		startTime = GetNowCount() / 1000;
 		MV1SetPosition(modelHandle, mPosition);				// ポジション更新
 		StartProcess(_deltaTime);
+		countDownFinishFlag = true;
 	}
 
 	//	ステートが泳ぎの時
@@ -132,7 +127,10 @@ void PlayerActor::UpdateActor(float _deltaTime)
 
 		//}
 
-		mPosition.x -= mVelosity.x * _deltaTime;				//プレイヤーの自動移動
+		mPrevPosition = mPosition;							//プレイヤーのポジションを補完
+		mPosition.x -= mVelosity.x * _deltaTime;			//プレイヤーの自動移動
+		//dCount += (mPosition.x - mPrevPosition.x);		// 残り距離を減らす
+		dCount -= std::sqrt((mPosition.x - mPrevPosition.x) * (mPosition.x - mPrevPosition.x)) * 0.088;
 
 		if (randomFlag == false)
 		{
@@ -143,7 +141,7 @@ void PlayerActor::UpdateActor(float _deltaTime)
 
 		//プレイヤーの処理//
 
-		//ランダムにに生成した数が STATE_KEY_UP(1) と同じとき
+		//ランダムに生成した数が STATE_KEY_UP(1) と同じとき
 		if (randomKeyNumber == STATE_KEY_UP)
 		{
 			inputEndTime = GetNowCount() / 1000;			//現在の時間を取得
@@ -171,33 +169,33 @@ void PlayerActor::UpdateActor(float _deltaTime)
 				//ターン処理がfalseのとき
 				if (turnFlag == false)
 				{
-					mVelosity = VGet(5, 0, 0);				//mVelosityを 15 にセット
+					mVelosity = VGet(5, 0, 0);				//mVelosityを 5 にセット
 				}
 				//ターン処理がtrueのとき
 				else
 				{
-					mVelosity = VGet(-5, 0, 0);				//mVelosityを -15 にセット
+					mVelosity = VGet(-5, 0, 0);				//mVelosityを -5 にセット
 				}
 				st -= 2;
 			}
-			//現在時間とランダムに矢印を生成した時間の差が3秒たったら
-			else if (inputTime > 3)
+			//現在時間とランダムに矢印を生成した時間の差が1秒たったら
+			else if (inputTime > 1)
 			{
 				//ターン処理がfalseのとき
 				if (turnFlag == false)
 				{
-					mVelosity = VGet(5, 0, 0);				//mVelosityを 15 にセット
+					mVelosity = VGet(5, 0, 0);				//mVelosityを 5 にセット
 				}
 				//ターン処理がtrueのとき
 				else
 				{
-					mVelosity = VGet(-5, 0, 0);				//mVelosityを -15 にセット
+					mVelosity = VGet(-5, 0, 0);				//mVelosityを -5 にセット
 				}
 				randomFlag = false;
 				inputTime = 0;								//入力可能時間を初期化
 			}
 		}
-		//ランダムにに生成した数が STATE_KEY_DOWN(2) と同じとき
+		//ランダムに生成した数が STATE_KEY_DOWN(2) と同じとき
 		if (randomKeyNumber == STATE_KEY_DOWN)
 		{
 			inputEndTime = GetNowCount() / 1000;
@@ -228,7 +226,7 @@ void PlayerActor::UpdateActor(float _deltaTime)
 				}
 				st -= 2;
 			}
-			else if (inputTime > 3)
+			else if (inputTime > 1)
 			{
 				if (turnFlag == false)
 				{
@@ -242,7 +240,7 @@ void PlayerActor::UpdateActor(float _deltaTime)
 				inputTime = 0;
 			}
 		}
-		//ランダムにに生成した数が STATE_KEY_RIGHT(3) と同じとき
+		//ランダムに生成した数が STATE_KEY_RIGHT(3) と同じとき
 		if (randomKeyNumber == STATE_KEY_RIGHT)
 		{
 			inputEndTime = GetNowCount() / 1000;
@@ -273,7 +271,7 @@ void PlayerActor::UpdateActor(float _deltaTime)
 				}
 				st -= 2;
 			}
-			else if (inputTime > 3)
+			else if (inputTime > 1)
 			{
 				if (turnFlag == false)
 				{
@@ -287,7 +285,7 @@ void PlayerActor::UpdateActor(float _deltaTime)
 				inputTime = 0;
 			}
 		}
-		//ランダムにに生成した数が STATE_KEY_LEFT(4) と同じとき
+		//ランダムに生成した数が STATE_KEY_LEFT(4) と同じとき
 		if (randomKeyNumber == STATE_KEY_LEFT)
 		{
 			inputEndTime = GetNowCount() / 1000;
@@ -318,7 +316,7 @@ void PlayerActor::UpdateActor(float _deltaTime)
 				}
 				st -= 2;
 			}
-			else if (inputTime > 3)
+			else if (inputTime > 1)
 			{
 				if (turnFlag == false)
 				{
@@ -331,6 +329,25 @@ void PlayerActor::UpdateActor(float _deltaTime)
 				randomFlag = false;
 				inputTime = 0;
 			}
+		}
+
+		// スタミナが切れたら
+		if (st <= MinSt)
+		{
+			// スタミナを最小値で固定
+			st = MinSt;
+		}
+		// ターンする前
+		if (st <= MinSt && turnFlag == false)
+		{
+			// 速度を通常の半分程度に
+			mVelosity = VGet(2.0, 0, 0);
+		}
+		// ターンした後
+		else if (st <= MinSt && turnFlag == true)
+		{
+			// 速度を通常の半分程度に
+			mVelosity = VGet(-2.0, 0, 0);
 		}
 
 		//引き戻し処理
@@ -362,7 +379,7 @@ void PlayerActor::UpdateActor(float _deltaTime)
 		//スペースが押されたとき
 		if (Key & PAD_INPUT_M && turnFlag == false)
 		{
-			turnFlag = true;
+			inputSpaceFlag = true;
 			mPosX = mPosition.x;				//押された時のプレイヤーの座標を補完
 
 			if (-90 >= mPosX && mPosX > -120)
@@ -386,6 +403,7 @@ void PlayerActor::UpdateActor(float _deltaTime)
 			mEvlt = BAD;						//BAD評価に
 		}
 
+
 		//プールの端まで来たら
 		if (mPosition.x <= -136)
 		{
@@ -395,20 +413,20 @@ void PlayerActor::UpdateActor(float _deltaTime)
 			switch (mEvlt)
 			{
 			case BAD:
-				mVelosity = VGet(-50, 0, 0);
+				mVelosity = VGet(-10, 0, 0);
 				st -= 15;
 
 			case NORMAL:
-				mVelosity = VGet(-80, 0, 0);
+				mVelosity = VGet(-12, 0, 0);
 				st -= 10;
 
 			case GOOD:
-				mVelosity = VGet(-100, 0, 0);
+				mVelosity = VGet(-15, 0, 0);
 				st -= 5;
 
 			default:
 				break;
-			}													//速度を反転
+			}
 		}
 
 		PlayAnim(_deltaTime);						// アニメーション情報を取得
@@ -422,14 +440,6 @@ void PlayerActor::StartProcess(float _deltaTime)
 	//キー入力取得
 	int Key = GetJoypadInputState(DX_INPUT_KEY_PAD1);
 
-	//if (Key & PAD_INPUT_M)				//スペースキー
-	//{
-	//	mNowPlayerState = STATE_SWIM;	//プレイヤーを泳ぎ状態に
-
-	//	startFlag = false;
-	//	attachAnim(0);					//アニメーション000をアタッチ
-	//}
-
 	mNowPlayerState = STATE_SWIM;	// プレイヤーを泳ぎ状態に
 
 	attachAnim(0);					// アニメーション000をアタッチ
@@ -440,6 +450,8 @@ void PlayerActor::StartProcess(float _deltaTime)
 //描画
 void PlayerActor::DrawActor()
 {
+	// 1.3f ～ 1.5f
+	SetDraw3DScale(1.4f);
 	// 3Dモデルの描画
 	MV1DrawModel(modelHandle);
 
@@ -544,23 +556,23 @@ void PlayerActor::Skill(float _playerPos, float _goalPos)
 	DrawBox(850, 100, 950, 200, GetColor(0, 0, 0), FALSE);
 
 	// turnFlag = true でスキルカウントが 0 のとき
-	if (/*turnFlag &&*/ skillCount == 0)
+	if (turnFlag && skillCount == 0)
 	{
-		DrawFormatString(680, 60, GetColor(255, 0, 0), "ひっさつわざ つかえる");
+		DrawFormatString(680, 60, GetColor(255, 0, 0), "スタミナ回復 できる");
 		// 必殺技のアイコン（枠）を塗りつぶす
 		DrawBox(850, 100, 950, 200, GetColor(255, 0, 0), TRUE);
-		DrawFormatString(800, 200, GetColor(0, 255, 255), "PUSH SPACE");
+		DrawFormatString(800, 200, GetColor(0, 255, 255), "PUSH S");
 	}
 	else
 	{
-		DrawFormatString(680, 60, GetColor(255, 0, 0), "ひっさつわざ つかえない");
+		DrawFormatString(680, 60, GetColor(255, 0, 0), "スタミナ回復 できない");
 	}
 
 	// プレイヤーがターンしたら
-	if (/*turnFlag &&*/ (int)(_goalPos * _playerPos / _goalPos) <= 25)
+	if (turnFlag)
 	{
-		// Space を押すと必殺技を使う(スタミナを回復)
-		if (CheckHitKey(KEY_INPUT_SPACE))
+		// Sキーを押すと必殺技を使う(スタミナを回復)
+		if (CheckHitKey(KEY_INPUT_S))
 		{
 			mPrevKeyState = mNowKeyState;		// 今のキー状態を前回のキー状態に
 			mNowKeyState = STATE_KEY_SPACE;		// 今のキー状態をSTATE_KEY_SPACEに
@@ -570,30 +582,27 @@ void PlayerActor::Skill(float _playerPos, float _goalPos)
 			if (mNowKeyState != mPrevKeyState && skillCount <= 0)
 			{
 				// スタミナを回復する
-				st = st + 30;
+				st += 100;
 				// スキルカウントを 1 に
 				skillCount = 1;
-				// turnFlag を false に
-				turnFlag = false;
 			}
 		}
 	}
 
 	// A を押すと必殺技を使う(スピードアップ １～３秒くらいの予定)
-	if (CheckHitKey(KEY_INPUT_A))
-	{
-		mPrevKeyState = mNowKeyState;		// 今のキー状態を前回のキー状態に
-		mNowKeyState = STATE_KEY_SPACE;		// 今のキー状態をSTATE_KEY_SPACEに
+	//if (CheckHitKey(KEY_INPUT_A))
+	//{
+	//	mPrevKeyState = mNowKeyState;		// 今のキー状態を前回のキー状態に
+	//	mNowKeyState = STATE_KEY_SPACE;		// 今のキー状態をSTATE_KEY_SPACEに
 
-		// 必殺技の処理
-		// 今と前回のキー状態が違うとき
-		if (mNowKeyState != mPrevKeyState)
-		{
-			// スピードアップ
-			mVelosity.x = mVelosity.x * 1.005;
-			// スタミナの消費量を２倍に
-			st -= 2;
-		}
-	}
-	// 制作中
+	//	// 必殺技の処理
+	//	// 今と前回のキー状態が違うとき
+	//	if (mNowKeyState != mPrevKeyState)
+	//	{
+	//		// スピードアップ
+	//		mVelosity.x = mVelosity.x * 1.005;
+	//		// スタミナの消費量を２倍に
+	//		st -= 2;
+	//	}
+	//}
 }

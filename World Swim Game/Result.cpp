@@ -1,5 +1,6 @@
 #include "Result.h"
 #include "Title.h"
+#include "Save.h"
 
 #include "DxLib.h"
 
@@ -15,7 +16,15 @@ const int SQUARE_END_Y = 1030;
 
 // タイムを表示する場所
 const int TIME_X = 370;
-const int TIME_Y = 660;
+const int TIME_Y = 460;
+
+// RECORDを表示する場所
+const int RECORD_X = 200;				//	RECORDの文字	
+const int RECORD_Y = 660;
+const int RECORD_TIME_X = 150;			//	歴代タイムのX座標
+const int FIRST_TIME_Y = 760;			//	一位の場所
+const int SECOND_TIME_Y = 860;			//	二位の場所
+const int THIRD_TIME_Y = 960;			//	三位の場所
 
 //	リザルトの遷移する時間
 const int TIME = 100;
@@ -31,9 +40,9 @@ const int TRANSP_MODERATION = -1;
 const int FIRST_TRANS_VAL = 100;
 
 //	評価の基準となる秒数
-const int FIRST = 6;
-const int SECOND = 8;
-const int THIRD = 10;
+const int FIRST = 45;
+const int SECOND = 55;
+const int THIRD = 65;
 
 //	星の拡大縮小範囲
 const int STAR_MIN = -30;
@@ -65,6 +74,8 @@ Result::Result(const int _time)
 		m_checkKeyFlag = TRUE;
 	}
 
+	SAVE->SetTime(_time);
+
 	// 透過量変数を122に設定
 	m_transpVal = MAX_TRANSP_VAL;
 	m_fadeTransVal = FIRST_TRANS_VAL;
@@ -73,7 +84,6 @@ Result::Result(const int _time)
 
 	//	フェードインから始める
 	m_state = RESULT_SCENE_STATE::FADE_IN;
-	m_time = _time;								//引数でもらってきたタイムをm_timeに入れる
 }
 
 Result::~Result()
@@ -109,6 +119,7 @@ Result::~Result()
 
 SceneBase* Result::Update(float _deltaTime)
 {
+	//	リザルトの経過時間を進める
 	m_resultTime++;
 
 	switch (m_state)
@@ -257,7 +268,6 @@ SceneBase* Result::Update(float _deltaTime)
 		{
 			return new Title();
 		}
-
 		break;
 	default:
 		break;
@@ -283,7 +293,11 @@ void Result::Draw()
 	if (m_resultFlag >= 1)
 	{
 		//	クリアタイムを表示
-		DrawFormatStringToHandle(TIME_X, TIME_Y, GetColor(0, 0, 0), keifontHandle, "TIME : %d", m_time);
+		DrawFormatStringToHandle(TIME_X, TIME_Y, GetColor(0, 0, 0), nowTimeHandle, "TIME : %d", m_time);
+		DrawFormatStringToHandle(RECORD_X, RECORD_Y, GetColor(0, 0, 0), recordHandle, "RECORD");
+		DrawFormatStringToHandle(RECORD_TIME_X, FIRST_TIME_Y, GetColor(0, 0, 0), recordHandle, "1位 : %d", SAVE->GetFirstTime());
+		DrawFormatStringToHandle(RECORD_TIME_X, SECOND_TIME_Y, GetColor(0, 0, 0), recordHandle, "2位 : %d", SAVE->GetSecondTime());
+		DrawFormatStringToHandle(RECORD_TIME_X, THIRD_TIME_Y, GetColor(0, 0, 0), recordHandle, "3位 : %d", SAVE->GetThirdTime());
 	}
 	if (m_resultFlag >= 2)
 	{

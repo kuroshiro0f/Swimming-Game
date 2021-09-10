@@ -12,6 +12,7 @@ public:
 		FADE_IN,
 		TITLE,
 		MANUAL,
+		MANUAL2,
 		FADE_OUT
 	};
 
@@ -38,6 +39,7 @@ private:
 	int m_bigDropGraphHandle;			//	大きな水滴
 	int m_smallDropGraphHandle;			//	小さな水滴
 	int m_manualGraphHandle;			//	マニュアル
+	int m_manual2GraphHandle;			//	マニュアル2ページ目
 
 	//	サウンドハンドル
 	int m_backSoundHandle;				//	BGM
@@ -59,7 +61,7 @@ private:
 	int m_permeationAmount;			//	毎フレーム透過量
 
 	//	デルタタイム
-	float m_deltaTime;
+	//float m_deltaTime;
 
 	//	フラグ
 	bool m_checkKeyFlag;			//	キーが押されたままかを判定するフラグ

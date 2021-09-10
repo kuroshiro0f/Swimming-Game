@@ -18,8 +18,8 @@ const int TRANSP_MODERATION = -1;
 const int FIRST_TRANS_VAL = 100;
 
 //	フェードイン・フェードアウトの速度
-const float ADD_ALPHA_VAL = 60.0f;
-const float ADD_ALPHA_VAL_2 = 300.0f;
+const float ADD_ALPHA_VAL = 6.0f;
+const float ADD_ALPHA_VAL_2 = 30.0f;
 
 ////	円周率
 //const double PI = 3.1415926535897932384626433832795f;
@@ -35,7 +35,7 @@ Title::Title()
 {
 	if (CheckHitKey(KEY_INPUT_RETURN))
 	{
-		m_checkKeyFlag = TRUE;
+		m_checkKeyFlag = true;
 	}
 
 	// 透過量変数を122に設定
@@ -140,6 +140,24 @@ SceneBase* Title::Update(float _deltaTime)
 			//	SEを流す
 			PlaySoundMem(m_spaClickSoundHandle, DX_PLAYTYPE_BACK, TRUE);
 
+			m_state = TITLE_SCENE_STATE::MANUAL2;
+		}
+
+		break;
+	case TITLE_SCENE_STATE::MANUAL2:
+		if (!CheckHitKey(KEY_INPUT_RETURN))
+		{
+			m_checkKeyFlag = false;
+		}
+
+		if (CheckHitKey(KEY_INPUT_RETURN) && m_checkKeyFlag == false)
+		{
+			// ※キー入力重複対策のフラグ
+			m_checkKeyFlag = true;
+
+			//	SEを流す
+			PlaySoundMem(m_spaClickSoundHandle, DX_PLAYTYPE_BACK, TRUE);
+
 			m_state = TITLE_SCENE_STATE::TITLE;
 		}
 
@@ -155,7 +173,7 @@ SceneBase* Title::Update(float _deltaTime)
 		break;
 	}
 
-	m_deltaTime = _deltaTime;
+	//m_deltaTime = _deltaTime;
 
 	return this;
 }
@@ -169,7 +187,7 @@ void Title::Draw()
 	{
 		// 描画
 		DrawGraph(0, 0, m_backGraphHandle, TRUE);			//	背景
-		if (m_state != TITLE_SCENE_STATE::MANUAL)
+		if (m_state != TITLE_SCENE_STATE::MANUAL && m_state != TITLE_SCENE_STATE::MANUAL2)
 		{
 			DrawGraph(0, 0, m_logoGraphHandle, TRUE);			//	ロゴ
 
@@ -198,11 +216,22 @@ void Title::Draw()
 		//	描画
 		DrawGraph(0, 0, m_manualGraphHandle, TRUE);
 	}
+	if (m_state == TITLE_SCENE_STATE::MANUAL2)
+	{
+		// 透過して描画
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 190);
+		DrawBox(0, 0, SCREEN_SIZE_W, SCREEN_SIZE_H, GetColor(0, 0, 0), TRUE);
+		// 透過を元に戻す
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+
+		//	描画
+		DrawGraph(0, 0, m_manual2GraphHandle, TRUE);
+	}
 
 	if (m_state == TITLE_SCENE_STATE::FIRST)
 	{
 		// アルファ値の減算
-		m_alphaVal -= m_addAlphaVal * m_deltaTime;
+		m_alphaVal -= m_addAlphaVal;
 		if (m_alphaVal <= 255)
 		{
 			//	描画
@@ -217,7 +246,7 @@ void Title::Draw()
 			// アルファブレンド無効化
 			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
-			// アルファ値が70になったらフェードイン終了
+			// アルファ値が0になったらフェードイン終了
 			if (m_alphaVal <= 0)
 			{
 				m_state = TITLE_SCENE_STATE::SECOND;
@@ -232,7 +261,7 @@ void Title::Draw()
 		DrawGraph(0, 0, m_maouGraphHandle, TRUE);			//	魔王魂
 
 		// アルファ値の減算
-		m_alphaVal -= m_addAlphaVal * m_deltaTime;
+		m_alphaVal -= m_addAlphaVal;
 
 		// アルファブレンド有効化(ここでアルファ値をセット)
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, m_alphaVal);
@@ -243,7 +272,7 @@ void Title::Draw()
 		// アルファブレンド無効化
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 60);
 
-		// アルファ値が70になったらフェードイン終了
+		// アルファ値が0になったらフェードイン終了
 		if (m_alphaVal <= 0)
 		{
 			m_state = TITLE_SCENE_STATE::FADE_IN;
@@ -255,7 +284,7 @@ void Title::Draw()
 	if (m_state == TITLE_SCENE_STATE::FADE_IN)
 	{
 		// アルファ値の減算
-		m_alphaVal -= m_addAlphaVal * m_deltaTime;
+		m_alphaVal -= m_addAlphaVal;
 
 		// アルファブレンド有効化(ここでアルファ値をセット)
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, m_alphaVal);
@@ -269,6 +298,7 @@ void Title::Draw()
 		// アルファ値が最大(255)になったらフェードアウト終了
 		if (m_alphaVal <= 0)
 		{
+			m_alphaVal = 0;
 			m_state = TITLE_SCENE_STATE::TITLE;
 		}
 	}
@@ -277,7 +307,7 @@ void Title::Draw()
 	if (m_state == TITLE_SCENE_STATE::FADE_OUT)
 	{
 		// アルファ値の加算
-		m_alphaVal += m_addAlphaVal2 * m_deltaTime;
+		m_alphaVal += m_addAlphaVal2;
 		// アルファブレンド有効化(ここでアルファ値をセット)
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, m_alphaVal);
 
@@ -290,6 +320,7 @@ void Title::Draw()
 		// アルファ値が最大(255)になったらフェードアウト終了
 		if (m_alphaVal >= 255)
 		{
+			m_alphaVal = 255;
 			m_fadeOutFinishFlag = true;
 		}
 	}
@@ -311,8 +342,9 @@ void Title::Load()
 	m_gateGraphHandle = LoadGraph("data/img/Title/GATE.png");					//	GATE
 	m_maouGraphHandle = LoadGraph("data/img/Title/maou.png");					//	魔王魂
 	//m_bigDropGraphHandle = LoadGraph("data/img/Title/drop1.png");				//	大きな水滴
-	//m_smallDropGraphHandle = LoadGraph("data/img/Title/drop2.png");				//	小さな水滴
-	m_manualGraphHandle = LoadGraph("data/img/Manual/Manual.png");			//	マニュアル
+	//m_smallDropGraphHandle = LoadGraph("data/img/Title/drop2.png");			//	小さな水滴
+	m_manualGraphHandle = LoadGraph("data/img/Manual/Manual.png");				//	マニュアル
+	m_manual2GraphHandle = LoadGraph("data/img/Manual/Manual2.png");			//	マニュアル2
 
 	//	サウンドハンドルにセット
 	m_backSoundHandle = LoadSoundMem("data/sound/Title/Title4.ogg");			//	BGM

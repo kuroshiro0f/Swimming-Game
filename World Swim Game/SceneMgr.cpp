@@ -1,11 +1,12 @@
 #include "SceneMgr.h"
 #include "Title.h"
 #include "GameScene.h"
-
+#include "Save.h"
 
 SceneMgr::SceneMgr()
 {
 	m_scene = nullptr;		//	ƒƒ“ƒo•Ï”‚Ì‰Šú‰»
+	Save::Instance();
 }
 
 SceneMgr::~SceneMgr()

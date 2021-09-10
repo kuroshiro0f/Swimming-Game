@@ -9,6 +9,7 @@
 #include "Ueyama_Title.h"
 #include "Ueyama_GameScene.h"
 #include "Ueyama_Result.h"
+#include "Save.h"
 
 //-----------------------------------------------------------------------------
 // @brief  メイン関数.
@@ -40,10 +41,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	SceneMgr* Scene = new SceneMgr;
 
 	//	タイトルシーンをセット
-	//Scene->SetScene(new Ueyama_Title());
+	Scene->SetScene(new Title());
 
 	//	デバッグ用
-	Scene->SetScene(new Ueyama_GameScene());
+	//Scene->SetScene(new GameScene());
 
 	// エスケープキーが押されるかウインドウが閉じられるまでループ
 	while (ProcessMessage() == 0 && CheckHitKey(KEY_INPUT_ESCAPE) == 0)
@@ -56,6 +57,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 		// BGM処理
 		Scene->Sound();
+
+		//	デバッグ用
+		DrawFormatString(0, 0, GetColor(255, 0, 0), "deltaTime = %f", DeltaTime);
 
 		// 裏画面の内容を表画面に反映させる
 		ScreenFlip();
@@ -73,6 +77,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		//	画面消去
 		ClearDrawScreen();
 	}
+
+	//	シングルトンのインスタンスを削除
+	SAVE->DeleteInstance();
 
 	// シーンを削除
 	delete(Scene);

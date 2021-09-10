@@ -17,6 +17,12 @@ public:
 		FADE_OUT
 	};
 
+	typedef struct {
+		int TIME_FIRST;			//	一位のタイム
+		int TIME_SECOND;		//	二位のタイム
+		int TIME_THIRD;			//	三位のタイム
+	}ranking;
+
 	Result(const int _time);			//	コンストラクタ
 	~Result();			//　デストラクタ
 
@@ -75,4 +81,6 @@ private:
 	bool m_starScallFlag;				//	星を拡大するか（しない場合は縮小）
 	bool m_checkKeyFlag;				//	キーが押されたままか
 	bool m_fadeOutFinishFlag;			//	フェードアウト終了
+
+	class Save* m_save;
 };

@@ -12,6 +12,9 @@ const int SCREEN_SIZE_H = 1080;
 // フェードイン・フェードアウトの速度
 const int addAlphaVal = 5;
 
+//	カウントダウンの速度
+const int COUNTDOWN_SPEED = 50;
+
 //	ロードするファイル数
 const int LOAD_FAILE_NUM = 5;
 
@@ -24,14 +27,20 @@ const int LOADING_SPEED = 60;
 //	男の子の移動範囲
 const int BOY_MIN_Y = -50;
 
+//	効果音音量調整
+const int SE_VOLUME_PAL = 50;
+
 GameScene::GameScene()
 	: m_alphaVal(255)
 	, m_fadeOutFinishFlag(false)
 	, m_loadFlag(true)
 	, m_loadFinishFlag(false)
-	, m_tipsFlag(GetRand(TIPS_NUM - 1))
 	, m_loadingFlag(0)
 	, m_boyPlusFlag(false)
+	, m_whistleFinishFlag(false)
+	, m_startFinishFlag(false)
+	, m_gameFinishFlag(false)
+	, m_fadeOutFlag(false)
 	, m_stage(nullptr)
 	, m_camera(nullptr)
 	, m_actor(nullptr)
@@ -39,6 +48,8 @@ GameScene::GameScene()
 	, m_mojiY(1000)
 	, m_boyY(0)
 {
+	m_tipsFlag = GetRand(TIPS_NUM - 1);
+
 	// ステートセット(フェードインから)
 	m_state = GAME_SCENE_STATE::LOAD;
 }
@@ -51,6 +62,10 @@ GameScene::~GameScene()
 	DeleteGraph(m_tips2GraphHandle);
 	DeleteGraph(m_tips3GraphHandle);
 	DeleteGraph(m_boyGraphHandle);
+	DeleteSoundMem(m_bgmSoundHandle);
+	DeleteSoundMem(m_whistleFinishFlag);
+	DeleteSoundMem(m_countDownSoundHandle);
+	DeleteSoundMem(m_goalSoundHandle);
 
 	delete m_stage;   // ステージのポインタメンバ変数を消去
 	delete m_camera;  // カメラのポインタメンバ変数を消去
@@ -95,7 +110,10 @@ SceneBase* GameScene::Update(float _deltaTime)
 		m_actor->UpdateActor(_deltaTime);
 
 		//	カウントダウン開始
-		m_actor->countDown--;
+		if (m_actor->countDown >= 0)
+		{
+			m_actor->countDown -= COUNTDOWN_SPEED * _deltaTime;
+		}
 
 		// ※キー入力重複対策のフラグ
 		// ENTERキーから指を離したら、次のENTERの入力を有効に
@@ -110,8 +128,14 @@ SceneBase* GameScene::Update(float _deltaTime)
 		//	m_state = GAME_SCENE_STATE::FADE_OUT;
 		//}
 
-		//端まで戻ってきてかつ、turnFlag が true なら次のステートへ
+
+		//端まで戻ってきてかつ、turnFlag が true ならゴールの文字を表示
 		if (m_actor->GetPosX() >= 130 && m_actor->GetTurnFlag() == true)
+		{
+			m_gameFinishFlag = true;
+		}
+
+		if (m_fadeOutFlag)
 		{
 			m_state = GAME_SCENE_STATE::FADE_OUT;
 		}
@@ -132,6 +156,9 @@ SceneBase* GameScene::Update(float _deltaTime)
 	default:
 		break;
 	}
+
+	m_deltaTime = _deltaTime;
+
 	return this;
 }
 
@@ -151,10 +178,13 @@ void GameScene::Draw()
 			{
 			case 0:
 				DrawGraph(0, 0, m_tips1GraphHandle, TRUE);
+				break;
 			case 1:
 				DrawGraph(0, 0, m_tips2GraphHandle, TRUE);
+				break;
 			case 2:
 				DrawGraph(0, 0, m_tips3GraphHandle, TRUE);
+				break;
 			default:
 				break;
 			}
@@ -238,47 +268,84 @@ void GameScene::Draw()
 		SetFontSize(100);
 
 		//ランダムに矢印を表示
-		if (m_actor->randomKeyNumber == 1)		//ランダムに生成した数が STATE_KEY_UP(1) と同じとき
+		switch (m_actor->randomKeyNumber)
 		{
+		case 1:		//ランダムに生成した数が STATE_KEY_UP(1) と同じとき
 			if (CheckHitKey(KEY_INPUT_UP))
 			{
+				m_actor->inputArrowFlag = true;
+			}
+
+			if (m_actor->inputArrowFlag && m_actor->randomFlag)
+			{
 				DrawBox(900, 800, 1000, 900, GetColor(255, 255, 255), TRUE);
+			}
+			else if (!m_actor->randomFlag)
+			{
+				m_actor->inputArrowFlag = false;
 			}
 			else if (CheckHitKey(KEY_INPUT_DOWN) || CheckHitKey(KEY_INPUT_RIGHT) || CheckHitKey(KEY_INPUT_LEFT))
 			{
 				DrawBox(900, 800, 1000, 900, GetColor(255, 0, 0), TRUE);
 			}
 			DrawFormatString(900, 800, GetColor(0, 0, 0), "↑");
-		}
-		if (m_actor->randomKeyNumber == 2)		//ランダムに生成した数が STATE_KEY_DOWN(1) と同じとき
-		{
+			break;
+
+		case 2:		//ランダムに生成した数が STATE_KEY_DOWN(2) と同じとき
 			if (CheckHitKey(KEY_INPUT_DOWN))
 			{
+				m_actor->inputArrowFlag = true;
+			}
+
+			if (m_actor->inputArrowFlag && m_actor->randomFlag)
+			{
 				DrawBox(900, 800, 1000, 900, GetColor(255, 255, 255), TRUE);
+			}
+			else if (!m_actor->randomFlag)
+			{
+				m_actor->inputArrowFlag = false;
 			}
 			else if (CheckHitKey(KEY_INPUT_UP) || CheckHitKey(KEY_INPUT_RIGHT) || CheckHitKey(KEY_INPUT_LEFT))
 			{
 				DrawBox(900, 800, 1000, 900, GetColor(255, 0, 0), TRUE);
 			}
 			DrawFormatString(900, 800, GetColor(0, 0, 0), "↓");
-		}
-		if (m_actor->randomKeyNumber == 3)		//ランダムに生成した数が STATE_KEY_LEFT(1) と同じとき
-		{
+			break;
+
+		case 3:		//ランダムに生成した数が STATE_KEY_RIGHT(3) と同じとき
 			if (CheckHitKey(KEY_INPUT_RIGHT))
 			{
+				m_actor->inputArrowFlag = true;
+			}
+
+			if (m_actor->inputArrowFlag && m_actor->randomFlag)
+			{
 				DrawBox(900, 800, 1000, 900, GetColor(255, 255, 255), TRUE);
+			}
+			else if (!m_actor->randomFlag)
+			{
+				m_actor->inputArrowFlag = false;
 			}
 			else if (CheckHitKey(KEY_INPUT_UP) || CheckHitKey(KEY_INPUT_DOWN) || CheckHitKey(KEY_INPUT_LEFT))
 			{
 				DrawBox(900, 800, 1000, 900, GetColor(255, 0, 0), TRUE);
 			}
 			DrawFormatString(900, 800, GetColor(0, 0, 0), "→");
-		}
-		if (m_actor->randomKeyNumber == 4)		//ランダムに生成した数が STATE_KEY_RIGHT(1) と同じとき
-		{
+			break;
+
+		case 4:		//ランダムに生成した数が STATE_KEY_LEFT(4) と同じとき
 			if (CheckHitKey(KEY_INPUT_LEFT))
 			{
+				m_actor->inputArrowFlag = true;
+			}
+
+			if (m_actor->inputArrowFlag && m_actor->randomFlag)
+			{
 				DrawBox(900, 800, 1000, 900, GetColor(255, 255, 255), TRUE);
+			}
+			else if (!m_actor->randomFlag)
+			{
+				m_actor->inputArrowFlag = false;
 			}
 			else if (CheckHitKey(KEY_INPUT_UP) || CheckHitKey(KEY_INPUT_DOWN) || CheckHitKey(KEY_INPUT_RIGHT))
 			{
@@ -329,10 +396,32 @@ void GameScene::Draw()
 		m_actor->Skill(m_actor->dCount, m_actor->maxdCount);
 
 		// カウントダウンの表示
-		if (m_actor->countDown >= 0)
+		if (m_actor->countDown > 0 && m_actor->countDown <= 150)
 		{
 			SetFontSize(150);
 			DrawFormatString(800, 400, GetColor(0, 0, 0), " %d ", m_actor->countDown / 60 + 1);
+		}
+
+		//	START!!の表示
+		if (m_actor->countDown <= 0 && !m_startFinishFlag)
+		{
+			DrawFormatStringToHandle(700, 400, GetColor(255, 0, 0), startHandle, "START!!");
+			m_startCount++;
+			if (m_startCount >= 50)
+			{
+				m_startFinishFlag = true;
+			}
+		}
+
+		//	GOAL!!の表示
+		if (m_gameFinishFlag)
+		{
+			DrawFormatStringToHandle(700, 400, GetColor(255, 0, 0), startHandle, "GOAL!!");
+			m_finishCount++;
+			if (m_startCount >= 50)
+			{
+				m_fadeOutFlag = true;
+			}
 		}
 
 		//	フェードイン処理
@@ -382,10 +471,29 @@ void GameScene::Draw()
 
 void GameScene::Sound()
 {
-	if (m_state == GAME_SCENE_STATE::GAME)
+	if (m_state == GAME_SCENE_STATE::GAME && !m_whistleFinishFlag)
+	{
+		PlaySoundMem(m_countDownSoundHandle, DX_PLAYTYPE_BACK, FALSE);
+		ChangeVolumeSoundMem(m_volumePal + SE_VOLUME_PAL, m_countDownSoundHandle);
+	}
+	//	カウントダウン終了後、笛を鳴らす
+	if (m_actor->countDownFinishFlag)
+	{
+		PlaySoundMem(m_whistleSoundHandle, DX_PLAYTYPE_BACK, FALSE);
+		ChangeVolumeSoundMem(m_volumePal + SE_VOLUME_PAL, m_whistleSoundHandle);
+		m_actor->countDownFinishFlag = false;
+		m_whistleFinishFlag = true;
+	}
+	//	笛が鳴り終わったら、BGMを流す
+	if (m_state == GAME_SCENE_STATE::GAME && m_whistleFinishFlag)
 	{
 		PlaySoundMem(m_bgmSoundHandle, DX_PLAYTYPE_BACK, FALSE);
 		ChangeVolumeSoundMem(m_volumePal, m_bgmSoundHandle);
+	}
+	if (m_gameFinishFlag)
+	{
+		PlaySoundMem(m_goalSoundHandle, DX_PLAYTYPE_BACK, FALSE);
+		ChangeVolumeSoundMem(m_volumePal + SE_VOLUME_PAL, m_goalSoundHandle);
 	}
 }
 
@@ -400,10 +508,13 @@ void GameScene::Load()
 	SetUseASyncLoadFlag(TRUE);
 
 	// グラフィックハンドルにセット
-	m_backGraphHandle = LoadGraph("data/img/Game/gameBackTest.png");		//	背景
+	m_backGraphHandle = LoadGraph("data/img/Game/gameBackTest.png");			//	背景
 
 	//	サウンドハンドルにセット
-	m_bgmSoundHandle = LoadSoundMem("data/sound/Game/Game.ogg");			//	BGM
+	m_bgmSoundHandle = LoadSoundMem("data/sound/Game/Game.ogg");				//	BGM
+	m_whistleSoundHandle = LoadSoundMem("data/sound/Game/whistle.ogg");			//	笛
+	m_countDownSoundHandle = LoadSoundMem("data/sound/Game/Countdown2.ogg");	//	カウントダウン
+	m_goalSoundHandle = LoadSoundMem("data/sound/Game/goalWhistle.ogg");		//	ゴール
 
 	// ステージクラスのインスタンスを生成
 	m_stage = new Stage();

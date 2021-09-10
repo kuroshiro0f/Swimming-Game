@@ -11,8 +11,6 @@ const int GREEN = 950;
 const int ORANGE = 800;
 //const int RED = 3;
 
-const int VOLUME_PAL = 40;
-
 //コンストラクタ
 Ueyama_PlayerActor::Ueyama_PlayerActor()
 	:mNowPlayerState(STATE_IDLE)
@@ -81,15 +79,6 @@ void Ueyama_PlayerActor::Update(float _deltaTime)
 void Ueyama_PlayerActor::UpdateActor(float _deltaTime)
 {
 	int Key = GetJoypadInputState(DX_INPUT_KEY_PAD1);
-
-	////スタート処理
-	////startFlagがtrueのとき
-	//if (startFlag)
-	//{
-	//	PlayAnim(_deltaTime);								// アニメーション情報を取得
-	//	MV1SetPosition(modelHandle, mPosition);				// ポジション更新
-	//	StartProcess(_deltaTime);
-	//}
 
 	// カウントダウンが終了したら開始
 	if (!startFlag && countDown <= 0)
@@ -426,14 +415,6 @@ void Ueyama_PlayerActor::StartProcess(float _deltaTime)
 {
 	//キー入力取得
 	int Key = GetJoypadInputState(DX_INPUT_KEY_PAD1);
-
-	//if (Key & PAD_INPUT_M)				//スペースキー
-	//{
-	//	mNowPlayerState = STATE_SWIM;	//プレイヤーを泳ぎ状態に
-
-	//	startFlag = false;
-	//	attachAnim(0);					//アニメーション000をアタッチ
-	//}
 
 	mNowPlayerState = STATE_SWIM;	// プレイヤーを泳ぎ状態に
 

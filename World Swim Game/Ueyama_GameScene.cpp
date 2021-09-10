@@ -68,6 +68,10 @@ Ueyama_GameScene::~Ueyama_GameScene()
 	DeleteGraph(m_tips2GraphHandle);
 	DeleteGraph(m_tips3GraphHandle);
 	DeleteGraph(m_boyGraphHandle);
+	DeleteSoundMem(m_bgmSoundHandle);
+	DeleteSoundMem(m_whistleFinishFlag);
+	DeleteSoundMem(m_countDownSoundHandle);
+	DeleteSoundMem(m_goalSoundHandle);
 
 	delete m_stage;   // ステージのポインタメンバ変数を消去
 	delete m_camera;  // カメラのポインタメンバ変数を消去
