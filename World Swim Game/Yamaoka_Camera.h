@@ -4,7 +4,7 @@
 #include "DxLib.h"
 #include "Yamaoka_PlayerActor.h"
 
-class Yamaoka_PlayerActor;      //プレイヤークラスへの参照
+class PlayerActor;      //プレイヤークラスへの参照
 
 class Camera
 {
