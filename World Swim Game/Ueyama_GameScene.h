@@ -38,8 +38,17 @@ public:
 private:
 	GAME_SCENE_STATE m_state;
 
+	//	文字の位置
+	int m_mojiX;		//	ロード文字のX座標
+	int m_mojiY;		//	ロード文字のY座標
+
 	//	男の子の移動
 	int m_boyY;
+
+	//	文字の表示時間の操作
+	int m_startCount;			//	スタート
+	int m_finishCount;			//	ゴール
+	bool m_startFinishFlag;
 
 	//	グラフィックハンドル
 	int m_backGraphHandle;			//	背景
@@ -51,9 +60,15 @@ private:
 
 	//	サウンドハンドル
 	int m_bgmSoundHandle;			//	BGM
+	int m_whistleSoundHandle;		//	笛
+	int m_countDownSoundHandle;		//	カウントダウン
+	int m_goalSoundHandle;			//	ゴール
 
 	//	アルファ値
 	int m_alphaVal;
+
+	//	デルタタイム
+	float m_deltaTime;
 
 	//	フラグ
 	int m_tipsFlag;					//	TIPSの表示変える
@@ -63,14 +78,11 @@ private:
 	bool m_loadFlag;				//	ロード画面を表示するか
 	bool m_loadFinishFlag;			//	ロードが終わったか
 	bool m_boyPlusFlag;				//	男の子をうごかすフラグ
+	bool m_whistleFinishFlag;		//	笛を鳴らし終わったか
+	bool m_gameFinishFlag;			//	ゲームが終わったか
+	bool m_fadeOutFlag;				//	フェードアウトを始めるか
 
 	class Stage* m_stage;   // ステージクラスへのポインタメンバ変数
 	class Ueyama_Camera* m_camera;	// カメラクラスへのポインタメンバ変数
 	class Ueyama_PlayerActor* m_actor;   // アクタークラスへのポインタメンバ変数
-
-	//	デバッグ用
-	int m_mojiX;		//	ロード文字のX座標
-	int m_mojiY;		//	ロード文字のY座標
-	bool m_mojiXPlusFlag;		//	文字のX座標をうごかすフラグ
-	bool m_mojiYPlusFlag;		//	文字のY座標をうごかすフラグ
 };

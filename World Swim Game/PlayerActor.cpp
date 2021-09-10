@@ -530,7 +530,6 @@ void PlayerActor::DrawToGoal(float _playerPos, float _goalPos)
 		SetFontSize(100);
 		DrawFormatString(900, 450, GetColor(255, 0, 0), "GOAL");
 	}
-
 }
 
 // •KŽE‹Z

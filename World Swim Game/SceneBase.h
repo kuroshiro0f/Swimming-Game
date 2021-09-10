@@ -15,8 +15,12 @@ public:
 	virtual void Load() = 0;			//	‰Šú‰»
 	int getVolume() { return m_volumePal; }
 	void setVolume(int _volume) { m_volumePal = _volume; }
-	int keifontHandle;
+
+	//	ƒtƒHƒ“ƒg
+	int nowTimeHandle;
 	int loadFontHandle;
+	int recordHandle;
+	int startHandle;
 
 protected:
 	int m_volumePal;

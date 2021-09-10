@@ -79,4 +79,7 @@ private:
 	bool m_starScallFlag;				//	星を拡大するか（しない場合は縮小）
 	bool m_checkKeyFlag;				//	キーが押されたままか
 	bool m_fadeOutFinishFlag;			//	フェードアウト終了
+
+	class Ueyama_Save* m_save;
+
 };
