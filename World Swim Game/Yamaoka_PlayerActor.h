@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Yamaoka_Actor.h"
+#include "Actor.h"
 
 class Yamaoka_PlayerActor : public Actor
 {
@@ -16,9 +16,11 @@ public:
 
 	typedef enum KEY_STATE_ENUM
 	{
-		STATE_KEY_IDLE,
-		STATE_KEY_RIGHT,
-		STATE_KEY_LEFT,
+		STATE_KEY_IDLE = 0,
+		STATE_KEY_UP = 1,
+		STATE_KEY_DOWN = 2,
+		STATE_KEY_RIGHT = 3,
+		STATE_KEY_LEFT = 4,
 		STATE_KEY_SPACE,
 
 		STATE_KEY_ENUM,
@@ -48,17 +50,19 @@ public:
 	// ゴールまでの距離の描画
 	void DrawToGoal(float _playerPos, float _goalPos);
 
+	//turnFlagのゲッター
+	bool GetTurnFlag() { return turnFlag; };
+
 	// 必殺技
-	void healSkill(float _playerPos, float _goalPos);
-	void speedUpSkill(float _deltaTime);
+	void Skill(float _playerPos, float _goalPos);
 
 	//リターンの評価するためのプレイヤーの座標を補完
 	float mPosX;
 
-	// ゴールまでの距離
+	// ゴールまでの距離 //
 	float dCount;      // どれだけ進んだか        
 	float maxdCount;   // どこまで進めるのか
-
+	int NowPos;    // プレイヤーの現在座標
 
 	int st;      // スタミナ
 	int MaxSt;   // スタミナ最大値
@@ -68,12 +72,20 @@ public:
 	int tmpTime;     // 現在時間を一時保存
 	int countUP;     // 経過時間
 
-	int count;       // 次のシーンに行くまでのカウント    
+	int count;       // 次のシーンに行くまでのカウント
 	int countDown;		// スタートまでのカウントダウン
 	int skillCount;  // スキルの使用カウント
-	int framcount;
+
+	int randomKeyNumber;
+	bool randomFlag;
 
 private:
+	int inputTime;
+	int inputStartTime;
+	int inputEndTime;
+
+	VECTOR mPrevPosition;
+
 	PLAYER_STATE_ENUM mNowPlayerState;	//プレイヤーの今の状態
 
 	KEY_STATE_ENUM mNowKeyState;		//キーの今の状態
@@ -83,6 +95,4 @@ private:
 
 	bool startFlag;
 	bool turnFlag;        // ターンフラグ
-
-	int testModel;
 };
