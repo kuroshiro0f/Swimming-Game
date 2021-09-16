@@ -21,7 +21,9 @@ public:
 		STATE_KEY_DOWN = 2,
 		STATE_KEY_RIGHT = 3,
 		STATE_KEY_LEFT = 4,
-		STATE_KEY_SPACE,
+		STATE_KEY_C = 5,
+		STATE_KEY_S,
+		STATE_KEY_A,
 
 		STATE_KEY_ENUM,
 	}KEY_STATE_ENUM;
@@ -56,6 +58,11 @@ public:
 	// 必殺技
 	void Skill(float _playerPos, float _goalPos);
 
+	bool GetInputSpaceFlag() { return inputSpaceFlag; };
+
+	//inputArrowFlagのゲッター
+	bool GetInputArrpwFlag() { return inputArrowFlag; };
+
 	//リターンの評価するためのプレイヤーの座標を補完
 	float mPosX;
 
@@ -72,15 +79,21 @@ public:
 	int tmpTime;     // 現在時間を一時保存
 	int countUP;     // 経過時間
 
-	int count;       // 次のシーンに行くまでのカウント
-	int countDown;		// スタートまでのカウントダウン
+	int count;       // 次のシーンに行くまでのカウント    
+	int countDown;	 // スタートまでのカウントダウン
 	int skillCount;  // スキルの使用カウント
+	int skillTime;   // スキルの効果時間
+
+	int inputTime;
 
 	int randomKeyNumber;
 	bool randomFlag;
+	bool inputArrowFlag;				// 矢印キー入力フラグ
+	int keyCount;
+
+	bool countDownFinishFlag;		   // カウントダウンが終わったか
 
 private:
-	int inputTime;
 	int inputStartTime;
 	int inputEndTime;
 
@@ -94,5 +107,9 @@ private:
 	Evaluation	   mEvlt;				//評価
 
 	bool startFlag;
-	bool turnFlag;        // ターンフラグ
+	bool turnFlag;          // ターンフラグ
+	bool inputSpaceFlag;	//SPACE入力フラグ
+
+	bool skillFlag;         // スキルを使用したかどうか
+
 };

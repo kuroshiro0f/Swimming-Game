@@ -3,12 +3,12 @@
 #include "Yamaoka_PlayerActor.h"
 #include "Yamaoka_Camera.h"
 
-class PlayerActor;			//PlayerActorへの参照
+class Yamaoka_PlayerActor;			//PlayerActorへの参照
 class Camera;				//Cameraへの参照
 
-class GameScene :public SceneBase
+class Yamaoka_GameScene :public SceneBase
 {
-	PlayerActor* player;
+	Yamaoka_PlayerActor* player;
 	Camera* camera;
 
 public:
@@ -22,8 +22,8 @@ public:
 		FADE_OUT
 	};
 
-	GameScene();			//	コンストラクタ
-	~GameScene();			//	デストラクタ
+	Yamaoka_GameScene();			//	コンストラクタ
+	~Yamaoka_GameScene();			//	デストラクタ
 
 	SceneBase* Update(float _deltaTime)override;	//	更新
 	void Draw()override;			//	描画
@@ -40,6 +40,11 @@ private:
 	//	男の子の移動
 	int m_boyY;
 
+	//	文字の表示時間の操作
+	int m_startCount;			//	スタート
+	int m_finishCount;			//	ゴール
+	bool m_startFinishFlag;
+
 	//	グラフィックハンドル
 	int m_backGraphHandle;			//	背景
 	int m_loadGraphHandle;			//	ロード
@@ -50,9 +55,15 @@ private:
 
 	//	サウンドハンドル
 	int m_bgmSoundHandle;			//	BGM
+	int m_whistleSoundHandle;		//	笛
+	int m_countDownSoundHandle;		//	カウントダウン
+	int m_goalSoundHandle;			//	ゴール
 
 	//	アルファ値
 	int m_alphaVal;
+
+	//	デルタタイム
+	float m_deltaTime;
 
 	//	フラグ
 	int m_tipsFlag;					//	TIPSの表示変える
@@ -62,6 +73,9 @@ private:
 	bool m_loadFlag;				//	ロード画面を表示するか
 	bool m_loadFinishFlag;			//	ロードが終わったか
 	bool m_boyPlusFlag;				//	男の子をうごかすフラグ
+	bool m_whistleFinishFlag;		//	笛を鳴らし終わったか
+	bool m_gameFinishFlag;			//	ゲームが終わったか
+	bool m_fadeOutFlag;				//	フェードアウトを始めるか
 
 	class Stage* m_stage;   // ステージクラスへのポインタメンバ変数
 	class Camera* m_camera;	// カメラクラスへのポインタメンバ変数
