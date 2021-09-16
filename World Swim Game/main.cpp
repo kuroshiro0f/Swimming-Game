@@ -59,7 +59,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		Scene->Sound();
 
 		//	デバッグ用
-		DrawFormatString(0, 0, GetColor(255, 0, 0), "deltaTime = %f", DeltaTime);
+		//DrawFormatString(0, 0, GetColor(255, 0, 0), "deltaTime = %f", DeltaTime);
 
 		// 裏画面の内容を表画面に反映させる
 		ScreenFlip();
