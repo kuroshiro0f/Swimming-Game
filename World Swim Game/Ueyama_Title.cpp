@@ -6,10 +6,6 @@
 
 //-----------------------------------------------------------------------------
 //	・変更点
-//	水滴関連（ボツの可能性があるので一旦コメントアウト）
-//	マニュアル関連
-//	音量調整の場所
-//	効果音を追加
 //-----------------------------------------------------------------------------
 
 //	ウインドウのサイズ
@@ -19,15 +15,6 @@ const int SCREEN_SIZE_H = 1080;
 //	効果音音量調整
 int DECVOLUMEPAL = 40;
 
-////	水滴の場所
-//const int DROP1_X = 1400;
-//const int DROP1_Y = 300;
-//const int DROP2_X = 550;
-//const int DROP2_Y = 300;
-//
-////	水滴の速度
-//const double DROP_SPEED = 1.0;
-
 //	最大透過量
 const int MAX_TRANSP_VAL = 255;
 //	透過量変化用ベクトル
@@ -36,10 +23,20 @@ const int TRANSP_MODERATION = -1;
 const int FIRST_TRANS_VAL = 100;
 
 //	フェードイン・フェードアウトの速度
-const float ADD_ALPHA_VAL = 60.0f;
-const float ADD_ALPHA_VAL_2 = 300.0f;
+const float ADD_ALPHA_VAL = 3.0f;
+const float ADD_ALPHA_VAL_2 = 30.0f;
+
 ////	円周率
 //const double PI = 3.1415926535897932384626433832795f;
+//
+////	水滴の場所
+//const int DROP1_X = 1400;
+//const int DROP1_Y = 300;
+//const int DROP2_X = 550;
+//const int DROP2_Y = 300;
+//
+////	水滴の速度
+//const double DROP_SPEED = 0.1;
 
 Ueyama_Title::Ueyama_Title()
 	: m_state(TITLE_SCENE_STATE::FIRST)
@@ -48,13 +45,13 @@ Ueyama_Title::Ueyama_Title()
 	, m_addAlphaVal(ADD_ALPHA_VAL)
 	, m_addAlphaVal2(ADD_ALPHA_VAL_2)
 	/*, m_bigDropAngle(PI * 2)
-	, m_smallDropAngle(PI)
-	, m_bigDropFlag(0)
+	, m_smallDropAngle(PI)*/
+	/*, m_bigDropFlag(0)
 	, m_smallDropFlag(0)*/
 {
 	if (CheckHitKey(KEY_INPUT_RETURN))
 	{
-		m_checkKeyFlag = TRUE;
+		m_checkKeyFlag = true;
 	}
 
 	// 透過量変数を122に設定
@@ -75,8 +72,8 @@ Ueyama_Title::~Ueyama_Title()
 	DeleteGraph(m_manualGuideGraphHandle);
 	DeleteGraph(m_gateGraphHandle);
 	DeleteGraph(m_maouGraphHandle);
-	DeleteGraph(m_bigDropGraphHandle);
-	DeleteGraph(m_smallDropGraphHandle);
+	/*DeleteGraph(m_bigDropGraphHandle);
+	DeleteGraph(m_smallDropGraphHandle);*/
 	DeleteGraph(m_manualGraphHandle);
 	DeleteSoundMem(m_backSoundHandle);
 	DeleteSoundMem(m_entClickSoundHandle);
@@ -159,6 +156,24 @@ SceneBase* Ueyama_Title::Update(float _deltaTime)
 			//	SEを流す
 			PlaySoundMem(m_spaClickSoundHandle, DX_PLAYTYPE_BACK, TRUE);
 
+			m_state = TITLE_SCENE_STATE::MANUAL2;
+		}
+
+		break;
+	case TITLE_SCENE_STATE::MANUAL2:
+		if (!CheckHitKey(KEY_INPUT_RETURN))
+		{
+			m_checkKeyFlag = false;
+		}
+
+		if (CheckHitKey(KEY_INPUT_RETURN) && m_checkKeyFlag == false)
+		{
+			// ※キー入力重複対策のフラグ
+			m_checkKeyFlag = true;
+
+			//	SEを流す
+			PlaySoundMem(m_spaClickSoundHandle, DX_PLAYTYPE_BACK, TRUE);
+
 			m_state = TITLE_SCENE_STATE::TITLE;
 		}
 
@@ -166,15 +181,15 @@ SceneBase* Ueyama_Title::Update(float _deltaTime)
 	case TITLE_SCENE_STATE::FADE_OUT:
 		if (m_fadeOutFinishFlag)
 		{
-			//return new Ueyama_GameScene();
 			return new Ueyama_GameScene();
+			//return new GameScene();
 		}
 		break;
 	default:
 		break;
 	}
 
-	m_deltaTime = _deltaTime;
+	//m_deltaTime = _deltaTime;
 
 	return this;
 }
@@ -185,22 +200,21 @@ void Ueyama_Title::Draw()
 	// 透過量更新
 	UpdateTransparent();
 
-
 	if (m_state != TITLE_SCENE_STATE::FIRST && m_state != TITLE_SCENE_STATE::SECOND)
 	{
 		// 描画
 		DrawGraph(0, 0, m_backGraphHandle, TRUE);			//	背景
-		if (m_state != TITLE_SCENE_STATE::MANUAL)
+		if (m_state != TITLE_SCENE_STATE::MANUAL && m_state != TITLE_SCENE_STATE::MANUAL2)
 		{
 			DrawGraph(0, 0, m_logoGraphHandle, TRUE);			//	ロゴ
 
-	/*	m_bigDropAngle += DROP_SPEED * m_deltaTime;
-		m_smallDropAngle -= DROP_SPEED * m_deltaTime;
+			/*m_bigDropAngle += DROP_SPEED;
+			m_smallDropAngle -= DROP_SPEED;
 
-		DrawRotaGraph(DROP1_X, DROP1_Y, 1.0, m_bigDropAngle, m_bigDropGraphHandle, TRUE, FALSE);
-		DrawRotaGraph(DROP2_X, DROP2_Y, 1.0, m_smallDropAngle, m_smallDropGraphHandle, TRUE, FALSE);*/
+			DrawRotaGraph(DROP1_X, DROP1_Y, 1.0, m_bigDropAngle, m_bigDropGraphHandle, TRUE, FALSE);
+			DrawRotaGraph(DROP2_X, DROP2_Y, 1.0, m_smallDropAngle, m_smallDropGraphHandle, TRUE, FALSE);*/
 
-		// 透過して描画
+			// 透過して描画
 			SetDrawBlendMode(DX_BLENDMODE_ALPHA, m_transpVal);
 			DrawGraph(0, 0, m_startGuideGraphHandle, TRUE);		//	スタートの案内
 			// 透過を元に戻す
@@ -214,18 +228,6 @@ void Ueyama_Title::Draw()
 		}
 	}
 
-
-	//// 画面に映る位置に３Ｄモデルを移動
-	//MV1SetPosition(m_swimModelHandle, VGet(320.0f, -300.0f, 600.0f));
-
-
-	//// 3Dモデルのスケールを拡大
-	//MV1SetScale(m_swimModelHandle, VGet(50.0f, 50.0f, 50.0f));
-
-	////	クロールのモデルを描画
-	//MV1DrawModel(m_swimModelHandle);
-
-
 	if (m_state == TITLE_SCENE_STATE::MANUAL)
 	{
 		// 透過して描画
@@ -237,11 +239,22 @@ void Ueyama_Title::Draw()
 		//	描画
 		DrawGraph(0, 0, m_manualGraphHandle, TRUE);
 	}
+	if (m_state == TITLE_SCENE_STATE::MANUAL2)
+	{
+		// 透過して描画
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 190);
+		DrawBox(0, 0, SCREEN_SIZE_W, SCREEN_SIZE_H, GetColor(0, 0, 0), TRUE);
+		// 透過を元に戻す
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+
+		//	描画
+		DrawGraph(0, 0, m_manual2GraphHandle, TRUE);
+	}
 
 	if (m_state == TITLE_SCENE_STATE::FIRST)
 	{
 		// アルファ値の減算
-		m_alphaVal -= m_addAlphaVal * m_deltaTime;
+		m_alphaVal -= m_addAlphaVal;
 		if (m_alphaVal <= 255)
 		{
 			//	描画
@@ -256,7 +269,7 @@ void Ueyama_Title::Draw()
 			// アルファブレンド無効化
 			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
-			// アルファ値が70になったらフェードイン終了
+			// アルファ値が0になったらフェードイン終了
 			if (m_alphaVal <= 0)
 			{
 				m_state = TITLE_SCENE_STATE::SECOND;
@@ -271,7 +284,7 @@ void Ueyama_Title::Draw()
 		DrawGraph(0, 0, m_maouGraphHandle, TRUE);			//	魔王魂
 
 		// アルファ値の減算
-		m_alphaVal -= m_addAlphaVal * m_deltaTime;
+		m_alphaVal -= m_addAlphaVal;
 
 		// アルファブレンド有効化(ここでアルファ値をセット)
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, m_alphaVal);
@@ -282,7 +295,7 @@ void Ueyama_Title::Draw()
 		// アルファブレンド無効化
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 60);
 
-		// アルファ値が70になったらフェードイン終了
+		// アルファ値が0になったらフェードイン終了
 		if (m_alphaVal <= 0)
 		{
 			m_state = TITLE_SCENE_STATE::FADE_IN;
@@ -294,7 +307,7 @@ void Ueyama_Title::Draw()
 	if (m_state == TITLE_SCENE_STATE::FADE_IN)
 	{
 		// アルファ値の減算
-		m_alphaVal -= m_addAlphaVal * m_deltaTime;
+		m_alphaVal -= m_addAlphaVal;
 
 		// アルファブレンド有効化(ここでアルファ値をセット)
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, m_alphaVal);
@@ -308,6 +321,7 @@ void Ueyama_Title::Draw()
 		// アルファ値が最大(255)になったらフェードアウト終了
 		if (m_alphaVal <= 0)
 		{
+			m_alphaVal = 0;
 			m_state = TITLE_SCENE_STATE::TITLE;
 		}
 	}
@@ -316,7 +330,7 @@ void Ueyama_Title::Draw()
 	if (m_state == TITLE_SCENE_STATE::FADE_OUT)
 	{
 		// アルファ値の加算
-		m_alphaVal += m_addAlphaVal2 * m_deltaTime;
+		m_alphaVal += m_addAlphaVal2;
 		// アルファブレンド有効化(ここでアルファ値をセット)
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, m_alphaVal);
 
@@ -329,6 +343,7 @@ void Ueyama_Title::Draw()
 		// アルファ値が最大(255)になったらフェードアウト終了
 		if (m_alphaVal >= 255)
 		{
+			m_alphaVal = 255;
 			m_fadeOutFinishFlag = true;
 		}
 	}
@@ -336,8 +351,11 @@ void Ueyama_Title::Draw()
 
 void Ueyama_Title::Sound()
 {
-	//	BGMを流す
-	PlaySoundMem(m_backSoundHandle, DX_PLAYTYPE_BACK, FALSE);
+	if (m_state != TITLE_SCENE_STATE::FIRST && m_state != TITLE_SCENE_STATE::SECOND)
+	{
+		//	BGMを流す
+		PlaySoundMem(m_backSoundHandle, DX_PLAYTYPE_BACK, FALSE);
+	}
 }
 
 void Ueyama_Title::Load()
@@ -350,15 +368,9 @@ void Ueyama_Title::Load()
 	m_gateGraphHandle = LoadGraph("data/img/Title/GATE.png");					//	GATE
 	m_maouGraphHandle = LoadGraph("data/img/Title/maou.png");					//	魔王魂
 	//m_bigDropGraphHandle = LoadGraph("data/img/Title/drop1.png");				//	大きな水滴
-	//m_smallDropGraphHandle = LoadGraph("data/img/Title/drop2.png");				//	小さな水滴
-	m_manualGraphHandle = LoadGraph("data/img/Manual/Manual.png");			//	マニュアル
-
-	////	モデルハンドルにセット
-	//m_swimModelHandle = MV1LoadModel("data/asset/swim/natu12b.pmx");			//	泳ぐキャラ
-	//m_crawlModelHandle = MV1LoadModel("data/asset/クロール.vmd");					//	クロール
-
-	//// アニメーションをアタッチ
-	//MV1AttachAnim(m_swimModelHandle, 0, m_crawlModelHandle, FALSE);				//	クロール
+	//m_smallDropGraphHandle = LoadGraph("data/img/Title/drop2.png");			//	小さな水滴
+	m_manualGraphHandle = LoadGraph("data/img/Manual/Manual.png");				//	マニュアル
+	m_manual2GraphHandle = LoadGraph("data/img/Manual/Manual2.png");			//	マニュアル2
 
 	//	サウンドハンドルにセット
 	m_backSoundHandle = LoadSoundMem("data/sound/Title/Title4.ogg");			//	BGM

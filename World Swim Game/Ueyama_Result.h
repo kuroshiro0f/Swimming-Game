@@ -21,6 +21,12 @@ public:
 		FADE_OUT
 	};
 
+	typedef struct {
+		int TIME_FIRST;			//	一位のタイム
+		int TIME_SECOND;		//	二位のタイム
+		int TIME_THIRD;			//	三位のタイム
+	}ranking;
+
 	Ueyama_Result(const int _time);			//	コンストラクタ
 	~Ueyama_Result();			//　デストラクタ
 
@@ -80,6 +86,5 @@ private:
 	bool m_checkKeyFlag;				//	キーが押されたままか
 	bool m_fadeOutFinishFlag;			//	フェードアウト終了
 
-	class Ueyama_Save* m_save;
-
+	class Save* m_save;
 };

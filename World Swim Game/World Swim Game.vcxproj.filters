@@ -5,10 +5,6 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;c++;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="ヘッダー ファイル">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
     <Filter Include="リソース ファイル">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
@@ -27,6 +23,10 @@
     </Filter>
     <Filter Include="ソース ファイル\work\Ueyama">
       <UniqueIdentifier>{d527768b-72df-4671-8681-93d70b3114ee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -108,11 +108,11 @@
     <ClInclude Include="Ueyama_Camera.h">
       <Filter>ソース ファイル\work\Ueyama</Filter>
     </ClInclude>
-    <ClInclude Include="Ueyama_Save.h">
-      <Filter>ソース ファイル\work\Ueyama</Filter>
-    </ClInclude>
     <ClInclude Include="Save.h">
       <Filter>ソース ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayEffect.h">
+      <Filter>ソース ファイル\work\Ueyama</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -206,11 +206,11 @@
     <ClCompile Include="Ueyama_Camera.cpp">
       <Filter>ソース ファイル\work\Ueyama</Filter>
     </ClCompile>
-    <ClCompile Include="Ueyama_Save.cpp">
-      <Filter>ソース ファイル\work\Ueyama</Filter>
-    </ClCompile>
     <ClCompile Include="Save.cpp">
       <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayEffect.cpp">
+      <Filter>ソース ファイル\work\Ueyama</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

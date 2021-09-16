@@ -3,8 +3,6 @@
 
 //-----------------------------------------------------------------------------
 //	変更点
-//	水滴関連
-//	マニュアル関連
 //-----------------------------------------------------------------------------
 
 
@@ -19,6 +17,7 @@ public:
 		FADE_IN,
 		TITLE,
 		MANUAL,
+		MANUAL2,
 		FADE_OUT
 	};
 
@@ -35,10 +34,6 @@ public:
 private:
 	TITLE_SCENE_STATE m_state;
 
-	//	モデルハンドル
-	int m_swimModelHandle;				//	泳ぐキャラ
-	int m_crawlModelHandle;				//	クロールのモーション
-
 	//	グラフィックハンドル
 	int m_backGraphHandle;				//	背景
 	int m_logoGraphHandle;				//	ロゴ
@@ -46,9 +41,10 @@ private:
 	int m_manualGuideGraphHandle;		//	マニュアルへの案内
 	int m_gateGraphHandle;				//	GATE
 	int m_maouGraphHandle;				//	魔王魂
-	int m_bigDropGraphHandle;			//	大きな水滴
-	int m_smallDropGraphHandle;			//	小さな水滴
+	//int m_bigDropGraphHandle;			//	大きな水滴
+	//int m_smallDropGraphHandle;			//	小さな水滴
 	int m_manualGraphHandle;			//	マニュアル
+	int m_manual2GraphHandle;			//	マニュアル2ページ目
 
 	//	サウンドハンドル
 	int m_backSoundHandle;				//	BGM
@@ -57,24 +53,22 @@ private:
 
 	//	アルファ値
 	int m_alphaVal;
-	float m_addAlphaVal;
-	float m_addAlphaVal2;
+	int m_addAlphaVal;
+	int m_addAlphaVal2;
 
-	//	水滴の動き
-	double m_bigDropAngle;				//	大きな水滴
-	double m_smallDropAngle;			//	小さな水滴
+	////	水滴の動き
+	//double m_bigDropAngle;				//	大きな水滴
+	//double m_smallDropAngle;			//	小さな水滴
 
-	//	文字の透過
+	// 文字の透過
 	int m_transpVal;				//	透過量
 	int m_fadeTransVal;				//	フェードアウト中の透過量
 	int m_permeationAmount;			//	毎フレーム透過量
 
 	//	デルタタイム
-	float m_deltaTime;
+	//float m_deltaTime;
 
 	//	フラグ
-	int m_bigDropFlag;				//	大きな水滴の状態管理
-	int m_smallDropFlag;			//	小さな水滴の状態管理
 	bool m_checkKeyFlag;			//	キーが押されたままかを判定するフラグ
 	bool m_fadeOutFinishFlag;		//	フェードアウトの終了判定フラグ
 };

@@ -18,7 +18,7 @@ const int TRANSP_MODERATION = -1;
 const int FIRST_TRANS_VAL = 100;
 
 //	フェードイン・フェードアウトの速度
-const float ADD_ALPHA_VAL = 6.0f;
+const float ADD_ALPHA_VAL = 3.0f;
 const float ADD_ALPHA_VAL_2 = 30.0f;
 
 ////	円周率
@@ -328,8 +328,11 @@ void Title::Draw()
 
 void Title::Sound()
 {
-	//	BGMを流す
-	PlaySoundMem(m_backSoundHandle, DX_PLAYTYPE_BACK, FALSE);
+	if (m_state != TITLE_SCENE_STATE::FIRST && m_state != TITLE_SCENE_STATE::SECOND)
+	{
+		//	BGMを流す
+		PlaySoundMem(m_backSoundHandle, DX_PLAYTYPE_BACK, FALSE);
+	}
 }
 
 void Title::Load()

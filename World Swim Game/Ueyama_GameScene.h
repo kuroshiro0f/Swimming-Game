@@ -1,6 +1,7 @@
 #pragma once
 
 #include "SceneBase.h"
+#include "PlayEffect.h"
 #include "Ueyama_PlayerActor.h"
 #include "Ueyama_Camera.h"
 
@@ -50,6 +51,15 @@ private:
 	int m_finishCount;			//	ゴール
 	bool m_startFinishFlag;
 
+	//	星の移動
+	int m_starX;				//	X方向
+	int m_starY;				//	Y方向
+	double m_starAngle;			//	角度
+
+	//	汗の移動
+	int m_sweat1X, m_sweat1Y;	//	汗1
+	int m_sweat2X, m_sweat2Y;	//	汗2
+
 	//	グラフィックハンドル
 	int m_backGraphHandle;			//	背景
 	int m_loadGraphHandle;			//	ロード
@@ -57,12 +67,21 @@ private:
 	int m_tips2GraphHandle;			//	TIPS2
 	int m_tips3GraphHandle;			//	TIPS3
 	int m_boyGraphHandle;			//	男の子
+	int m_starGraphHandle;			//	星
+	int m_sweat1GraphHandle;		//	汗1
+	int m_sweat2GraphHandle;		//	汗2
 
 	//	サウンドハンドル
 	int m_bgmSoundHandle;			//	BGM
 	int m_whistleSoundHandle;		//	笛
 	int m_countDownSoundHandle;		//	カウントダウン
 	int m_goalSoundHandle;			//	ゴール
+
+	//	時間の経過
+	int m_timeElapsed;
+
+	//	ターンの評価関連
+	int m_turnEvaX, m_turnEvaY;				//	座標
 
 	//	アルファ値
 	int m_alphaVal;
@@ -82,7 +101,8 @@ private:
 	bool m_gameFinishFlag;			//	ゲームが終わったか
 	bool m_fadeOutFlag;				//	フェードアウトを始めるか
 
-	class Stage* m_stage;   // ステージクラスへのポインタメンバ変数
-	class Ueyama_Camera* m_camera;	// カメラクラスへのポインタメンバ変数
-	class Ueyama_PlayerActor* m_actor;   // アクタークラスへのポインタメンバ変数
+	class Stage* m_stage;					//	ステージクラスへのポインタメンバ変数
+	class Ueyama_Camera* m_camera;			//	カメラクラスへのポインタメンバ変数
+	class Ueyama_PlayerActor* m_actor;		//	アクタークラスへのポインタメンバ変数
+	class PlayEffect* m_effect;				//	エフェクトプレーヤー
 };

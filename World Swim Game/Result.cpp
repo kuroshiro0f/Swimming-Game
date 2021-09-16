@@ -19,12 +19,12 @@ const int TIME_X = 370;
 const int TIME_Y = 460;
 
 // RECORDを表示する場所
-const int RECORD_X = 200;				//	RECORDの文字	
-const int RECORD_Y = 660;
-const int RECORD_TIME_X = 150;			//	歴代タイムのX座標
-const int FIRST_TIME_Y = 760;			//	一位の場所
-const int SECOND_TIME_Y = 860;			//	二位の場所
-const int THIRD_TIME_Y = 960;			//	三位の場所
+const int RECORD_X = 300;				//	RECORDの文字	
+const int RECORD_Y = 610;
+const int RECORD_TIME_X = 300;			//	歴代タイムのX座標
+const int FIRST_TIME_Y = 710;			//	一位の場所
+const int SECOND_TIME_Y = 810;			//	二位の場所
+const int THIRD_TIME_Y = 910;			//	三位の場所
 
 //	リザルトの遷移する時間
 const int TIME = 100;

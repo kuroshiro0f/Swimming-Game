@@ -56,8 +56,16 @@ public:
 	//turnFlagのゲッター
 	bool GetTurnFlag() { return turnFlag; };
 
+	////	ポジションのgetter
+	//VECTOR GetPos() { return mPosition; }
+
 	// 必殺技
 	void Skill(float _playerPos, float _goalPos);
+
+	bool GetInputSpaceFlag() { return inputSpaceFlag; };
+
+	//inputArrowFlagのゲッター
+	bool GetInputArrpwFlag() { return inputArrowFlag; };
 
 	//リターンの評価するためのプレイヤーの座標を補完
 	float mPosX;
@@ -66,7 +74,6 @@ public:
 	float dCount;      // どれだけ進んだか        
 	float maxdCount;   // どこまで進めるのか
 	int NowPos;    // プレイヤーの現在座標
-	// 未完成 //
 
 	int st;      // スタミナ
 	int MaxSt;   // スタミナ最大値
@@ -77,16 +84,21 @@ public:
 	int countUP;     // 経過時間
 
 	int count;       // 次のシーンに行くまでのカウント    
-	int countDown;	// スタートまでのカウントダウン
+	int countDown;		// スタートまでのカウントダウン
 	int skillCount;  // スキルの使用カウント
+
+	int inputTime;
+
+	int turnGraphHandle;				//	グラフィックハンドル
+	bool turnGraphFlag;					//	表示するか
 
 	int randomKeyNumber;
 	bool randomFlag;
+	bool inputArrowFlag;				//矢印キー入力フラグ
 
 	bool countDownFinishFlag;		//	カウントダウンが終わったか
 
 private:
-	int inputTime;
 	int inputStartTime;
 	int inputEndTime;
 
@@ -99,6 +111,14 @@ private:
 
 	Evaluation	   mEvlt;				//評価
 
+	//	ターンの評価関連
+	//int m_turnEvaX, m_turnEvaY;				//	座標
+	//int m_turnGraphHandle;				//	グラフィックハンドル
+	//bool m_turnGraphFlag;					//	表示するか
+
+	//int m_timeElapsed;					//	時間経過
+
 	bool startFlag;
 	bool turnFlag;        // ターンフラグ
+	bool inputSpaceFlag;				//SPACE入力フラグ
 };

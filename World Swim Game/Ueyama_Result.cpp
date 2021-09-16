@@ -1,12 +1,11 @@
 #include "Ueyama_Result.h"
 #include "Ueyama_Title.h"
-#include "Ueyama_Save.h"
+#include "Save.h"
 
 #include "DxLib.h"
 
 //-----------------------------------------------------------------------------
 //	・変更点
-//	　音量の位置調整
 //-----------------------------------------------------------------------------
 
 //	スクリーンのサイズ
@@ -19,21 +18,17 @@ const int SQUARE_START_Y = 370;
 const int SQUARE_END_X = 1100;
 const int SQUARE_END_Y = 1030;
 
-//// タイムを表示する場所
-//const int TIME_X = 370;
-//const int TIME_Y = 660;
-
 // タイムを表示する場所
 const int TIME_X = 370;
 const int TIME_Y = 460;
 
 // RECORDを表示する場所
-const int RECORD_X = 200;				//	RECORDの文字	
-const int RECORD_Y = 660;				
-const int RECORD_TIME_X = 150;			//	歴代タイムのX座標
-const int FIRST_TIME_Y = 760;			//	一位の場所
-const int SECOND_TIME_Y = 860;			//	二位の場所
-const int THIRD_TIME_Y = 960;			//	三位の場所
+const int RECORD_X = 300;				//	RECORDの文字	
+const int RECORD_Y = 610;
+const int RECORD_TIME_X = 300;			//	歴代タイムのX座標
+const int FIRST_TIME_Y = 710;			//	一位の場所
+const int SECOND_TIME_Y = 810;			//	二位の場所
+const int THIRD_TIME_Y = 910;			//	三位の場所
 
 //	リザルトの遷移する時間
 const int TIME = 100;
@@ -48,19 +43,16 @@ const int TRANSP_MODERATION = -1;
 //	最初の透過量
 const int FIRST_TRANS_VAL = 100;
 
-//	フェードイン・フェードアウトの速度
-const int addAlphaVal = 5;
-
-//	星の拡大縮小速度
-//const int STAR_SCALE = 5;
-
 //	評価の基準となる秒数
-const int FIRST = 1;
-const int SECOND = 2;
-const int THIRD = 3;
+const int FIRST = 45;
+const int SECOND = 55;
+const int THIRD = 65;
 
 //	星の拡大縮小範囲
 const int STAR_MIN = -30;
+
+//	フェードイン・フェードアウトの速度
+const int addAlphaVal = 5;
 
 Ueyama_Result::Ueyama_Result(const int _time)
 	: m_alphaVal(255)
@@ -82,8 +74,10 @@ Ueyama_Result::Ueyama_Result(const int _time)
 	// ENTERキーが押されている間、次のENTERの入力を無効に
 	if (CheckHitKey(KEY_INPUT_RETURN))
 	{
-		m_checkKeyFlag = true;
+		m_checkKeyFlag = TRUE;
 	}
+
+	SAVE->SetTime(_time);
 
 	// 透過量変数を122に設定
 	m_transpVal = MAX_TRANSP_VAL;
@@ -130,9 +124,6 @@ SceneBase* Ueyama_Result::Update(float _deltaTime)
 {
 	//	リザルトの経過時間を進める
 	m_resultTime++;
-
-	//	タイムをセーブ
-	//m_save->SetTime(m_time);
 
 	switch (m_state)
 	{
@@ -280,7 +271,6 @@ SceneBase* Ueyama_Result::Update(float _deltaTime)
 		{
 			return new Ueyama_Title();
 		}
-
 		break;
 	default:
 		break;
@@ -307,10 +297,10 @@ void Ueyama_Result::Draw()
 	{
 		//	クリアタイムを表示
 		DrawFormatStringToHandle(TIME_X, TIME_Y, GetColor(0, 0, 0), nowTimeHandle, "TIME : %d", m_time);
-		/*DrawFormatStringToHandle(RECORD_X, RECORD_Y, GetColor(0, 0, 0), recordHandle, "RECORD");
-		DrawFormatStringToHandle(RECORD_TIME_X, FIRST_TIME_Y, GetColor(0, 0, 0), recordHandle, "1位 : %d", m_save->GetFirstTime());
-		DrawFormatStringToHandle(RECORD_TIME_X, SECOND_TIME_Y, GetColor(0, 0, 0), recordHandle, "2位 : %d", m_save->GetSecondTime());
-		DrawFormatStringToHandle(RECORD_TIME_X, THIRD_TIME_Y, GetColor(0, 0, 0), recordHandle, "3位 : %d", m_save->GetThirdTime());*/
+		DrawFormatStringToHandle(RECORD_X, RECORD_Y, GetColor(0, 0, 0), recordHandle, "RECORD");
+		DrawFormatStringToHandle(RECORD_TIME_X, FIRST_TIME_Y, GetColor(0, 0, 0), recordHandle, "1位 : %d", SAVE->GetFirstTime());
+		DrawFormatStringToHandle(RECORD_TIME_X, SECOND_TIME_Y, GetColor(0, 0, 0), recordHandle, "2位 : %d", SAVE->GetSecondTime());
+		DrawFormatStringToHandle(RECORD_TIME_X, THIRD_TIME_Y, GetColor(0, 0, 0), recordHandle, "3位 : %d", SAVE->GetThirdTime());
 	}
 	if (m_resultFlag >= 2)
 	{
@@ -410,7 +400,6 @@ void Ueyama_Result::Draw()
 
 void Ueyama_Result::Sound()
 {
-	//	BGMを流す
 	PlaySoundMem(m_bgmSoundHandle, DX_PLAYTYPE_BACK, FALSE);
 	switch (m_resultFlag)
 	{
@@ -420,7 +409,7 @@ void Ueyama_Result::Sound()
 		break;
 	case 2:
 		//	効果音を流す
-		PlaySoundMem(m_se2SoundHandle, DX_PLAYTYPE_BACK, FALSE);	
+		PlaySoundMem(m_se2SoundHandle, DX_PLAYTYPE_BACK, FALSE);
 		break;
 	case 3:
 		//	効果音を流す
@@ -428,7 +417,7 @@ void Ueyama_Result::Sound()
 		break;
 	case 4:
 		//	効果音を流す
-		PlaySoundMem(m_se4SoundHandle, DX_PLAYTYPE_BACK, FALSE);	
+		PlaySoundMem(m_se4SoundHandle, DX_PLAYTYPE_BACK, FALSE);
 		break;
 	default:
 		break;
