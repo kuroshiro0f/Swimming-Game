@@ -106,33 +106,13 @@ void GameScene::Draw()
 	// プレイヤー描画
 	m_actor->DrawActor();
 
-	// 操作ボタン（仮）
-	/*if (CheckHitKey(KEY_INPUT_RIGHT))
-	{
-		DrawBox(1050, 800, 1150, 900, GetColor(255, 255, 255), TRUE);
-	}
-	if (CheckHitKey(KEY_INPUT_LEFT))
-	{
-		DrawBox(750, 800, 850, 900, GetColor(255, 255, 255), TRUE);
-	}
-	DrawBox(750, 800, 850, 900, GetColor(0, 0, 0), FALSE);				//ボックスの表示(2つ用)
-	DrawBox(1050, 800, 1150, 900, GetColor(0, 0, 0), FALSE);			//ボックスの表示(2つ用)
-	*/
 	DrawBox(900, 800, 1000, 900, GetColor(0, 0, 0), FALSE);				//ボックスの表示(1つ用)
 	SetFontSize(100);
-
-	//DrawFormatString(750, 800, GetColor(0, 0, 0), "←");
-	//DrawFormatString(1050, 800, GetColor(0, 0, 0), "→");
 
 	//ランダムに矢印を表示
 	switch (m_actor->randomKeyNumber)
 	{
 	case 1:		//ランダムに生成した数が STATE_KEY_UP(1) と同じとき
-		if (CheckHitKey(KEY_INPUT_UP))
-		{
-			m_actor->inputArrowFlag = true;
-		}
-
 		if (m_actor->inputArrowFlag && m_actor->randomFlag)
 		{
 			DrawBox(900, 800, 1000, 900, GetColor(255, 255, 255), TRUE);
@@ -149,11 +129,6 @@ void GameScene::Draw()
 		break;
 
 	case 2:		//ランダムに生成した数が STATE_KEY_DOWN(2) と同じとき
-		if (CheckHitKey(KEY_INPUT_DOWN))
-		{
-			m_actor->inputArrowFlag = true;
-		}
-
 		if (m_actor->inputArrowFlag && m_actor->randomFlag)
 		{
 			DrawBox(900, 800, 1000, 900, GetColor(255, 255, 255), TRUE);
@@ -170,11 +145,6 @@ void GameScene::Draw()
 		break;
 
 	case 3:		//ランダムに生成した数が STATE_KEY_RIGHT(3) と同じとき
-		if (CheckHitKey(KEY_INPUT_RIGHT))
-		{
-			m_actor->inputArrowFlag = true;
-		}
-
 		if (m_actor->inputArrowFlag && m_actor->randomFlag)
 		{
 			DrawBox(900, 800, 1000, 900, GetColor(255, 255, 255), TRUE);
@@ -191,11 +161,6 @@ void GameScene::Draw()
 		break;
 
 	case 4:		//ランダムに生成した数が STATE_KEY_LEFT(4) と同じとき
-		if (CheckHitKey(KEY_INPUT_LEFT))
-		{
-			m_actor->inputArrowFlag = true;
-		}
-
 		if (m_actor->inputArrowFlag && m_actor->randomFlag)
 		{
 			DrawBox(900, 800, 1000, 900, GetColor(255, 255, 255), TRUE);
@@ -212,7 +177,7 @@ void GameScene::Draw()
 	}
 
 	//スペースキーのBOX描画
-	if (-90 >= m_actor->GetPosX() && m_actor->GetPosX() > -136 && m_actor->GetInputSpaceFlag() == false)
+	if (-90 >= m_actor->GetPosX() && m_actor->GetPosX() > -136 && m_actor->GetInputSpaceFlag() == false && m_actor->GetTurnFlag() == false)
 	{
 		//αブレンドモード
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 128);

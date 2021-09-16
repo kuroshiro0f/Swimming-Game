@@ -6,6 +6,7 @@ class Nagatomo_PlayerActor : public Nagatomo_Actor
 {
 public:
 
+	//プレイヤーの状態
 	typedef enum PLAYER_STATE_ENUM
 	{
 		STATE_IDLE,
@@ -14,6 +15,7 @@ public:
 		STATE_NUM,
 	}PLAYER_STATE_ENUM;
 
+	//キーの状態
 	typedef enum KEY_STATE_ENUM
 	{
 		STATE_KEY_IDLE  = 0,
@@ -34,14 +36,22 @@ public:
 		GOOD
 	}Evaluation;
 
+	//コンストラクタ
 	Nagatomo_PlayerActor();
+	//デストラクタ
 	~Nagatomo_PlayerActor();
 
+	//アップデート関数
 	void Update(float _deltaTime);
+	//アクターのアップデート関数
 	void UpdateActor(float _deltaTime) override;
+	//スタート処理の関数
 	void StartProcess(float _deltaTime);
+	//アクターの描画関数
 	void DrawActor();
+	//アニメーション関数
 	void PlayAnim(float _deltaTime);
+	//アニメーションのアタッチ関数
 	void attachAnim(int _animPlay);
 
 	// スタミナゲージの描画
@@ -65,22 +75,27 @@ public:
 	float mPosX;
 
 	// ゴールまでの距離 //
-	float dCount;      // どれだけ進んだか        
-	int maxdCount;   // どこまで進めるのか
-	int NowPos;		 // プレイヤーの現在座標
+	float dCount;				// どれだけ進んだか        
+	int maxdCount;				// どこまで進めるのか
+	int NowPos;					// プレイヤーの現在座標
 
-	int st;      // スタミナ
-	int MaxSt;   // スタミナ最大値
-	int MinSt;   // スタミナ最小値
+	//スタミナ関連
+	int st;						// スタミナ
+	int MaxSt;					// スタミナ最大値
+	int MinSt;					// スタミナ最小値
+	int halfSt;					//スタミナ（50%）
+	int quarterSt;				//スタミナ（25%）
 
-	int startTime;   // ゲーム開始時間
-	int tmpTime;     // 現在時間を一時保存
-	int countUP;     // 経過時間
+	int startTime;				// ゲーム開始時間
+	int tmpTime;				// 現在時間を一時保存
+	int countUP;				// 経過時間
 
-	int count;       // 次のシーンに行くまでのカウント    
+	int count;					// 次のシーンに行くまでのカウント    
 	int countDown;
 
-	int inputTime;
+	float inputTime;			//入力時間
+	float inputLimitTime;		//入力制限時間
+
 
 	int randomKeyNumber;
 	bool randomFlag;
@@ -89,6 +104,8 @@ public:
 private:
 	int inputStartTime;
 	int inputEndTime;
+
+	float addStaminaSpeed;				//加算されるスタミナによるスピード
 
 	VECTOR mPrevPosition;
 
@@ -103,4 +120,6 @@ private:
 	bool startFlag;
 	bool turnFlag;						//ターンフラグ
 	bool inputSpaceFlag;				//SPACE入力フラグ
+	bool mCheckKeyFlag;					//長押し対策フラグ
+
 };
