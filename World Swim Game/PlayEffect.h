@@ -41,6 +41,6 @@ private:
 
 	VECTOR m_playPos;          // エフェクトの座標
 
-	int m_effectHandle;        // 被ダメージエフェクトのハンドル
+	int m_effectHandle;        // エフェクトのハンドル
 	int m_playingEffect;
 };

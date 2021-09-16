@@ -160,13 +160,6 @@ SceneBase* Ueyama_GameScene::Update(float _deltaTime)
 			m_checkKeyFlag = false;
 		}
 
-		////端まで行くと次のステートへ
-		//if (m_actor->GetPosX() <= -136)
-		//{
-		//	m_state = GAME_SCENE_STATE::FADE_OUT;
-		//}
-
-
 		//端まで戻ってきてかつ、turnFlag が true ならゴールの文字を表示
 		if (m_actor->GetPosX() >= 130 && m_actor->GetTurnFlag() == true)
 		{
@@ -287,25 +280,8 @@ void Ueyama_GameScene::Draw()
 		// プレイヤー描画
 		m_actor->DrawActor();
 
-		//// 操作ボタン（仮）
-		//if (CheckHitKey(KEY_INPUT_RIGHT))
-		//{
-		//	DrawBox(1050, 600, 1150, 700, GetColor(255, 255, 255), TRUE);
-		//}
-		//if (CheckHitKey(KEY_INPUT_LEFT))
-		//{
-		//	DrawBox(750, 600, 850, 700, GetColor(255, 255, 255), TRUE);
-		//}
-		//DrawBox(750, 600, 850, 700, GetColor(0, 0, 0), FALSE);
-		//DrawBox(1050, 600, 1150, 700, GetColor(0, 0, 0), FALSE);
-		//SetFontSize(100);
-		//DrawFormatString(750, 600, GetColor(0, 0, 0), "←");
-		//DrawFormatString(1050, 600, GetColor(0, 0, 0), "→");
-
 		DrawBox(900, 800, 1000, 900, GetColor(0, 0, 0), FALSE);				//ボックスの表示(1つ用)
 		SetFontSize(100);
-
-
 
 		//ランダムに矢印を表示
 		switch (m_actor->randomKeyNumber)

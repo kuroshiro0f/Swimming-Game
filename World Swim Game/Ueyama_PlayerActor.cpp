@@ -36,9 +36,6 @@ Ueyama_PlayerActor::Ueyama_PlayerActor()
 	mDirection = VGet(0, 0, 1);
 	mVelosity = VGet(10, 0, 0);
 
-	//モデルのロード
-	//modelHandle = MV1LoadModel("data/player/player.pmx");
-
 	// 自作モデル
 	modelHandle = MV1LoadModel("data/swimmer/player.pmx");
 
@@ -377,6 +374,7 @@ void Ueyama_PlayerActor::UpdateActor(float _deltaTime)
 		else if (turnFlag == false && mPosition.x <= -136)		//押されないまま端まで来たとき
 		{
 			mEvlt = BAD;						//BAD評価に
+			turnGraphHandle = LoadGraph("data/img/Game/Turn1.png");
 		}
 
 

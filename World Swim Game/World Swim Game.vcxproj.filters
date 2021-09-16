@@ -112,7 +112,7 @@
       <Filter>ソース ファイル</Filter>
     </ClInclude>
     <ClInclude Include="PlayEffect.h">
-      <Filter>ソース ファイル\work\Ueyama</Filter>
+      <Filter>ソース ファイル</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -210,7 +210,7 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="PlayEffect.cpp">
-      <Filter>ソース ファイル\work\Ueyama</Filter>
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

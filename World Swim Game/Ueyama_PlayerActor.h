@@ -56,9 +56,6 @@ public:
 	//turnFlagのゲッター
 	bool GetTurnFlag() { return turnFlag; };
 
-	////	ポジションのgetter
-	//VECTOR GetPos() { return mPosition; }
-
 	// 必殺技
 	void Skill(float _playerPos, float _goalPos);
 
@@ -110,13 +107,6 @@ private:
 	KEY_STATE_ENUM mPrevKeyState;		//キーの1つ前の状態
 
 	Evaluation	   mEvlt;				//評価
-
-	//	ターンの評価関連
-	//int m_turnEvaX, m_turnEvaY;				//	座標
-	//int m_turnGraphHandle;				//	グラフィックハンドル
-	//bool m_turnGraphFlag;					//	表示するか
-
-	//int m_timeElapsed;					//	時間経過
 
 	bool startFlag;
 	bool turnFlag;        // ターンフラグ
