@@ -37,10 +37,17 @@ const int STAR_END_Y = 700;
 const double STAR_ROTA_SPEED = 0.1;
 
 //	汗の移動範囲
-const int SWEAT_1_X = 40;
-const int SWEAT_1_Y = 40;
-const int SWEAT_2_X = -40;
-const int SWEAT_2_Y = -40;
+const int SWEAT1_END_X = 40;
+const int SWEAT1_END_Y = -40;
+const int SWEAT2_END_X = -40;
+const int SWEAT2_END_Y = -40;
+
+//	汗の反転量
+const int SWEAT_REV = 500;
+
+//	スタミナゲージの色が変わる残りゲージ量
+const int GREEN = 300;
+const int ORANGE = 150;
 
 //	男の子の移動範囲
 const int BOY_MIN_Y = -50;
@@ -62,6 +69,8 @@ GameScene::GameScene()
 	, m_startFinishFlag(false)
 	, m_gameFinishFlag(false)
 	, m_fadeOutFlag(false)
+	, m_sweat1Flag(true)
+	, m_sweat2Flag(false)
 	, m_stage(nullptr)
 	, m_camera(nullptr)
 	, m_actor(nullptr)
@@ -476,6 +485,93 @@ void GameScene::Draw()
 
 		// スキル
 		m_actor->Skill(m_actor->dCount, m_actor->maxdCount);
+
+		//	スタミナ減少時の汗の表示
+		if (m_actor->st <= ORANGE)
+		{
+			if (!m_actor->turnFlag)
+			{
+				if (m_sweat1Flag)
+				{
+					DrawGraph(m_sweat1X, m_sweat1Y, m_sweat1GraphHandle, TRUE);
+					m_sweat1X++;
+					m_sweat1Y--;
+					if (m_sweat1X > SWEAT1_END_X)
+					{
+						m_sweat1X = 0;
+						m_sweat1Flag = false;
+					}
+					if (m_sweat1Y < SWEAT1_END_Y)
+					{
+						m_sweat1Y = 0;
+						m_sweat1Flag = false;
+					}
+					if (m_sweat1X > SWEAT1_END_X / 2)
+					{
+						m_sweat2Flag = true;
+					}
+				}
+				if (m_sweat2Flag)
+				{
+					DrawGraph(m_sweat2X, m_sweat2Y, m_sweat2GraphHandle, TRUE);
+					m_sweat2X--;
+					m_sweat2Y--;
+					if (m_sweat2X < SWEAT2_END_X)
+					{
+						m_sweat2X = 0;
+						m_sweat2Flag = false;
+						m_sweat1Flag = true;
+					}
+					if (m_sweat2Y < SWEAT2_END_Y)
+					{
+						m_sweat2Y = 0;
+						m_sweat2Flag = false;
+						m_sweat1Flag = true;
+					}
+				}
+			}
+			if (m_actor->turnFlag)
+			{
+				if (m_sweat1Flag)
+				{
+					DrawGraph(m_sweat1X - SWEAT_REV, m_sweat1Y, m_sweat1GraphHandle, TRUE);
+					m_sweat1X++;
+					m_sweat1Y--;
+					if (m_sweat1X > SWEAT1_END_X)
+					{
+						m_sweat1X = 0;
+						m_sweat1Flag = false;
+					}
+					if (m_sweat1Y < SWEAT1_END_Y)
+					{
+						m_sweat1Y = 0;
+						m_sweat1Flag = false;
+					}
+					if (m_sweat1X > SWEAT1_END_X / 2)
+					{
+						m_sweat2Flag = true;
+					}
+				}
+				if (m_sweat2Flag)
+				{
+					DrawGraph(m_sweat2X - SWEAT_REV, m_sweat2Y, m_sweat2GraphHandle, TRUE);
+					m_sweat2X--;
+					m_sweat2Y--;
+					if (m_sweat2X < SWEAT2_END_X)
+					{
+						m_sweat2X = 0;
+						m_sweat2Flag = false;
+						m_sweat1Flag = true;
+					}
+					if (m_sweat2Y < SWEAT2_END_Y)
+					{
+						m_sweat2Y = 0;
+						m_sweat2Flag = false;
+						m_sweat1Flag = true;
+					}
+				}
+			}
+		}
 
 		// カウントダウンの表示
 		if (m_actor->countDown > 0 && m_actor->countDown <= 150)

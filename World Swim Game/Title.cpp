@@ -158,6 +158,42 @@ SceneBase* Title::Update(float _deltaTime)
 			//	SEを流す
 			PlaySoundMem(m_spaClickSoundHandle, DX_PLAYTYPE_BACK, TRUE);
 
+			m_state = TITLE_SCENE_STATE::MANUAL3;
+		}
+
+		break;
+	case TITLE_SCENE_STATE::MANUAL3:
+		if (!CheckHitKey(KEY_INPUT_RETURN))
+		{
+			m_checkKeyFlag = false;
+		}
+
+		if (CheckHitKey(KEY_INPUT_RETURN) && m_checkKeyFlag == false)
+		{
+			// ※キー入力重複対策のフラグ
+			m_checkKeyFlag = true;
+
+			//	SEを流す
+			PlaySoundMem(m_spaClickSoundHandle, DX_PLAYTYPE_BACK, TRUE);
+
+			m_state = TITLE_SCENE_STATE::MANUAL4;
+		}
+
+		break;
+	case TITLE_SCENE_STATE::MANUAL4:
+		if (!CheckHitKey(KEY_INPUT_RETURN))
+		{
+			m_checkKeyFlag = false;
+		}
+
+		if (CheckHitKey(KEY_INPUT_RETURN) && m_checkKeyFlag == false)
+		{
+			// ※キー入力重複対策のフラグ
+			m_checkKeyFlag = true;
+
+			//	SEを流す
+			PlaySoundMem(m_spaClickSoundHandle, DX_PLAYTYPE_BACK, TRUE);
+
 			m_state = TITLE_SCENE_STATE::TITLE;
 		}
 
@@ -187,7 +223,7 @@ void Title::Draw()
 	{
 		// 描画
 		DrawGraph(0, 0, m_backGraphHandle, TRUE);			//	背景
-		if (m_state != TITLE_SCENE_STATE::MANUAL && m_state != TITLE_SCENE_STATE::MANUAL2)
+		if (m_state != TITLE_SCENE_STATE::MANUAL && m_state != TITLE_SCENE_STATE::MANUAL2 && m_state != TITLE_SCENE_STATE::MANUAL3 && m_state != TITLE_SCENE_STATE::MANUAL4)
 		{
 			DrawGraph(0, 0, m_logoGraphHandle, TRUE);			//	ロゴ
 
@@ -216,7 +252,7 @@ void Title::Draw()
 		//	描画
 		DrawGraph(0, 0, m_manualGraphHandle, TRUE);
 	}
-	if (m_state == TITLE_SCENE_STATE::MANUAL2)
+	else if (m_state == TITLE_SCENE_STATE::MANUAL2)
 	{
 		// 透過して描画
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 190);
@@ -226,6 +262,28 @@ void Title::Draw()
 
 		//	描画
 		DrawGraph(0, 0, m_manual2GraphHandle, TRUE);
+	}
+	else if (m_state == TITLE_SCENE_STATE::MANUAL3)
+	{
+		// 透過して描画
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 190);
+		DrawBox(0, 0, SCREEN_SIZE_W, SCREEN_SIZE_H, GetColor(0, 0, 0), TRUE);
+		// 透過を元に戻す
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+
+		//	描画
+		DrawGraph(0, 0, m_manual3GraphHandle, TRUE);
+	}
+	else if (m_state == TITLE_SCENE_STATE::MANUAL4)
+	{
+		// 透過して描画
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 190);
+		DrawBox(0, 0, SCREEN_SIZE_W, SCREEN_SIZE_H, GetColor(0, 0, 0), TRUE);
+		// 透過を元に戻す
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+
+		//	描画
+		DrawGraph(0, 0, m_manual4GraphHandle, TRUE);
 	}
 
 	if (m_state == TITLE_SCENE_STATE::FIRST)
@@ -348,6 +406,8 @@ void Title::Load()
 	//m_smallDropGraphHandle = LoadGraph("data/img/Title/drop2.png");			//	小さな水滴
 	m_manualGraphHandle = LoadGraph("data/img/Manual/Manual.png");				//	マニュアル
 	m_manual2GraphHandle = LoadGraph("data/img/Manual/Manual2.png");			//	マニュアル2
+	m_manual3GraphHandle = LoadGraph("data/img/Manual/Manual3.png");			//	マニュアル3
+	m_manual4GraphHandle = LoadGraph("data/img/Manual/Manual4.png");			//	マニュアル4
 
 	//	サウンドハンドルにセット
 	m_backSoundHandle = LoadSoundMem("data/sound/Title/Title4.ogg");			//	BGM
