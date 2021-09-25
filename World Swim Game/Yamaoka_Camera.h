@@ -17,11 +17,15 @@ public:
 	// 更新
 	void Update(const Yamaoka_PlayerActor& playerActor);
 
+	void Draw();
+
 	// ポジションの getter/setter
 	const VECTOR& GetPos() const
 	{
 		return mPos;
 	}
+
+	
 
 private:
 	VECTOR mPos;    // ポジション

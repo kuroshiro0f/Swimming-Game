@@ -24,6 +24,7 @@ public:
 		STATE_KEY_C = 5,
 		STATE_KEY_S,
 		STATE_KEY_A,
+		STATE_KEY_SPACE,
 
 		STATE_KEY_ENUM,
 	}KEY_STATE_ENUM;
@@ -40,11 +41,17 @@ public:
 	Yamaoka_PlayerActor();
 	~Yamaoka_PlayerActor();
 
+	// アップデート関数
 	void Update(float _deltaTime);
+	// アクターのアップデート関数
 	void UpdateActor(float _deltaTime) override;
+	// スタート処理の関数
 	void StartProcess(float _deltaTime);
+	// アクターの描画関数
 	void DrawActor();
+	// アニメーション関数
 	void PlayAnim(float _deltaTime);
+	// アニメーションのアタッチ関数
 	void attachAnim(int _animPlay);
 
 	// スタミナゲージの描画
@@ -55,47 +62,57 @@ public:
 	//turnFlagのゲッター
 	bool GetTurnFlag() { return turnFlag; };
 
-	// 必殺技
-	void Skill(float _playerPos, float _goalPos);
+	// ラストスパート
+	void LastSpurt();
 
+	// inputSpaceFlagのゲッター
 	bool GetInputSpaceFlag() { return inputSpaceFlag; };
 
-	//inputArrowFlagのゲッター
+	// inputArrowFlagのゲッター
 	bool GetInputArrpwFlag() { return inputArrowFlag; };
 
-	//リターンの評価するためのプレイヤーの座標を補完
+	// リターンの評価するためのプレイヤーの座標を補完
 	float mPosX;
 
 	// ゴールまでの距離 //
-	float dCount;      // どれだけ進んだか        
+	float dCount;      // どれだけ進んだか
 	float maxdCount;   // どこまで進めるのか
-	int NowPos;    // プレイヤーの現在座標
+	int NowPos;        // プレイヤーの現在座標
 
-	int st;      // スタミナ
-	int MaxSt;   // スタミナ最大値
-	int MinSt;   // スタミナ最小値
+	//スタミナ関連
+	int st;						// スタミナ
+	int MaxSt;					// スタミナ最大値
+	int MinSt;					// スタミナ最小値
+	int halfSt;					//スタミナ（50%）
+	int quarterSt;				//スタミナ（25%）
 
 	int startTime;   // ゲーム開始時間
 	int tmpTime;     // 現在時間を一時保存
 	int countUP;     // 経過時間
 
-	int count;       // 次のシーンに行くまでのカウント    
-	int countDown;	 // スタートまでのカウントダウン
+	int count;       // 次のシーンに行くまでのカウント
+	int countDown;   // スタートまでのカウントダウン
 	int skillCount;  // スキルの使用カウント
-	int skillTime;   // スキルの効果時間
 
-	int inputTime;
+	int stopTime;    // 停止時間
+
+	float inputTime;			//入力時間
+	float inputLimitTime;		//入力制限時間
+
+	int turnGraphHandle;				//	グラフィックハンドル
+	bool turnGraphFlag;					//	表示するか
 
 	int randomKeyNumber;
 	bool randomFlag;
-	bool inputArrowFlag;				// 矢印キー入力フラグ
-	int keyCount;
+	bool inputArrowFlag;			//矢印キー入力フラグ
 
-	bool countDownFinishFlag;		   // カウントダウンが終わったか
+	bool countDownFinishFlag;		//	カウントダウンが終わったか
 
 private:
 	int inputStartTime;
 	int inputEndTime;
+
+	float addStaminaSpeed;				//加算されるスタミナによるスピード
 
 	VECTOR mPrevPosition;
 
@@ -107,9 +124,11 @@ private:
 	Evaluation	   mEvlt;				//評価
 
 	bool startFlag;
-	bool turnFlag;          // ターンフラグ
-	bool inputSpaceFlag;	//SPACE入力フラグ
+	bool turnFlag;						// ターンフラグ
+	bool inputSpaceFlag;				// SPACE入力フラグ
+	bool mCheckKeyFlag;					// 長押し対策フラグ
+	bool skillFlag;						// スキルを使用したかどうか
+	bool stFlag;						// スタミナがスキル使用中に切れたかどうか
 
-	bool skillFlag;         // スキルを使用したかどうか
-
+	bool finishFlag;					// ゴールしたかどうか
 };

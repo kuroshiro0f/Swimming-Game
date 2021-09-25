@@ -1,14 +1,15 @@
 #pragma once
 #include "SceneBase.h"
+#include "PlayEffect.h"
 #include "Yamaoka_PlayerActor.h"
 #include "Yamaoka_Camera.h"
 
 class Yamaoka_PlayerActor;			//PlayerActorへの参照
 class Camera;				//Cameraへの参照
 
-class Yamaoka_GameScene :public SceneBase
+class GameScene :public SceneBase
 {
-	Yamaoka_PlayerActor* player;
+	PlayerActor* player;
 	Camera* camera;
 
 public:
@@ -22,8 +23,8 @@ public:
 		FADE_OUT
 	};
 
-	Yamaoka_GameScene();			//	コンストラクタ
-	~Yamaoka_GameScene();			//	デストラクタ
+	GameScene();			//	コンストラクタ
+	~GameScene();			//	デストラクタ
 
 	SceneBase* Update(float _deltaTime)override;	//	更新
 	void Draw()override;			//	描画
@@ -45,6 +46,15 @@ private:
 	int m_finishCount;			//	ゴール
 	bool m_startFinishFlag;
 
+	//	星の移動
+	int m_starX;				//	X方向
+	int m_starY;				//	Y方向
+	double m_starAngle;			//	角度
+
+	//	汗の移動
+	int m_sweat1X, m_sweat1Y;	//	汗1
+	int m_sweat2X, m_sweat2Y;	//	汗2
+
 	//	グラフィックハンドル
 	int m_backGraphHandle;			//	背景
 	int m_loadGraphHandle;			//	ロード
@@ -52,12 +62,21 @@ private:
 	int m_tips2GraphHandle;			//	TIPS2
 	int m_tips3GraphHandle;			//	TIPS3
 	int m_boyGraphHandle;			//	男の子
+	int m_starGraphHandle;			//	星
+	int m_sweat1GraphHandle;		//	汗1
+	int m_sweat2GraphHandle;		//	汗2
 
 	//	サウンドハンドル
 	int m_bgmSoundHandle;			//	BGM
 	int m_whistleSoundHandle;		//	笛
 	int m_countDownSoundHandle;		//	カウントダウン
 	int m_goalSoundHandle;			//	ゴール
+
+	//	時間の経過
+	int m_timeElapsed;
+
+	//	ターンの評価関連
+	int m_turnEvaX, m_turnEvaY;				//	座標
 
 	//	アルファ値
 	int m_alphaVal;
@@ -80,4 +99,5 @@ private:
 	class Stage* m_stage;   // ステージクラスへのポインタメンバ変数
 	class Camera* m_camera;	// カメラクラスへのポインタメンバ変数
 	class Yamaoka_PlayerActor* m_actor;   // アクタークラスへのポインタメンバ変数
+	class PlayEffect* m_effect;				//	エフェクトプレーヤー
 };

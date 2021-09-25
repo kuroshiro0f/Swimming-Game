@@ -24,13 +24,34 @@ const int TIPS_NUM = 3;
 //	LOADINGの文字の切り替わる速さ
 const int LOADING_SPEED = 60;
 
+//	タイムの評価の表示時間
+const int TURN_EVA_TIME = 80;
+
+//	星の初期位置と消える位置
+const int STAR_FIRST_X = 960;
+const int STAR_FIRST_Y = 750;
+const int STAR_END_X = 1000;
+const int STAR_END_Y = 700;
+
+//	星の回転速度
+const double STAR_ROTA_SPEED = 0.1;
+
+//	汗の移動範囲
+const int SWEAT_1_X = 40;
+const int SWEAT_1_Y = 40;
+const int SWEAT_2_X = -40;
+const int SWEAT_2_Y = -40;
+
 //	男の子の移動範囲
 const int BOY_MIN_Y = -50;
 
 //	効果音音量調整
 const int SE_VOLUME_PAL = 50;
 
-Yamaoka_GameScene::Yamaoka_GameScene()
+//	円周率
+const double PI = 3.1415926535897932384626433832795f;
+
+GameScene::GameScene()
 	: m_alphaVal(255)
 	, m_fadeOutFinishFlag(false)
 	, m_loadFlag(true)
@@ -47,6 +68,14 @@ Yamaoka_GameScene::Yamaoka_GameScene()
 	, m_mojiX(1450)
 	, m_mojiY(1000)
 	, m_boyY(0)
+	, m_sweat1X(0)
+	, m_sweat1Y(0)
+	, m_sweat2X(0)
+	, m_sweat2Y(0)
+	, m_timeElapsed(0)
+	, m_starX(STAR_FIRST_X)
+	, m_starY(STAR_FIRST_Y)
+	, m_starAngle(PI)
 {
 	m_tipsFlag = GetRand(TIPS_NUM - 1);
 
@@ -54,14 +83,18 @@ Yamaoka_GameScene::Yamaoka_GameScene()
 	m_state = GAME_SCENE_STATE::LOAD;
 }
 
-Yamaoka_GameScene::~Yamaoka_GameScene()
+GameScene::~GameScene()
 {
+	//	メモリの解放
 	StopSoundMem(m_bgmSoundHandle);
 	DeleteGraph(m_backGraphHandle);
 	DeleteGraph(m_tips1GraphHandle);
 	DeleteGraph(m_tips2GraphHandle);
 	DeleteGraph(m_tips3GraphHandle);
 	DeleteGraph(m_boyGraphHandle);
+	DeleteGraph(m_starGraphHandle);
+	DeleteGraph(m_sweat1GraphHandle);
+	DeleteGraph(m_sweat2GraphHandle);
 	DeleteSoundMem(m_bgmSoundHandle);
 	DeleteSoundMem(m_whistleFinishFlag);
 	DeleteSoundMem(m_countDownSoundHandle);
@@ -70,9 +103,13 @@ Yamaoka_GameScene::~Yamaoka_GameScene()
 	delete m_stage;   // ステージのポインタメンバ変数を消去
 	delete m_camera;  // カメラのポインタメンバ変数を消去
 	delete m_actor;   // アクターのポインタメンバ変数を削除
+
+	m_effect->StopEffect();
+	m_effect->Delete();
+	delete m_effect;
 }
 
-SceneBase* Yamaoka_GameScene::Update(float _deltaTime)
+SceneBase* GameScene::Update(float _deltaTime)
 {
 	//	カメラをセット
 	m_camera->Update(*m_actor);
@@ -94,6 +131,7 @@ SceneBase* Yamaoka_GameScene::Update(float _deltaTime)
 
 			if (CheckHitKey(KEY_INPUT_RETURN))
 			{
+				//	非同期読み込みを終了し、次のステートへ
 				SetUseASyncLoadFlag(FALSE);
 				m_state = GAME_SCENE_STATE::FADE_IN;
 			}
@@ -121,13 +159,6 @@ SceneBase* Yamaoka_GameScene::Update(float _deltaTime)
 		{
 			m_checkKeyFlag = false;
 		}
-
-		////端まで行くと次のステートへ
-		//if (m_actor->GetPosX() <= -136)
-		//{
-		//	m_state = GAME_SCENE_STATE::FADE_OUT;
-		//}
-
 
 		//端まで戻ってきてかつ、turnFlag が true ならゴールの文字を表示
 		if (m_actor->GetPosX() >= 130 && m_actor->GetTurnFlag() == true)
@@ -162,7 +193,7 @@ SceneBase* Yamaoka_GameScene::Update(float _deltaTime)
 	return this;
 }
 
-void Yamaoka_GameScene::Draw()
+void GameScene::Draw()
 {
 	if (m_state == GAME_SCENE_STATE::LOAD)
 	{
@@ -246,8 +277,12 @@ void Yamaoka_GameScene::Draw()
 		DrawBox(1550, 830, 1850, 880, GetColor(255, 255, 0), TRUE);
 		DrawFormatString(1600, 835, GetColor(0, 0, 0), "TIME   %d", m_actor->countUP);
 
+
 		// プレイヤー描画
 		m_actor->DrawActor();
+
+		// カメラ座標表示
+		//m_camera->Draw();
 
 		DrawBox(900, 800, 1000, 900, GetColor(0, 0, 0), FALSE);				//ボックスの表示(1つ用)
 		SetFontSize(100);
@@ -258,18 +293,27 @@ void Yamaoka_GameScene::Draw()
 			switch (m_actor->randomKeyNumber)
 			{
 			case 1:		//ランダムに生成した数が STATE_KEY_UP(1) と同じとき
-				if (CheckHitKey(KEY_INPUT_UP))
-				{
-					m_actor->inputArrowFlag = true;
-				}
-
 				if (m_actor->inputArrowFlag && m_actor->randomFlag)
 				{
 					DrawBox(900, 800, 1000, 900, GetColor(255, 255, 255), TRUE);
+					DrawRotaGraph(m_starX, m_starY, 1.0, m_starAngle, m_starGraphHandle, TRUE, FALSE);
+					m_starX++;
+					m_starY--;
+					m_starAngle += STAR_ROTA_SPEED;
+
+					if (m_starX >= STAR_END_X)
+					{
+						m_starX = STAR_FIRST_X;
+						m_starY = STAR_FIRST_Y;
+					}
+
+					///	エフェクトの再生
+					m_effect->PlayEffekseer(m_actor->GetPos());
 				}
 				else if (!m_actor->randomFlag)
 				{
 					m_actor->inputArrowFlag = false;
+					m_effect->StopEffect();
 				}
 				else if (CheckHitKey(KEY_INPUT_DOWN) || CheckHitKey(KEY_INPUT_RIGHT) || CheckHitKey(KEY_INPUT_LEFT))
 				{
@@ -279,18 +323,27 @@ void Yamaoka_GameScene::Draw()
 				break;
 
 			case 2:		//ランダムに生成した数が STATE_KEY_DOWN(2) と同じとき
-				if (CheckHitKey(KEY_INPUT_DOWN))
-				{
-					m_actor->inputArrowFlag = true;
-				}
-
 				if (m_actor->inputArrowFlag && m_actor->randomFlag)
 				{
 					DrawBox(900, 800, 1000, 900, GetColor(255, 255, 255), TRUE);
+					DrawRotaGraph(m_starX, m_starY, 1.0, m_starAngle, m_starGraphHandle, TRUE, FALSE);
+					m_starX++;
+					m_starY--;
+					m_starAngle += STAR_ROTA_SPEED;
+
+					if (m_starX >= STAR_END_X)
+					{
+						m_starX = STAR_FIRST_X;
+						m_starY = STAR_FIRST_Y;
+					}
+
+					//	エフェクトの再生
+					m_effect->PlayEffekseer(m_actor->GetPos());
 				}
 				else if (!m_actor->randomFlag)
 				{
 					m_actor->inputArrowFlag = false;
+					m_effect->StopEffect();
 				}
 				else if (CheckHitKey(KEY_INPUT_UP) || CheckHitKey(KEY_INPUT_RIGHT) || CheckHitKey(KEY_INPUT_LEFT))
 				{
@@ -300,18 +353,27 @@ void Yamaoka_GameScene::Draw()
 				break;
 
 			case 3:		//ランダムに生成した数が STATE_KEY_RIGHT(3) と同じとき
-				if (CheckHitKey(KEY_INPUT_RIGHT))
-				{
-					m_actor->inputArrowFlag = true;
-				}
-
 				if (m_actor->inputArrowFlag && m_actor->randomFlag)
 				{
 					DrawBox(900, 800, 1000, 900, GetColor(255, 255, 255), TRUE);
+					DrawRotaGraph(m_starX, m_starY, 1.0, m_starAngle, m_starGraphHandle, TRUE, FALSE);
+					m_starX++;
+					m_starY--;
+					m_starAngle += STAR_ROTA_SPEED;
+
+					if (m_starX >= STAR_END_X)
+					{
+						m_starX = STAR_FIRST_X;
+						m_starY = STAR_FIRST_Y;
+					}
+
+					//	エフェクトの再生
+					m_effect->PlayEffekseer(m_actor->GetPos());
 				}
 				else if (!m_actor->randomFlag)
 				{
 					m_actor->inputArrowFlag = false;
+					m_effect->StopEffect();
 				}
 				else if (CheckHitKey(KEY_INPUT_UP) || CheckHitKey(KEY_INPUT_DOWN) || CheckHitKey(KEY_INPUT_LEFT))
 				{
@@ -321,24 +383,47 @@ void Yamaoka_GameScene::Draw()
 				break;
 
 			case 4:		//ランダムに生成した数が STATE_KEY_LEFT(4) と同じとき
-				if (CheckHitKey(KEY_INPUT_LEFT))
-				{
-					m_actor->inputArrowFlag = true;
-				}
-
 				if (m_actor->inputArrowFlag && m_actor->randomFlag)
 				{
 					DrawBox(900, 800, 1000, 900, GetColor(255, 255, 255), TRUE);
+					DrawRotaGraph(m_starX, m_starY, 1.0, m_starAngle, m_starGraphHandle, TRUE, FALSE);
+					m_starX++;
+					m_starY--;
+					m_starAngle += STAR_ROTA_SPEED;
+
+					if (m_starX >= STAR_END_X)
+					{
+						m_starX = STAR_FIRST_X;
+						m_starY = STAR_FIRST_Y;
+					}
+
+					//	エフェクトの再生
+					m_effect->PlayEffekseer(m_actor->GetPos());
 				}
 				else if (!m_actor->randomFlag)
 				{
 					m_actor->inputArrowFlag = false;
+					m_effect->StopEffect();
 				}
 				else if (CheckHitKey(KEY_INPUT_UP) || CheckHitKey(KEY_INPUT_DOWN) || CheckHitKey(KEY_INPUT_RIGHT))
 				{
 					DrawBox(900, 800, 1000, 900, GetColor(255, 0, 0), TRUE);
 				}
 				DrawFormatString(900, 800, GetColor(0, 0, 0), "←");
+				break;
+			default:
+				break;
+			}
+		}
+
+		//	ターンの評価の表示
+		if (m_actor->turnGraphFlag)
+		{
+			m_timeElapsed++;
+			DrawGraph(m_turnEvaX, m_turnEvaY, m_actor->turnGraphHandle, TRUE);
+			if (m_timeElapsed == TURN_EVA_TIME)
+			{
+				m_actor->turnGraphFlag = false;
 			}
 		}
 
@@ -349,14 +434,10 @@ void Yamaoka_GameScene::Draw()
 			m_actor->inputArrowFlag = true;
 			DrawBox(600, 800, 700, 900, GetColor(255, 255, 255), TRUE);
 		}
-		else if (CheckHitKey(KEY_INPUT_UP) || CheckHitKey(KEY_INPUT_DOWN) || CheckHitKey(KEY_INPUT_RIGHT) || CheckHitKey(KEY_INPUT_LEFT))
-		{
-			DrawBox(600, 800, 700, 900, GetColor(255, 0, 0), TRUE);
-		}
 		DrawFormatString(625, 800, GetColor(0, 0, 0), "C");
 
 		//スペースキーのBOX描画
-		if (-90 >= m_actor->GetPosX() && m_actor->GetPosX() > -136 && m_actor->GetTurnFlag() == false)
+		if (-90 >= m_actor->GetPosX() && m_actor->GetPosX() > -136 && m_actor->GetInputSpaceFlag() == false && m_actor->GetTurnFlag() == false)
 		{
 			//αブレンドモード
 			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 128);
@@ -394,7 +475,7 @@ void Yamaoka_GameScene::Draw()
 		m_actor->DrawToGoal(m_actor->dCount, m_actor->maxdCount);
 
 		// スキル
-		m_actor->Skill(m_actor->dCount, m_actor->maxdCount);
+		m_actor->LastSpurt();
 
 		// カウントダウンの表示
 		if (m_actor->countDown > 0 && m_actor->countDown <= 150)
@@ -470,7 +551,7 @@ void Yamaoka_GameScene::Draw()
 	}
 }
 
-void Yamaoka_GameScene::Sound()
+void GameScene::Sound()
 {
 	if (m_state == GAME_SCENE_STATE::GAME && !m_whistleFinishFlag)
 	{
@@ -498,7 +579,7 @@ void Yamaoka_GameScene::Sound()
 	}
 }
 
-void Yamaoka_GameScene::Load()
+void GameScene::Load()
 {
 	// グラフィックハンドルにセット
 	m_tips1GraphHandle = LoadGraph("data/img/Load/TIPS1.png");
@@ -506,10 +587,16 @@ void Yamaoka_GameScene::Load()
 	m_tips3GraphHandle = LoadGraph("data/img/Load/TIPS3.png");
 	m_boyGraphHandle = LoadGraph("data/img/Load/boy.png");
 
+	//	エフェクト生成
+	m_effect = new PlayEffect("data/effects/water4.efk", 3.0f);
+
 	SetUseASyncLoadFlag(TRUE);
 
 	// グラフィックハンドルにセット
 	m_backGraphHandle = LoadGraph("data/img/Game/gameBackTest.png");			//	背景
+	m_starGraphHandle = LoadGraph("data/img/Game/star.png");					//	星
+	m_sweat1GraphHandle = LoadGraph("data/img/Game/Sweat1.png");				//	汗1
+	m_sweat2GraphHandle = LoadGraph("data/img/Game/Sweat2.png");				//	汗2
 
 	//	サウンドハンドルにセット
 	m_bgmSoundHandle = LoadSoundMem("data/sound/Game/Game.ogg");				//	BGM
