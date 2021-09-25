@@ -46,6 +46,7 @@ const int SWEAT_1_X = 40;
 const int SWEAT_1_Y = 40;
 const int SWEAT_2_X = -40;
 const int SWEAT_2_Y = -40;
+
 //	男の子の移動範囲
 const int BOY_MIN_Y = -50;
 
@@ -89,12 +90,21 @@ Ueyama_GameScene::Ueyama_GameScene()
 
 Ueyama_GameScene::~Ueyama_GameScene()
 {
+	//	メモリの解放
 	StopSoundMem(m_bgmSoundHandle);
 	DeleteGraph(m_backGraphHandle);
 	DeleteGraph(m_tips1GraphHandle);
 	DeleteGraph(m_tips2GraphHandle);
 	DeleteGraph(m_tips3GraphHandle);
 	DeleteGraph(m_boyGraphHandle);
+	DeleteGraph(m_boy2GraphHandle);
+	DeleteGraph(m_starGraphHandle);
+	DeleteGraph(m_sweat1GraphHandle);
+	DeleteGraph(m_sweat2GraphHandle);
+	DeleteGraph(m_upArrowGraphHandle);
+	DeleteGraph(m_rightArrowGraphHandle);
+	DeleteGraph(m_downArrowGraphHandle);
+	DeleteGraph(m_leftArrowGraphHandle);
 	DeleteSoundMem(m_bgmSoundHandle);
 	DeleteSoundMem(m_whistleFinishFlag);
 	DeleteSoundMem(m_countDownSoundHandle);
@@ -117,7 +127,7 @@ SceneBase* Ueyama_GameScene::Update(float _deltaTime)
 	switch (m_state)
 	{
 	case GAME_SCENE_STATE::LOAD:
-		//	ロードが終わったら
+		//	ロードが終わったらゲーム画面へ
 		if (GetASyncLoadNum() == 0)
 		{
 			m_loadFinishFlag = true;
@@ -237,8 +247,8 @@ void Ueyama_GameScene::Draw()
 				{
 					DrawFormatStringToHandle(m_mojiX, m_mojiY, GetColor(255, 255, 0), loadFontHandle, "Now Loading...");
 				}
+				DrawGraph(0, m_boyY, m_boyGraphHandle, TRUE);
 			}
-			DrawGraph(0, m_boyY, m_boyGraphHandle, TRUE);
 			if (m_boyPlusFlag == true)
 			{
 				m_boyY++;
@@ -261,6 +271,7 @@ void Ueyama_GameScene::Draw()
 
 		if (m_loadFinishFlag)
 		{
+			DrawGraph(0, m_boyY, m_boy2GraphHandle, TRUE);
 			DrawFormatStringToHandle(m_mojiX, m_mojiY, GetColor(255, 255, 0), loadFontHandle, "PLEASE ENTER");
 		}
 	}
@@ -274,8 +285,11 @@ void Ueyama_GameScene::Draw()
 		SetFontSize(40);
 
 		//	タイムの表示
-		DrawBox(1550, 830, 1850, 880, GetColor(255, 255, 0), TRUE);
-		DrawFormatString(1600, 835, GetColor(0, 0, 0), "TIME   %d", m_actor->countUP);
+		/*DrawBox(1550, 830, 1850, 880, GetColor(255, 255, 0), TRUE);
+		DrawFormatString(1600, 835, GetColor(0, 0, 0), "TIME   %d", m_actor->countUP);*/
+
+		DrawBox(1550, 30, 1850, 80, GetColor(255, 255, 0), TRUE);
+		DrawFormatString(1600, 35, GetColor(0, 0, 0), "TIME   %d", m_actor->countUP);
 
 		// プレイヤー描画
 		m_actor->DrawActor();
@@ -283,147 +297,137 @@ void Ueyama_GameScene::Draw()
 		DrawBox(900, 800, 1000, 900, GetColor(0, 0, 0), FALSE);				//ボックスの表示(1つ用)
 		SetFontSize(100);
 
-		//ランダムに矢印を表示
-		switch (m_actor->randomKeyNumber)
+		if (m_actor->st > m_actor->MinSt)
 		{
-		case 1:		//ランダムに生成した数が STATE_KEY_UP(1) と同じとき
-			if (CheckHitKey(KEY_INPUT_UP))
+			//ランダムに矢印を表示
+			switch (m_actor->randomKeyNumber)
 			{
-				m_actor->inputArrowFlag = true;
-			}
-
-			if (m_actor->inputArrowFlag && m_actor->randomFlag)
-			{
-				DrawBox(900, 800, 1000, 900, GetColor(255, 255, 255), TRUE);
-				DrawRotaGraph(m_starX, m_starY, 1.0, m_starAngle, m_starGraphHandle, TRUE, FALSE);
-				m_starX++;
-				m_starY--;
-				m_starAngle += STAR_ROTA_SPEED;
-
-				if (m_starX >= STAR_END_X)
+			case 1:		//ランダムに生成した数が STATE_KEY_UP(1) と同じとき
+				if (m_actor->inputArrowFlag && m_actor->randomFlag)
 				{
-					m_starX = STAR_FIRST_X;
-					m_starY = STAR_FIRST_Y;
+					DrawBox(900, 800, 1000, 900, GetColor(255, 255, 255), TRUE);
+					DrawRotaGraph(m_starX, m_starY, 1.0, m_starAngle, m_starGraphHandle, TRUE, FALSE);
+					m_starX++;
+					m_starY--;
+					m_starAngle += STAR_ROTA_SPEED;
+
+					if (m_starX >= STAR_END_X)
+					{
+						m_starX = STAR_FIRST_X;
+						m_starY = STAR_FIRST_Y;
+					}
+
+					///	エフェクトの再生
+					m_effect->PlayEffekseer(m_actor->GetPos());
 				}
-
-				///	エフェクトの再生
-				m_effect->PlayEffekseer(m_actor->GetPos());
-			}
-			else if (!m_actor->randomFlag)
-			{
-				m_actor->inputArrowFlag = false;
-				m_effect->StopEffect();
-			}
-			else if (CheckHitKey(KEY_INPUT_DOWN) || CheckHitKey(KEY_INPUT_RIGHT) || CheckHitKey(KEY_INPUT_LEFT))
-			{
-				DrawBox(900, 800, 1000, 900, GetColor(255, 0, 0), TRUE);
-			}
-			DrawFormatString(900, 800, GetColor(0, 0, 0), "↑");
-			break;
-
-		case 2:		//ランダムに生成した数が STATE_KEY_DOWN(2) と同じとき
-			if (CheckHitKey(KEY_INPUT_DOWN))
-			{
-				m_actor->inputArrowFlag = true;
-			}
-
-			if (m_actor->inputArrowFlag && m_actor->randomFlag)
-			{
-				DrawBox(900, 800, 1000, 900, GetColor(255, 255, 255), TRUE);
-				DrawRotaGraph(m_starX, m_starY, 1.0, m_starAngle, m_starGraphHandle, TRUE, FALSE);
-				m_starX++;
-				m_starY--;
-				m_starAngle += STAR_ROTA_SPEED;
-
-				if (m_starX >= STAR_END_X)
+				else if (!m_actor->randomFlag)
 				{
-					m_starX = STAR_FIRST_X;
-					m_starY = STAR_FIRST_Y;
+					m_actor->inputArrowFlag = false;
+					m_effect->StopEffect();
 				}
-
-				//	エフェクトの再生
-				m_effect->PlayEffekseer(m_actor->GetPos());
-			}
-			else if (!m_actor->randomFlag)
-			{
-				m_actor->inputArrowFlag = false;
-				m_effect->StopEffect();
-			}
-			else if (CheckHitKey(KEY_INPUT_UP) || CheckHitKey(KEY_INPUT_RIGHT) || CheckHitKey(KEY_INPUT_LEFT))
-			{
-				DrawBox(900, 800, 1000, 900, GetColor(255, 0, 0), TRUE);
-			}
-			DrawFormatString(900, 800, GetColor(0, 0, 0), "↓");
-			break;
-
-		case 3:		//ランダムに生成した数が STATE_KEY_RIGHT(3) と同じとき
-			if (CheckHitKey(KEY_INPUT_RIGHT))
-			{
-				m_actor->inputArrowFlag = true;
-			}
-
-			if (m_actor->inputArrowFlag && m_actor->randomFlag)
-			{
-				DrawBox(900, 800, 1000, 900, GetColor(255, 255, 255), TRUE);
-				DrawRotaGraph(m_starX, m_starY, 1.0, m_starAngle, m_starGraphHandle, TRUE, FALSE);
-				m_starX++;
-				m_starY--;
-				m_starAngle += STAR_ROTA_SPEED;
-
-				if (m_starX >= STAR_END_X)
+				else if (CheckHitKey(KEY_INPUT_DOWN) || CheckHitKey(KEY_INPUT_RIGHT) || CheckHitKey(KEY_INPUT_LEFT))
 				{
-					m_starX = STAR_FIRST_X;
-					m_starY = STAR_FIRST_Y;
+					DrawBox(900, 800, 1000, 900, GetColor(255, 0, 0), TRUE);
 				}
+				//DrawFormatString(900, 800, GetColor(0, 0, 0), "↑");
+				DrawGraph(900, 800, m_upArrowGraphHandle, TRUE);
+				break;
 
-				//	エフェクトの再生
-				m_effect->PlayEffekseer(m_actor->GetPos());
-			}
-			else if (!m_actor->randomFlag)
-			{
-				m_actor->inputArrowFlag = false;
-				m_effect->StopEffect();
-			}
-			else if (CheckHitKey(KEY_INPUT_UP) || CheckHitKey(KEY_INPUT_DOWN) || CheckHitKey(KEY_INPUT_LEFT))
-			{
-				DrawBox(900, 800, 1000, 900, GetColor(255, 0, 0), TRUE);
-			}
-			DrawFormatString(900, 800, GetColor(0, 0, 0), "→");
-			break;
-
-		case 4:		//ランダムに生成した数が STATE_KEY_LEFT(4) と同じとき
-			if (CheckHitKey(KEY_INPUT_LEFT))
-			{
-				m_actor->inputArrowFlag = true;
-			}
-
-			if (m_actor->inputArrowFlag && m_actor->randomFlag)
-			{
-				DrawBox(900, 800, 1000, 900, GetColor(255, 255, 255), TRUE);
-				DrawRotaGraph(m_starX, m_starY, 1.0, m_starAngle, m_starGraphHandle, TRUE, FALSE);
-				m_starX++;
-				m_starY--;
-				m_starAngle += STAR_ROTA_SPEED;
-
-				if (m_starX >= STAR_END_X)
+			case 2:		//ランダムに生成した数が STATE_KEY_DOWN(2) と同じとき
+				if (m_actor->inputArrowFlag && m_actor->randomFlag)
 				{
-					m_starX = STAR_FIRST_X;
-					m_starY = STAR_FIRST_Y;
-				}
+					DrawBox(900, 800, 1000, 900, GetColor(255, 255, 255), TRUE);
+					DrawRotaGraph(m_starX, m_starY, 1.0, m_starAngle, m_starGraphHandle, TRUE, FALSE);
+					m_starX++;
+					m_starY--;
+					m_starAngle += STAR_ROTA_SPEED;
 
-				//	エフェクトの再生
-				m_effect->PlayEffekseer(m_actor->GetPos());
+					if (m_starX >= STAR_END_X)
+					{
+						m_starX = STAR_FIRST_X;
+						m_starY = STAR_FIRST_Y;
+					}
+
+					//	エフェクトの再生
+					m_effect->PlayEffekseer(m_actor->GetPos());
+				}
+				else if (!m_actor->randomFlag)
+				{
+					m_actor->inputArrowFlag = false;
+					m_effect->StopEffect();
+				}
+				else if (CheckHitKey(KEY_INPUT_UP) || CheckHitKey(KEY_INPUT_RIGHT) || CheckHitKey(KEY_INPUT_LEFT))
+				{
+					DrawBox(900, 800, 1000, 900, GetColor(255, 0, 0), TRUE);
+				}
+				//DrawFormatString(900, 800, GetColor(0, 0, 0), "↓");
+				DrawGraph(900, 800, m_downArrowGraphHandle, TRUE);
+				break;
+
+			case 3:		//ランダムに生成した数が STATE_KEY_RIGHT(3) と同じとき
+				if (m_actor->inputArrowFlag && m_actor->randomFlag)
+				{
+					DrawBox(900, 800, 1000, 900, GetColor(255, 255, 255), TRUE);
+					DrawRotaGraph(m_starX, m_starY, 1.0, m_starAngle, m_starGraphHandle, TRUE, FALSE);
+					m_starX++;
+					m_starY--;
+					m_starAngle += STAR_ROTA_SPEED;
+
+					if (m_starX >= STAR_END_X)
+					{
+						m_starX = STAR_FIRST_X;
+						m_starY = STAR_FIRST_Y;
+					}
+
+					//	エフェクトの再生
+					m_effect->PlayEffekseer(m_actor->GetPos());
+				}
+				else if (!m_actor->randomFlag)
+				{
+					m_actor->inputArrowFlag = false;
+					m_effect->StopEffect();
+				}
+				else if (CheckHitKey(KEY_INPUT_UP) || CheckHitKey(KEY_INPUT_DOWN) || CheckHitKey(KEY_INPUT_LEFT))
+				{
+					DrawBox(900, 800, 1000, 900, GetColor(255, 0, 0), TRUE);
+				}
+				//DrawFormatString(900, 800, GetColor(0, 0, 0), "→");
+				DrawGraph(900, 800, m_rightArrowGraphHandle, TRUE);
+				break;
+
+			case 4:		//ランダムに生成した数が STATE_KEY_LEFT(4) と同じとき
+				if (m_actor->inputArrowFlag && m_actor->randomFlag)
+				{
+					DrawBox(900, 800, 1000, 900, GetColor(255, 255, 255), TRUE);
+					DrawRotaGraph(m_starX, m_starY, 1.0, m_starAngle, m_starGraphHandle, TRUE, FALSE);
+					m_starX++;
+					m_starY--;
+					m_starAngle += STAR_ROTA_SPEED;
+
+					if (m_starX >= STAR_END_X)
+					{
+						m_starX = STAR_FIRST_X;
+						m_starY = STAR_FIRST_Y;
+					}
+
+					//	エフェクトの再生
+					m_effect->PlayEffekseer(m_actor->GetPos());
+				}
+				else if (!m_actor->randomFlag)
+				{
+					m_actor->inputArrowFlag = false;
+					m_effect->StopEffect();
+				}
+				else if (CheckHitKey(KEY_INPUT_UP) || CheckHitKey(KEY_INPUT_DOWN) || CheckHitKey(KEY_INPUT_RIGHT))
+				{
+					DrawBox(900, 800, 1000, 900, GetColor(255, 0, 0), TRUE);
+				}
+				//DrawFormatString(900, 800, GetColor(0, 0, 0), "←");
+				DrawGraph(900, 800, m_leftArrowGraphHandle, TRUE);
+				break;
+			default:
+				break;
 			}
-			else if (!m_actor->randomFlag)
-			{
-				m_actor->inputArrowFlag = false;
-				m_effect->StopEffect();
-			}
-			else if (CheckHitKey(KEY_INPUT_UP) || CheckHitKey(KEY_INPUT_DOWN) || CheckHitKey(KEY_INPUT_RIGHT))
-			{
-				DrawBox(900, 800, 1000, 900, GetColor(255, 0, 0), TRUE);
-			}
-			DrawFormatString(900, 800, GetColor(0, 0, 0), "←");
 		}
 
 		//	ターンの評価の表示
@@ -437,8 +441,21 @@ void Ueyama_GameScene::Draw()
 			}
 		}
 
+		// 息継ぎキーの表示
+		DrawBox(600, 800, 700, 900, GetColor(0, 0, 0), FALSE);				//ボックスの表示(1つ用)
+		if (CheckHitKey(KEY_INPUT_C))
+		{
+			m_actor->inputArrowFlag = true;
+			DrawBox(600, 800, 700, 900, GetColor(255, 255, 255), TRUE);
+		}
+		else if (CheckHitKey(KEY_INPUT_UP) || CheckHitKey(KEY_INPUT_DOWN) || CheckHitKey(KEY_INPUT_RIGHT) || CheckHitKey(KEY_INPUT_LEFT))
+		{
+			DrawBox(600, 800, 700, 900, GetColor(255, 0, 0), TRUE);
+		}
+		DrawFormatString(625, 800, GetColor(0, 0, 0), "C");
+
 		//スペースキーのBOX描画
-		if (-90 >= m_actor->GetPosX() && m_actor->GetPosX() > -136 && m_actor->GetTurnFlag() == false)
+		if (-90 >= m_actor->GetPosX() && m_actor->GetPosX() > -136 && m_actor->GetInputSpaceFlag() == false && m_actor->GetTurnFlag() == false)
 		{
 			//αブレンドモード
 			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 128);
@@ -582,11 +599,16 @@ void Ueyama_GameScene::Sound()
 
 void Ueyama_GameScene::Load()
 {
+	//	非同期読み込みしないファイル
+
 	// グラフィックハンドルにセット
 	m_tips1GraphHandle = LoadGraph("data/img/Load/TIPS1.png");
 	m_tips2GraphHandle = LoadGraph("data/img/Load/TIPS2.png");
 	m_tips3GraphHandle = LoadGraph("data/img/Load/TIPS3.png");
 	m_boyGraphHandle = LoadGraph("data/img/Load/boy.png");
+
+	//	エフェクト生成
+	m_effect = new PlayEffect("data/effects/water4.efk", 3.0f);
 
 	//	非同期読み込み開始
 	SetUseASyncLoadFlag(TRUE);
@@ -596,9 +618,11 @@ void Ueyama_GameScene::Load()
 	m_starGraphHandle = LoadGraph("data/img/Game/star.png");					//	星
 	m_sweat1GraphHandle = LoadGraph("data/img/Game/Sweat1.png");				//	汗1
 	m_sweat2GraphHandle = LoadGraph("data/img/Game/Sweat2.png");				//	汗2
-
-	//	エフェクト生成
-	m_effect = new PlayEffect("data/effects/water4.efk", 3.0f);
+	m_boy2GraphHandle = LoadGraph("data/img/Load/boy2.png");					//	男の子2
+	m_upArrowGraphHandle = LoadGraph("data/img/Game/UpArrow.png");				//	上矢印
+	m_rightArrowGraphHandle = LoadGraph("data/img/Game/RightArrow.png");		//	右矢印
+	m_downArrowGraphHandle = LoadGraph("data/img/Game/DownArrow.png");			//	下矢印
+	m_leftArrowGraphHandle = LoadGraph("data/img/Game/LeftArrow.png");			//	左矢印
 
 	//	サウンドハンドルにセット
 	m_bgmSoundHandle = LoadSoundMem("data/sound/Game/Game.ogg");				//	BGM

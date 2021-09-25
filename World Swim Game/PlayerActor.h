@@ -107,6 +107,8 @@ public:
 
 	bool countDownFinishFlag;		//	カウントダウンが終わったか
 
+	bool turnFlag;						 // ターンフラグ
+
 private:
 	int inputStartTime;
 	int inputEndTime;
@@ -123,7 +125,6 @@ private:
 	Evaluation	   mEvlt;				//評価
 
 	bool startFlag;
-	bool turnFlag;						 // ターンフラグ
 	bool inputSpaceFlag;				//SPACE入力フラグ
 	bool mCheckKeyFlag;					//長押し対策フラグ
 	bool skillFlag;					  // スキルを使用したかどうか

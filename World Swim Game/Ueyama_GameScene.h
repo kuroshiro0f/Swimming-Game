@@ -67,9 +67,14 @@ private:
 	int m_tips2GraphHandle;			//	TIPS2
 	int m_tips3GraphHandle;			//	TIPS3
 	int m_boyGraphHandle;			//	男の子
+	int m_boy2GraphHandle;			//	男の子2
 	int m_starGraphHandle;			//	星
 	int m_sweat1GraphHandle;		//	汗1
 	int m_sweat2GraphHandle;		//	汗2
+	int m_upArrowGraphHandle;		//	上矢印
+	int m_rightArrowGraphHandle;	//	右矢印
+	int m_downArrowGraphHandle;		//	下矢印
+	int m_leftArrowGraphHandle;		//	左矢印
 
 	//	サウンドハンドル
 	int m_bgmSoundHandle;			//	BGM

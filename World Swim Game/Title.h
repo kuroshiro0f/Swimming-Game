@@ -13,6 +13,8 @@ public:
 		TITLE,
 		MANUAL,
 		MANUAL2,
+		MANUAL3,
+		MANUAL4,
 		FADE_OUT
 	};
 
@@ -40,6 +42,8 @@ private:
 	int m_smallDropGraphHandle;			//	小さな水滴
 	int m_manualGraphHandle;			//	マニュアル
 	int m_manual2GraphHandle;			//	マニュアル2ページ目
+	int m_manual3GraphHandle;			//	3ページ目
+	int m_manual4GraphHandle;			//	4ページ目
 
 	//	サウンドハンドル
 	int m_backSoundHandle;				//	BGM
