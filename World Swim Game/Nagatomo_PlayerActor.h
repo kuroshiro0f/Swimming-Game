@@ -23,6 +23,10 @@ public:
 		STATE_KEY_DOWN  = 2,
 		STATE_KEY_RIGHT = 3,
 		STATE_KEY_LEFT  = 4,
+		STATE_KEY_C     = 5,
+		STATE_KEY_S,
+		STATE_KEY_A,
+		STATE_KEY_SPACE,
 
 		STATE_KEY_ENUM,
 	}KEY_STATE_ENUM;
@@ -57,10 +61,13 @@ public:
 	// スタミナゲージの描画
 	void DrawSt(int _st, int _MaxSt, int _MinSt);
 	// ゴールまでの距離の描画
-	void DrawToGoal(int _dCount);
+	void DrawToGoal(float _playerPos, float _goalPos);
 
-	//ランダムキー
-	void RandomKey();
+	// 必殺技
+	void Skill(float _playerPos, float _goalPos);
+	void UltNumber(bool _randomFlag);
+	//void ProcessInput(int _randomKeyNumber);
+	void UltProcessInput(int _arrow[], int _size);
 
 	//turnFlagのゲッター
 	bool GetTurnFlag() { return turnFlag; };
@@ -75,35 +82,46 @@ public:
 	float mPosX;
 
 	// ゴールまでの距離 //
-	float dCount;				// どれだけ進んだか        
-	int maxdCount;				// どこまで進めるのか
-	int NowPos;					// プレイヤーの現在座標
+	float dCount;      // どれだけ進んだか        
+	float maxdCount;   // どこまで進めるのか
+	int NowPos;    // プレイヤーの現在座標
 
-	//スタミナ関連
+//スタミナ関連
 	int st;						// スタミナ
 	int MaxSt;					// スタミナ最大値
 	int MinSt;					// スタミナ最小値
 	int halfSt;					//スタミナ（50%）
 	int quarterSt;				//スタミナ（25%）
 
-	int startTime;				// ゲーム開始時間
-	int tmpTime;				// 現在時間を一時保存
-	int countUP;				// 経過時間
+	int startTime;   // ゲーム開始時間
+	int tmpTime;     // 現在時間を一時保存
+	int countUP;     // 経過時間
 
-	int count;					// 次のシーンに行くまでのカウント    
-	int countDown;
+	int count;       // 次のシーンに行くまでのカウント    
+	int countDown;		// スタートまでのカウントダウン
+	int skillCount;  // スキルの使用カウント
+	int skillTime;   // スキルの効果時間
 
 	float inputTime;			//入力時間
 	float inputLimitTime;		//入力制限時間
 
+	int arrow[4];					//ラストスパートのキー
+
+	int turnGraphHandle;				//	グラフィックハンドル
+	bool turnGraphFlag;					//	表示するか
 
 	int randomKeyNumber;
 	bool randomFlag;
 	bool inputArrowFlag;				//矢印キー入力フラグ
 
+	bool countDownFinishFlag;		//	カウントダウンが終わったか
+	bool ultLimitFlag;				//　ウルトの制限
+	bool ultFlag;
+
 private:
 	int inputStartTime;
 	int inputEndTime;
+	int inputCount;						//入力回数
 
 	float addStaminaSpeed;				//加算されるスタミナによるスピード
 
@@ -113,13 +131,12 @@ private:
 
 	KEY_STATE_ENUM mNowKeyState;		//キーの今の状態
 	KEY_STATE_ENUM mPrevKeyState;		//キーの1つ前の状態
-	//KEY_STATE_ENUM mRandomKeyState;	//ランダムキーの状態
 
 	Evaluation	   mEvlt;				//評価
 
 	bool startFlag;
-	bool turnFlag;						//ターンフラグ
+	bool turnFlag;						 // ターンフラグ
 	bool inputSpaceFlag;				//SPACE入力フラグ
 	bool mCheckKeyFlag;					//長押し対策フラグ
-
+	bool skillFlag;					  // スキルを使用したかどうか
 };
