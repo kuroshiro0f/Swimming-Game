@@ -54,10 +54,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	SceneMgr* Scene = new SceneMgr;
 
 	//	タイトルシーンをセット
-	Scene->SetScene(new Title());
+	//Scene->SetScene(new Title());
 
 	//	デバッグ用
-	//Scene->SetScene(new GameScene());
+	Scene->SetScene(new GameScene());
 
 	// エスケープキーが押されるかウインドウが閉じられるまでループ
 	while (ProcessMessage() == 0 && CheckHitKey(KEY_INPUT_ESCAPE) == 0)

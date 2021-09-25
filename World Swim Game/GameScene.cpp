@@ -292,7 +292,7 @@ void GameScene::Draw()
 		DrawBox(900, 800, 1000, 900, GetColor(0, 0, 0), FALSE);				//ボックスの表示(1つ用)
 		SetFontSize(100);
 
-		if (m_actor->st > m_actor->MinSt)
+		if (m_actor->st > m_actor->MinSt && m_actor->ultLimitFlag == false)
 		{
 			//ランダムに矢印を表示
 			switch (m_actor->randomKeyNumber)
@@ -421,6 +421,71 @@ void GameScene::Draw()
 			}
 		}
 
+		if (m_actor->ultFlag)
+		{
+			switch (m_actor->arrow[0])
+			{
+			case 1:
+				DrawFormatString(900, 800, GetColor(0, 0, 0), "↑");
+				break;
+			case 2:
+				DrawFormatString(900, 800, GetColor(0, 0, 0), "↓");
+				break;
+			case 3:
+				DrawFormatString(900, 800, GetColor(0, 0, 0), "→");
+				break;
+			case 4:
+				DrawFormatString(900, 800, GetColor(0, 0, 0), "←");
+				break;
+			}
+
+			switch (m_actor->arrow[1])
+			{
+			case 1:
+				DrawFormatString(1000, 800, GetColor(0, 0, 0), "↑");
+				break;
+			case 2:
+				DrawFormatString(1000, 800, GetColor(0, 0, 0), "↓");
+				break;
+			case 3:
+				DrawFormatString(1000, 800, GetColor(0, 0, 0), "→");
+				break;
+			case 4:
+				DrawFormatString(1000, 800, GetColor(0, 0, 0), "←");
+				break;
+			}
+			switch (m_actor->arrow[2])
+			{
+			case 1:
+				DrawFormatString(1100, 800, GetColor(0, 0, 0), "↑");
+				break;
+			case 2:
+				DrawFormatString(1100, 800, GetColor(0, 0, 0), "↓");
+				break;
+			case 3:
+				DrawFormatString(1100, 800, GetColor(0, 0, 0), "→");
+				break;
+			case 4:
+				DrawFormatString(1100, 800, GetColor(0, 0, 0), "←");
+				break;
+			}
+			switch (m_actor->arrow[3])
+			{
+			case 1:
+				DrawFormatString(1200, 800, GetColor(0, 0, 0), "↑");
+				break;
+			case 2:
+				DrawFormatString(1200, 800, GetColor(0, 0, 0), "↓");
+				break;
+			case 3:
+				DrawFormatString(1200, 800, GetColor(0, 0, 0), "→");
+				break;
+			case 4:
+				DrawFormatString(1200, 800, GetColor(0, 0, 0), "←");
+				break;
+			}
+		}
+
 		//	ターンの評価の表示
 		if (m_actor->turnGraphFlag)
 		{
@@ -484,7 +549,7 @@ void GameScene::Draw()
 		m_actor->DrawToGoal(m_actor->dCount, m_actor->maxdCount);
 
 		// スキル
-		m_actor->Skill(m_actor->dCount, m_actor->maxdCount);
+		m_actor->LastSpurt();
 
 		//	スタミナ減少時の汗の表示
 		if (m_actor->st <= ORANGE)
