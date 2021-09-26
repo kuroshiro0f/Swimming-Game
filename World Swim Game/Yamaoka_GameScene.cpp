@@ -37,10 +37,17 @@ const int STAR_END_Y = 700;
 const double STAR_ROTA_SPEED = 0.1;
 
 //	汗の移動範囲
-const int SWEAT_1_X = 40;
-const int SWEAT_1_Y = 40;
-const int SWEAT_2_X = -40;
-const int SWEAT_2_Y = -40;
+const int SWEAT1_END_X = 40;
+const int SWEAT1_END_Y = -40;
+const int SWEAT2_END_X = -40;
+const int SWEAT2_END_Y = -40;
+
+//	汗の反転量
+const int SWEAT_REV = 500;
+
+//	スタミナゲージの色が変わる残りゲージ量
+const int GREEN = 300;
+const int ORANGE = 150;
 
 //	男の子の移動範囲
 const int BOY_MIN_Y = -50;
@@ -62,6 +69,8 @@ GameScene::GameScene()
 	, m_startFinishFlag(false)
 	, m_gameFinishFlag(false)
 	, m_fadeOutFlag(false)
+	, m_sweat1Flag(true)
+	, m_sweat2Flag(false)
 	, m_stage(nullptr)
 	, m_camera(nullptr)
 	, m_actor(nullptr)
@@ -277,17 +286,13 @@ void GameScene::Draw()
 		DrawBox(1550, 830, 1850, 880, GetColor(255, 255, 0), TRUE);
 		DrawFormatString(1600, 835, GetColor(0, 0, 0), "TIME   %d", m_actor->countUP);
 
-
 		// プレイヤー描画
 		m_actor->DrawActor();
-
-		// カメラ座標表示
-		//m_camera->Draw();
 
 		DrawBox(900, 800, 1000, 900, GetColor(0, 0, 0), FALSE);				//ボックスの表示(1つ用)
 		SetFontSize(100);
 
-		if (m_actor->st > m_actor->MinSt)
+		if (m_actor->st > m_actor->MinSt && m_actor->ultLimitFlag == false)
 		{
 			//ランダムに矢印を表示
 			switch (m_actor->randomKeyNumber)
@@ -416,6 +421,71 @@ void GameScene::Draw()
 			}
 		}
 
+		if (m_actor->ultFlag)
+		{
+			switch (m_actor->arrow[0])
+			{
+			case 1:
+				DrawFormatString(900, 800, GetColor(0, 0, 0), "↑");
+				break;
+			case 2:
+				DrawFormatString(900, 800, GetColor(0, 0, 0), "↓");
+				break;
+			case 3:
+				DrawFormatString(900, 800, GetColor(0, 0, 0), "→");
+				break;
+			case 4:
+				DrawFormatString(900, 800, GetColor(0, 0, 0), "←");
+				break;
+			}
+
+			switch (m_actor->arrow[1])
+			{
+			case 1:
+				DrawFormatString(1000, 800, GetColor(0, 0, 0), "↑");
+				break;
+			case 2:
+				DrawFormatString(1000, 800, GetColor(0, 0, 0), "↓");
+				break;
+			case 3:
+				DrawFormatString(1000, 800, GetColor(0, 0, 0), "→");
+				break;
+			case 4:
+				DrawFormatString(1000, 800, GetColor(0, 0, 0), "←");
+				break;
+			}
+			switch (m_actor->arrow[2])
+			{
+			case 1:
+				DrawFormatString(1100, 800, GetColor(0, 0, 0), "↑");
+				break;
+			case 2:
+				DrawFormatString(1100, 800, GetColor(0, 0, 0), "↓");
+				break;
+			case 3:
+				DrawFormatString(1100, 800, GetColor(0, 0, 0), "→");
+				break;
+			case 4:
+				DrawFormatString(1100, 800, GetColor(0, 0, 0), "←");
+				break;
+			}
+			switch (m_actor->arrow[3])
+			{
+			case 1:
+				DrawFormatString(1200, 800, GetColor(0, 0, 0), "↑");
+				break;
+			case 2:
+				DrawFormatString(1200, 800, GetColor(0, 0, 0), "↓");
+				break;
+			case 3:
+				DrawFormatString(1200, 800, GetColor(0, 0, 0), "→");
+				break;
+			case 4:
+				DrawFormatString(1200, 800, GetColor(0, 0, 0), "←");
+				break;
+			}
+		}
+
 		//	ターンの評価の表示
 		if (m_actor->turnGraphFlag)
 		{
@@ -433,6 +503,10 @@ void GameScene::Draw()
 		{
 			m_actor->inputArrowFlag = true;
 			DrawBox(600, 800, 700, 900, GetColor(255, 255, 255), TRUE);
+		}
+		else if (CheckHitKey(KEY_INPUT_UP) || CheckHitKey(KEY_INPUT_DOWN) || CheckHitKey(KEY_INPUT_RIGHT) || CheckHitKey(KEY_INPUT_LEFT))
+		{
+			DrawBox(600, 800, 700, 900, GetColor(255, 0, 0), TRUE);
 		}
 		DrawFormatString(625, 800, GetColor(0, 0, 0), "C");
 
@@ -476,6 +550,93 @@ void GameScene::Draw()
 
 		// スキル
 		m_actor->LastSpurt();
+
+		//	スタミナ減少時の汗の表示
+		if (m_actor->st <= ORANGE)
+		{
+			if (!m_actor->turnFlag)
+			{
+				if (m_sweat1Flag)
+				{
+					DrawGraph(m_sweat1X, m_sweat1Y, m_sweat1GraphHandle, TRUE);
+					m_sweat1X++;
+					m_sweat1Y--;
+					if (m_sweat1X > SWEAT1_END_X)
+					{
+						m_sweat1X = 0;
+						m_sweat1Flag = false;
+					}
+					if (m_sweat1Y < SWEAT1_END_Y)
+					{
+						m_sweat1Y = 0;
+						m_sweat1Flag = false;
+					}
+					if (m_sweat1X > SWEAT1_END_X / 2)
+					{
+						m_sweat2Flag = true;
+					}
+				}
+				if (m_sweat2Flag)
+				{
+					DrawGraph(m_sweat2X, m_sweat2Y, m_sweat2GraphHandle, TRUE);
+					m_sweat2X--;
+					m_sweat2Y--;
+					if (m_sweat2X < SWEAT2_END_X)
+					{
+						m_sweat2X = 0;
+						m_sweat2Flag = false;
+						m_sweat1Flag = true;
+					}
+					if (m_sweat2Y < SWEAT2_END_Y)
+					{
+						m_sweat2Y = 0;
+						m_sweat2Flag = false;
+						m_sweat1Flag = true;
+					}
+				}
+			}
+			if (m_actor->turnFlag)
+			{
+				if (m_sweat1Flag)
+				{
+					DrawGraph(m_sweat1X - SWEAT_REV, m_sweat1Y, m_sweat1GraphHandle, TRUE);
+					m_sweat1X++;
+					m_sweat1Y--;
+					if (m_sweat1X > SWEAT1_END_X)
+					{
+						m_sweat1X = 0;
+						m_sweat1Flag = false;
+					}
+					if (m_sweat1Y < SWEAT1_END_Y)
+					{
+						m_sweat1Y = 0;
+						m_sweat1Flag = false;
+					}
+					if (m_sweat1X > SWEAT1_END_X / 2)
+					{
+						m_sweat2Flag = true;
+					}
+				}
+				if (m_sweat2Flag)
+				{
+					DrawGraph(m_sweat2X - SWEAT_REV, m_sweat2Y, m_sweat2GraphHandle, TRUE);
+					m_sweat2X--;
+					m_sweat2Y--;
+					if (m_sweat2X < SWEAT2_END_X)
+					{
+						m_sweat2X = 0;
+						m_sweat2Flag = false;
+						m_sweat1Flag = true;
+					}
+					if (m_sweat2Y < SWEAT2_END_Y)
+					{
+						m_sweat2Y = 0;
+						m_sweat2Flag = false;
+						m_sweat1Flag = true;
+					}
+				}
+			}
+		}
 
 		// カウントダウンの表示
 		if (m_actor->countDown > 0 && m_actor->countDown <= 150)

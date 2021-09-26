@@ -9,7 +9,7 @@ class Camera;				//Cameraへの参照
 
 class GameScene :public SceneBase
 {
-	PlayerActor* player;
+	Yamaoka_PlayerActor* player;
 	Camera* camera;
 
 public:
@@ -95,6 +95,8 @@ private:
 	bool m_whistleFinishFlag;		//	笛を鳴らし終わったか
 	bool m_gameFinishFlag;			//	ゲームが終わったか
 	bool m_fadeOutFlag;				//	フェードアウトを始めるか
+	bool m_sweat1Flag;				//	汗1を表示するか
+	bool m_sweat2Flag;				//	汗2を表示するか
 
 	class Stage* m_stage;   // ステージクラスへのポインタメンバ変数
 	class Camera* m_camera;	// カメラクラスへのポインタメンバ変数

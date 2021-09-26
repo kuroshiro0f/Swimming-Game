@@ -4,7 +4,7 @@
 #include "DxLib.h"
 #include "Yamaoka_PlayerActor.h"
 
-class PlayerActor;      //プレイヤークラスへの参照
+class Yamaola_PlayerActor;      //プレイヤークラスへの参照
 
 class Camera
 {
@@ -17,19 +17,18 @@ public:
 	// 更新
 	void Update(const Yamaoka_PlayerActor& playerActor);
 
-	void Draw();
-
 	// ポジションの getter/setter
 	const VECTOR& GetPos() const
 	{
 		return mPos;
 	}
 
-	
-
 private:
 	VECTOR mPos;    // ポジション
 	VECTOR mTempPos;
+	VECTOR mPlayerPos;
+
+	const int mCorrection = 12;	//補正値
 };
 
 #endif // !_CAMERA_H_

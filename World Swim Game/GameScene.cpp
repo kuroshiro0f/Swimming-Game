@@ -1,7 +1,7 @@
 #include "GameScene.h"
 #include "Result.h"
 #include "Stage.h"
-#include "PlayerActor.h"
+#include "Yamaoka_PlayerActor.h"
 
 #include "DxLib.h"
 
@@ -768,7 +768,7 @@ void GameScene::Load()
 	// ステージクラスのインスタンスを生成
 	m_stage = new Stage();
 	// アクタークラスへのインスタンスを生成
-	m_actor = new PlayerActor;
+	m_actor = new Yamaoka_PlayerActor;
 	// カメラクラスへのインスタンスを生成
 	m_camera = new Camera(*m_actor);
 }
