@@ -1,7 +1,7 @@
 #include "GameScene.h"
 #include "Result.h"
 #include "Stage.h"
-#include "Yamaoka_PlayerActor.h"
+#include "PlayerActor.h"
 
 #include "DxLib.h"
 
@@ -496,7 +496,7 @@ void GameScene::Draw()
 				m_actor->turnGraphFlag = false;
 			}
 		}
-		
+
 		// 息継ぎキーの表示
 		DrawBox(600, 800, 700, 900, GetColor(0, 0, 0), FALSE);				//ボックスの表示(1つ用)
 		if (CheckHitKey(KEY_INPUT_C))
@@ -768,7 +768,7 @@ void GameScene::Load()
 	// ステージクラスのインスタンスを生成
 	m_stage = new Stage();
 	// アクタークラスへのインスタンスを生成
-	m_actor = new Yamaoka_PlayerActor;
+	m_actor = new PlayerActor;
 	// カメラクラスへのインスタンスを生成
 	m_camera = new Camera(*m_actor);
 }

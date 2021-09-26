@@ -59,7 +59,7 @@ public:
 	// ゴールまでの距離の描画
 	void DrawToGoal(float _playerPos, float _goalPos);
 
-	
+
 	// ラストスパート
 	void LastSpurt();
 	void UltNumber(bool _randomFlag);
@@ -124,6 +124,8 @@ private:
 	int inputStartTime;
 	int inputEndTime;
 	int inputCount;						//入力回数
+
+	int countSpeed;
 
 	float addStaminaSpeed;				//加算されるスタミナによるスピード
 

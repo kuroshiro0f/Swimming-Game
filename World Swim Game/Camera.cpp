@@ -21,14 +21,25 @@ Camera::~Camera()
 // 更新
 void Camera::Update(const PlayerActor& playerActor)
 {
-	//mTempPos = playerActor.GetPos();			//プレイヤーのポジションをmTempPosにコピー
-	mPos.x = playerActor.GetPosX();				//mTempPos(プレイヤー)のx座標をカメラのx座標に代入
+	mPos.x = playerActor.GetPosX();
+	mPlayerPos = playerActor.GetPos();
+
+	if (!playerActor.turnFlag)
+	{
+		mPlayerPos.x -= mCorrection;
+		mPos.x -= mCorrection;
+	}
+	if (playerActor.turnFlag)
+	{
+		mPlayerPos.x += mCorrection;
+		mPos.x += mCorrection;
+	}
 
 	if (playerActor.dCount <= 15)
 	{
-		mPos.x = playerActor.GetPosX() - 25;				//mTempPos(プレイヤー)のx座標をカメラのx座標に代入
+		mPos.x = playerActor.GetPosX() - 25 + mCorrection;
 
 	}
 
-	SetCameraPositionAndTarget_UpVecY(mPos, playerActor.GetPos());	// カメラに位置を反映.
+	SetCameraPositionAndTarget_UpVecY(mPos, mPlayerPos);	// カメラに位置を反映.
 }

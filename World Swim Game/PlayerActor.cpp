@@ -16,10 +16,10 @@ const int ST_END_X = 1250;
 const int ST_END_Y = 1035;
 
 //	スタミナの減少量
-//const int ST_SUC_DEC = 60;
-//const int ST_FAI_DEC = 100;
-const int ST_SUC_DEC = 1;
-const int ST_FAI_DEC = 2;
+const int ST_SUC_DEC = 60;
+const int ST_FAI_DEC = 100;
+//const int ST_SUC_DEC = 1;
+//const int ST_FAI_DEC = 2;
 
 //スピード関連
 const VECTOR missSpeed = VGet(5, 0, 0);		//入力ミスしたときのスピード
@@ -31,6 +31,7 @@ const float limitTime = 1.5f;				//入力制限時間
 const float maxTime = 0.5f;					//最大時間
 
 const int dCountUlt = 15;					//ウルトが使えるようになる残り距離
+
 
 //コンストラクタ
 PlayerActor::PlayerActor()
@@ -70,9 +71,8 @@ PlayerActor::PlayerActor()
 	animIndex = 0;
 
 	NowPos = 0;            // 現在の座標
-	// 調整中          //
 
-		// ゴールまでの距離　( 50m ) 
+	// ゴールまでの距離　( 50m ) 
 	dCount = 50.0f;         // 進んだ距離
 	maxdCount = 50.0f;      // ゴール  
 
@@ -103,6 +103,9 @@ PlayerActor::PlayerActor()
 
 	// 停止時間初期化
 	stopTime = 0;
+
+	countSpeed = 0;
+
 }
 
 //デストラクタ
@@ -123,6 +126,7 @@ void PlayerActor::Update(float _deltaTime)
 void PlayerActor::UpdateActor(float _deltaTime)
 {
 	int Key = GetJoypadInputState(DX_INPUT_KEY_PAD1);
+
 
 	// カウントダウンが終了したら開始
 	if (!startFlag && countDown <= 0)
@@ -145,6 +149,16 @@ void PlayerActor::UpdateActor(float _deltaTime)
 			countUP = (tmpTime - startTime);
 		}
 
+		// 2秒おきにスタミナ回復
+		/*if (countUP % 2 == 0 && !skillFlag)
+		{
+			st += 1;
+		}
+		if (st >= MaxSt)
+		{
+			st = MaxSt;
+		}*/
+
 		mPrevPosition = mPosition;							//プレイヤーのポジションを補完
 
 		//ターン前
@@ -159,10 +173,10 @@ void PlayerActor::UpdateActor(float _deltaTime)
 		}
 
 		//	技が終わるまで位置を固定
-		if (skillFlag)
+		/*if (skillFlag)
 		{
 			mPosition.x = mPosition.x;
-		}
+		}*/
 
 		dCount -= std::sqrt((mPosition.x - mPrevPosition.x) * (mPosition.x - mPrevPosition.x)) * 0.088;
 
@@ -187,11 +201,11 @@ void PlayerActor::UpdateActor(float _deltaTime)
 			ultLimitFlag = true;
 		}
 		//必殺技
-	/*	if (CheckHitKey(KEY_INPUT_A) && ultLimitFlag)
+		if (/*CheckHitKey(KEY_INPUT_A) &&*/ ultLimitFlag)
 		{
 			ultFlag = true;
 			randomFlag = false;
-		}*/
+		}
 
 		/*if (ultFlag)
 		{
@@ -448,7 +462,7 @@ void PlayerActor::UpdateActor(float _deltaTime)
 				break;
 			}
 		}
-		
+
 
 		// 息継ぎ処理
 		if (randomKeyNumber == STATE_KEY_C)
@@ -459,7 +473,7 @@ void PlayerActor::UpdateActor(float _deltaTime)
 			// Cキーを押されたとき
 			if (Key & PAD_INPUT_C)
 			{
-				st += 5;			// スタミナを減らす
+				st += 5;			// スタミナを増やす
 				inputTime = 0;		// 入力可能時間を初期化
 				// スタミナが最大値を超えたら
 				if (st >= MaxSt)
@@ -467,7 +481,7 @@ void PlayerActor::UpdateActor(float _deltaTime)
 					st = MaxSt;
 				}
 
-				mVelosity = VGet(2.0, 0, 0);
+				mVelosity.x = missSpeed.x * addStaminaSpeed + 1;
 			}
 			// 現在時間とランダムに矢印を生成した時間の差が1秒たったら
 			else if (inputTime > 1)
@@ -721,7 +735,7 @@ void PlayerActor::LastSpurt()
 	// 残り15m以下になったら
 	if (dCount <= dCountUlt)
 	{
-		DrawFormatString(850, 700, GetColor(255, 0, 0), "Last Spurt");
+		//DrawFormatString(850, 700, GetColor(255, 0, 0), "Last Spurt");
 
 		if (!m_ultCheckFlag)
 		{
@@ -734,10 +748,11 @@ void PlayerActor::LastSpurt()
 		skillFlag = true;
 		//mVelosity.x = 60.0f;
 
+
 		stopTime++;
 
-		// 矢印の入力終了まで停止
-		if (m_ultFinishFlag == 4)
+		// ３秒間停止
+		if (stopTime % 180 == 0)
 		{
 			skillCount = 1;
 		}
@@ -746,22 +761,25 @@ void PlayerActor::LastSpurt()
 		{
 			skillFlag = false;
 			stopTime = 0;
+			mVelosity = VGet(inputCount * 2, 0, 0);
 
 			// 再開時のズレた分を引く（足す）
-			countUP -= 3;
+			countUP -= 2;
 		}
 		// ゴールしたら
 		if (GetPosX() >= 130 && GetTurnFlag() == true)
 		{
 			finishFlag = true;
+			skillCount = 0;
 		}
 
 	}
 
 	// 数値表示
 	//DrawFormatString(850, 700, GetColor(255, 0, 0), "skillTime   %d", skillTime);
-	//DrawFormatString(0, 30, GetColor(255, 0, 255), "mVelosity.x        %f", mVelosity.x);
+	//DrawFormatString(0, 30, GetColor(255, 0, 255), "skillCount   %d", skillCount);
 	//DrawFormatString(0, 100, GetColor(255, 0, 255), "stopTime    %d", stopTime);
+
 }
 
 void PlayerActor::UltNumber(bool _randomFlag)
@@ -781,68 +799,71 @@ void PlayerActor::UltProcessInput(int _arrow[], int _size)
 	int Key = GetJoypadInputState(DX_INPUT_KEY_PAD1);
 	count = 0;
 
-	for (int i = 0; i < _size; i++)
+	if (skillCount == 0)
 	{
-		switch (_arrow[i])
+		for (int i = 0; i < _size; i++)
 		{
-		case STATE_KEY_UP:
-			if (CheckHitKey(KEY_INPUT_UP) && mCheckKeyFlag)
+			switch (_arrow[i])
 			{
-				inputCount += 1;
-				m_ultFinishFlag++;
-				mCheckKeyFlag = false;
+			case STATE_KEY_UP:
+				if (CheckHitKey(KEY_INPUT_UP) && mCheckKeyFlag)
+				{
+					inputCount += 1;
+					m_ultFinishFlag++;
+					mCheckKeyFlag = false;
+				}
+				else if (CheckHitKey(KEY_INPUT_DOWN) && mCheckKeyFlag || CheckHitKey(KEY_INPUT_RIGHT) && mCheckKeyFlag
+					|| CheckHitKey(KEY_INPUT_LEFT) && mCheckKeyFlag)
+				{
+					m_ultCheckFlag++;
+					mCheckKeyFlag = false;
+				}
+				break;
+			case STATE_KEY_DOWN:
+				if (CheckHitKey(KEY_INPUT_DOWN) && mCheckKeyFlag)
+				{
+					inputCount += 1;
+					m_ultFinishFlag++;
+					mCheckKeyFlag = false;
+				}
+				else if (CheckHitKey(KEY_INPUT_UP) && mCheckKeyFlag || CheckHitKey(KEY_INPUT_RIGHT) && mCheckKeyFlag
+					|| CheckHitKey(KEY_INPUT_LEFT) && mCheckKeyFlag)
+				{
+					m_ultCheckFlag++;
+					mCheckKeyFlag = false;
+				}
+				break;
+			case STATE_KEY_RIGHT:
+				if (CheckHitKey(KEY_INPUT_RIGHT) && mCheckKeyFlag)
+				{
+					inputCount += 1;
+					m_ultFinishFlag++;
+					mCheckKeyFlag = false;
+				}
+				else if (CheckHitKey(KEY_INPUT_UP) && mCheckKeyFlag || CheckHitKey(KEY_INPUT_DOWN) && mCheckKeyFlag
+					|| CheckHitKey(KEY_INPUT_LEFT) && mCheckKeyFlag)
+				{
+					m_ultCheckFlag++;
+					mCheckKeyFlag = false;
+				}
+				break;
+			case STATE_KEY_LEFT:
+				if (CheckHitKey(KEY_INPUT_LEFT) && mCheckKeyFlag)
+				{
+					inputCount += 1;
+					m_ultFinishFlag++;
+					mCheckKeyFlag = false;
+				}
+				else if (CheckHitKey(KEY_INPUT_UP) && mCheckKeyFlag || CheckHitKey(KEY_INPUT_DOWN) && mCheckKeyFlag
+					|| CheckHitKey(KEY_INPUT_RIGHT) && mCheckKeyFlag)
+				{
+					m_ultCheckFlag++;
+					mCheckKeyFlag = false;
+				}
+				break;
 			}
-			else if (CheckHitKey(KEY_INPUT_DOWN) && mCheckKeyFlag || CheckHitKey(KEY_INPUT_RIGHT) && mCheckKeyFlag
-				|| CheckHitKey(KEY_INPUT_LEFT) && mCheckKeyFlag)
-			{
-				m_ultCheckFlag++;
-				mCheckKeyFlag = false;
-			}
-			break;
-		case STATE_KEY_DOWN:
-			if (CheckHitKey(KEY_INPUT_DOWN) && mCheckKeyFlag)
-			{
-				inputCount += 1;
-				m_ultFinishFlag++;
-				mCheckKeyFlag = false;
-			}
-			else if (CheckHitKey(KEY_INPUT_UP) && mCheckKeyFlag || CheckHitKey(KEY_INPUT_RIGHT) && mCheckKeyFlag
-				|| CheckHitKey(KEY_INPUT_LEFT) && mCheckKeyFlag)
-			{
-				m_ultCheckFlag++;
-				mCheckKeyFlag = false;
-			}
-			break;
-		case STATE_KEY_RIGHT:
-			if (CheckHitKey(KEY_INPUT_RIGHT) && mCheckKeyFlag)
-			{
-				inputCount += 1;
-				m_ultFinishFlag++;
-				mCheckKeyFlag = false;
-			}
-			else if (CheckHitKey(KEY_INPUT_UP) && mCheckKeyFlag || CheckHitKey(KEY_INPUT_DOWN) && mCheckKeyFlag
-				|| CheckHitKey(KEY_INPUT_LEFT) && mCheckKeyFlag)
-			{
-				m_ultCheckFlag++;
-				mCheckKeyFlag = false;
-			}
-			break;
-		case STATE_KEY_LEFT:
-			if (CheckHitKey(KEY_INPUT_LEFT) && mCheckKeyFlag)
-			{
-				inputCount += 1;
-				m_ultFinishFlag++;
-				mCheckKeyFlag = false;
-			}
-			else if (CheckHitKey(KEY_INPUT_UP) && mCheckKeyFlag || CheckHitKey(KEY_INPUT_DOWN) && mCheckKeyFlag
-				|| CheckHitKey(KEY_INPUT_RIGHT) && mCheckKeyFlag)
-			{
-				m_ultCheckFlag++;
-				mCheckKeyFlag = false;
-			}
-			break;
+			//mVelosity = VGet(inputCount * 2, 0, 0);
+			mCheckKeyFlag = true;
 		}
-		mVelosity = VGet(inputCount * 2, 0, 0);
-		mCheckKeyFlag = true;
 	}
 }

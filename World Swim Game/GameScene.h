@@ -4,7 +4,7 @@
 #include "PlayerActor.h"
 #include "Camera.h"
 
-class Yamaoka_PlayerActor;			//PlayerActorへの参照
+class PlayerActor;			//PlayerActorへの参照
 class Camera;				//Cameraへの参照
 
 class GameScene :public SceneBase
@@ -100,6 +100,6 @@ private:
 
 	class Stage* m_stage;   // ステージクラスへのポインタメンバ変数
 	class Camera* m_camera;	// カメラクラスへのポインタメンバ変数
-	class Yamaoka_PlayerActor* m_actor;   // アクタークラスへのポインタメンバ変数
+	class PlayerActor* m_actor;   // アクタークラスへのポインタメンバ変数
 	class PlayEffect* m_effect;				//	エフェクトプレーヤー
 };

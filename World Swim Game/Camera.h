@@ -26,6 +26,9 @@ public:
 private:
 	VECTOR mPos;    // ポジション
 	VECTOR mTempPos;
+	VECTOR mPlayerPos;
+
+	const int mCorrection = 12;	//補正値
 };
 
 #endif // !_CAMERA_H_
