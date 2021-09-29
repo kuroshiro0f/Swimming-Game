@@ -4,6 +4,7 @@
 #include "PlayEffect.h"
 #include "Ueyama_PlayerActor.h"
 #include "Ueyama_Camera.h"
+#include "Font.h"
 
 //-----------------------------------------------------------------------------
 //	変更点
@@ -19,7 +20,9 @@ class Ueyama_GameScene :public SceneBase
 	Ueyama_Camera* camera;
 
 public:
-
+	/// <summary>
+	/// 
+	/// </summary>
 	enum class GAME_SCENE_STATE
 	{
 		LOAD,
@@ -31,7 +34,19 @@ public:
 	Ueyama_GameScene();				//	コンストラクタ
 	~Ueyama_GameScene();			//	デストラクタ
 
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="_deltaTime"> </param>
+	/// <returns> </returns>
 	SceneBase* Update(float _deltaTime)override;	//	更新
+
+	/*
+	* @fn
+	* @breaf
+	* @param
+	* @return
+	*/
 	void Draw()override;			//	描画
 	void Sound()override;			//	音楽
 	void Load()override;			//	初期化
@@ -56,6 +71,18 @@ private:
 	int m_starY;				//	Y方向
 	double m_starAngle;			//	角度
 
+	//	ハートの拡大率
+	double m_heartRate;
+	double m_heartSpeed1;
+	double m_heartSpeed2;
+
+	//	矢印の表示関係
+	double m_arrowRate;			//	拡大率
+	double m_arrowAngle;		//	角度
+	double m_arrow2Angle;		//	角度
+	double m_arrow3Angle;		//	角度
+	double m_arrow4Angle;		//	角度
+
 	//	汗の移動
 	int m_sweat1X, m_sweat1Y;	//	汗1
 	int m_sweat2X, m_sweat2Y;	//	汗2
@@ -71,10 +98,19 @@ private:
 	int m_starGraphHandle;			//	星
 	int m_sweat1GraphHandle;		//	汗1
 	int m_sweat2GraphHandle;		//	汗2
+	int m_heartGraphHandle;			//	ハート
 	int m_upArrowGraphHandle;		//	上矢印
 	int m_rightArrowGraphHandle;	//	右矢印
 	int m_downArrowGraphHandle;		//	下矢印
 	int m_leftArrowGraphHandle;		//	左矢印
+	int m_spaceGraphHandle;			//	スペース
+	int m_stGraphHandle;			//	スタミナ
+	int m_breathGraphHandle;		//	息継ぎ
+	int m_arrowBaseGraphHandle;		//	矢印の土台
+	int m_scoreBaseGraphHandle;		//	スコアの土台
+	int m_spaceBaseGraphHandle;		//	スペースの土台
+	int m_stBaseGraphHandle;		//	スタミナの土台
+
 
 	//	サウンドハンドル
 	int m_bgmSoundHandle;			//	BGM
@@ -105,9 +141,19 @@ private:
 	bool m_whistleFinishFlag;		//	笛を鳴らし終わったか
 	bool m_gameFinishFlag;			//	ゲームが終わったか
 	bool m_fadeOutFlag;				//	フェードアウトを始めるか
+	bool m_sweat1Flag;				//	汗1を表示するか
+	bool m_sweat2Flag;				//	汗2を表示するか
+	bool m_heartFlag;				//	ハートの拡大と縮小の変更用
+	bool m_lastFlag;				//	ラストスパートが始まったか
+	bool m_last1SucFlag;
+	bool m_last2SucFlag;
+	bool m_last3SucFlag;
+	bool m_last4SucFlag;
 
-	class Stage* m_stage;					//	ステージクラスへのポインタメンバ変数
-	class Ueyama_Camera* m_camera;			//	カメラクラスへのポインタメンバ変数
-	class Ueyama_PlayerActor* m_actor;		//	アクタークラスへのポインタメンバ変数
+	//	クラスへのポインタメンバ変数
+	class Stage* m_stage;					//	ステージ
+	class Ueyama_Camera* m_camera;			//	カメラ
+	class Ueyama_PlayerActor* m_actor;		//	アクター
 	class PlayEffect* m_effect;				//	エフェクトプレーヤー
+	class Font* m_font;
 };

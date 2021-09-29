@@ -19,16 +19,16 @@ const int SQUARE_END_X = 1100;
 const int SQUARE_END_Y = 1030;
 
 // タイムを表示する場所
-const int TIME_X = 370;
-const int TIME_Y = 460;
+const int TIME_X = 350;
+const int TIME_Y = 450;
 
 // RECORDを表示する場所
 const int RECORD_X = 300;				//	RECORDの文字	
 const int RECORD_Y = 610;
-const int RECORD_TIME_X = 300;			//	歴代タイムのX座標
-const int FIRST_TIME_Y = 710;			//	一位の場所
-const int SECOND_TIME_Y = 810;			//	二位の場所
-const int THIRD_TIME_Y = 910;			//	三位の場所
+const int RECORD_TIME_X = 350;			//	歴代タイムのX座標
+const int FIRST_TIME_Y = 635;			//	一位の場所
+const int SECOND_TIME_Y = 790;			//	二位の場所
+const int THIRD_TIME_Y = 950;			//	三位の場所
 
 //	リザルトの遷移する時間
 const int TIME = 100;
@@ -286,21 +286,25 @@ void Ueyama_Result::Draw()
 	DrawGraph(0, 0, m_backGraphHandle, TRUE);			//	背景
 	DrawGraph(0, 0, m_logoGraphHandle, TRUE);			//	ロゴ
 
-	// 透過して描画
-	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 190);
-	DrawBox(SQUARE_START_X, SQUARE_START_Y, SQUARE_END_X, SQUARE_END_Y, GetColor(255, 255, 255), TRUE);
-	// 透過を元に戻す
-	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+	//// 透過して描画
+	//SetDrawBlendMode(DX_BLENDMODE_ALPHA, 190);
+	//DrawBox(SQUARE_START_X, SQUARE_START_Y, SQUARE_END_X, SQUARE_END_Y, GetColor(255, 255, 255), TRUE);
+	//// 透過を元に戻す
+	//SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
 
 	if (m_resultFlag >= 1)
 	{
 		//	クリアタイムを表示
-		DrawFormatStringToHandle(TIME_X, TIME_Y, GetColor(0, 0, 0), nowTimeHandle, "TIME : %d", m_time);
-		DrawFormatStringToHandle(RECORD_X, RECORD_Y, GetColor(0, 0, 0), recordHandle, "RECORD");
-		DrawFormatStringToHandle(RECORD_TIME_X, FIRST_TIME_Y, GetColor(0, 0, 0), recordHandle, "1位 : %d", SAVE->GetFirstTime());
-		DrawFormatStringToHandle(RECORD_TIME_X, SECOND_TIME_Y, GetColor(0, 0, 0), recordHandle, "2位 : %d", SAVE->GetSecondTime());
-		DrawFormatStringToHandle(RECORD_TIME_X, THIRD_TIME_Y, GetColor(0, 0, 0), recordHandle, "3位 : %d", SAVE->GetThirdTime());
+		DrawGraph(0, 0, m_nowGraphHandle, TRUE);
+		DrawGraph(0, 0, m_firstGraphHandle, TRUE);
+		DrawGraph(0, 0, m_secondGraphHandle, TRUE);
+		DrawGraph(0, 0, m_thirdGraphHandle, TRUE);
+
+		DrawFormatStringToHandle(TIME_X, TIME_Y, GetColor(255, 255, 255), m_font->recordHandle, "%d", m_time);
+		DrawFormatStringToHandle(RECORD_TIME_X, FIRST_TIME_Y, GetColor(255, 255, 255), m_font->recordHandle, "%d", SAVE->GetFirstTime());
+		DrawFormatStringToHandle(RECORD_TIME_X, SECOND_TIME_Y, GetColor(255, 255, 255), m_font->recordHandle, "%d", SAVE->GetSecondTime());
+		DrawFormatStringToHandle(RECORD_TIME_X, THIRD_TIME_Y, GetColor(255, 255, 255), m_font->recordHandle, "%d", SAVE->GetThirdTime());
 	}
 	if (m_resultFlag >= 2)
 	{
@@ -315,7 +319,11 @@ void Ueyama_Result::Draw()
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, m_transpVal);	//	透過して描画
 		DrawGraph(0, 0, m_guidanceGraphHandle, TRUE);		//	案内
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);			//	透過を元に戻す
-		DrawExtendGraph(m_bigStarX1, m_bigStarY1, m_bigStarX2, m_bigStarY2, m_bigStarGraphHandle, TRUE);			//	大きな星
+		if (m_time <= SAVE->GetSecondTime())
+		{
+			DrawExtendGraph(m_bigStarX1, m_bigStarY1, m_bigStarX2, m_bigStarY2, m_bigStarGraphHandle, TRUE);			//	大きな星
+		}
+		if(m_time <= SAVE->GetFirstTime() || m_time > SAVE->GetSecondTime() && m_time <= SAVE->GetThirdTime())
 		DrawExtendGraph(m_smallStarX1, m_smallStarY1, m_smallStarX2, m_smallStarY2, m_smallStarGraphHandle, TRUE);	//	小さな星
 
 
@@ -430,23 +438,33 @@ void Ueyama_Result::Load()
 	m_backGraphHandle = LoadGraph("data/img/Result/Result_back.png");				//	背景
 	m_logoGraphHandle = LoadGraph("data/img/Result/Result_logo.png");				//	ロゴ
 	m_guidanceGraphHandle = LoadGraph("data/img/Result/Result_guidance.png");		//	案内
-	if (m_time <= FIRST)
+	if (m_time <= SAVE->GetFirstTime())
 	{
 		m_medalGraphHandle = LoadGraph("data/img/Result/Result_gold.png");			//	金メダル
 		m_evaluationGraphHandle = LoadGraph("data/img/Result/Result_best.png");		//　CONGRATURATION
 	}
-	if (m_time > FIRST && m_time <= SECOND)
+	if (m_time > SAVE->GetFirstTime() && m_time <= SAVE->GetSecondTime())
 	{
 		m_medalGraphHandle = LoadGraph("data/img/Result/Result_silver.png");		//	銀メダル
 		m_evaluationGraphHandle = LoadGraph("data/img/Result/Result_great.png");	//	GREAT
 	}
-	if (m_time > SECOND)
+	if (m_time > SAVE->GetSecondTime() && m_time <= SAVE->GetThirdTime())
 	{
 		m_medalGraphHandle = LoadGraph("data/img/Result/Result_copper.png");		//	銅メダル
 		m_evaluationGraphHandle = LoadGraph("data/img/Result/Result_good.png");		//　GOOD
 	}
+	if (m_time > SAVE->GetThirdTime())
+	{
+		//m_medalGraphHandle = LoadGraph("data/img/Result/Result_copper.png");		//	銅メダル
+		m_evaluationGraphHandle = LoadGraph("data/img/Result/Result_ngu.png");		//　GOOD
+	}
 	m_bigStarGraphHandle = LoadGraph("data/img/Result/bigStar.png");				//	大きな星
 	m_smallStarGraphHandle = LoadGraph("data/img/Result/smallStar.png");			//	小さな星
+	m_nowGraphHandle = LoadGraph("data/img/Result/Result_timeBase.png");			//	今回のタイム
+	m_firstGraphHandle = LoadGraph("data/img/Result/Result_first.png");				//	一位のタイム
+	m_secondGraphHandle = LoadGraph("data/img/Result/Result_second.png");			//	二位のタイム
+	m_thirdGraphHandle = LoadGraph("data/img/Result/Result_third.png");				//	三位のタイム
+
 
 	//	サウンドハンドルにセット
 	m_bgmSoundHandle = LoadSoundMem("data/sound/Result/Result.ogg");				//	BGM
@@ -461,6 +479,8 @@ void Ueyama_Result::Load()
 	ChangeVolumeSoundMem(m_volumePal, m_se2SoundHandle);
 	ChangeVolumeSoundMem(m_volumePal, m_se3SoundHandle);
 	ChangeVolumeSoundMem(m_volumePal, m_se4SoundHandle);
+
+	m_font = new Font();
 }
 
 void Ueyama_Result::UpdateTransparent()

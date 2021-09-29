@@ -16,12 +16,6 @@ public:
 	int getVolume() { return m_volumePal; }
 	void setVolume(int _volume) { m_volumePal = _volume; }
 
-	//	ƒtƒHƒ“ƒg
-	int nowTimeHandle;
-	int loadFontHandle;
-	int recordHandle;
-	int startHandle;
-
 protected:
 	int m_volumePal;
 	int m_loadFontSize;

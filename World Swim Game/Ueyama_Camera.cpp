@@ -4,6 +4,7 @@
 // 　変更なし
 //-----------------------------------------------------------------------------
 
+const int CAMERA_ADD_Y = 7;
 
 // コンストラクタ
 Ueyama_Camera::Ueyama_Camera(const Ueyama_PlayerActor& playerActor)
@@ -12,7 +13,7 @@ Ueyama_Camera::Ueyama_Camera(const Ueyama_PlayerActor& playerActor)
 	SetCameraNearFar(1.0f, 10000.0f);
 
 	//カメラのポジション設定
-	mPos = VGet(0, 60, 80);
+	mPos = VGet(0, 40, 50);
 	//プレイヤーのポジションをコピーする用の変数を初期化
 	mTempPos = VGet(0, 0, 0);
 }
@@ -26,9 +27,26 @@ Ueyama_Camera::~Ueyama_Camera()
 // 更新
 void Ueyama_Camera::Update(const Ueyama_PlayerActor& playerActor)
 {
-	//mTempPos = playerActor.GetPos();								//プレイヤーのポジションをmTempPosにコピー
-	mPos.x = playerActor.GetPosX();									//mTempPos(プレイヤー)のx座標をカメラのx座標に代入
+	mPos.x = playerActor.GetPosX();
+	mPlayerPos = playerActor.GetPos();
+	mPlayerPos.y = playerActor.GetPos().y + CAMERA_ADD_Y;
 
-	SetCameraPositionAndTarget_UpVecY(mPos, playerActor.GetPos());	// カメラに位置を反映.
+	if (!playerActor.turnFlag)
+	{
+		mPlayerPos.x -= mCorrection;
+		mPos.x -= mCorrection;
+	}
+	if (playerActor.turnFlag)
+	{
+		mPlayerPos.x += mCorrection;
+		mPos.x += mCorrection;
+	}
 
+	if (playerActor.dCount <= 15)
+	{
+		mPos.x = playerActor.GetPosX() - 25 + mCorrection;
+
+	}
+
+	SetCameraPositionAndTarget_UpVecY(mPos, mPlayerPos);	// カメラに位置を反映.
 }

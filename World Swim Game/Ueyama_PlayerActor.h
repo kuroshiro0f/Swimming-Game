@@ -1,5 +1,6 @@
 #pragma once
 #include "Actor.h"
+#include "Font.h"
 
 //-----------------------------------------------------------------------------
 // 　変更なし
@@ -62,11 +63,15 @@ public:
 	// ゴールまでの距離の描画
 	void DrawToGoal(float _playerPos, float _goalPos);
 
+
+	// ラストスパート
+	void LastSpurt();
+	void UltNumber(bool _randomFlag);
+	//void ProcessInput(int _randomKeyNumber);
+	void UltProcessInput(int _arrow[], int _size);
+
 	//turnFlagのゲッター
 	bool GetTurnFlag() { return turnFlag; };
-
-	// 必殺技
-	void Skill(float _playerPos, float _goalPos);
 
 	//inputSpaceFlagのゲッター
 	bool GetInputSpaceFlag() { return inputSpaceFlag; };
@@ -98,8 +103,12 @@ public:
 	int skillCount;  // スキルの使用カウント
 	int skillTime;   // スキルの効果時間
 
+	int stopTime;    // 停止時間
+
 	float inputTime;			//入力時間
 	float inputLimitTime;		//入力制限時間
+
+	int arrow[4];					//ラストスパートのキー
 
 	int turnGraphHandle;				//	グラフィックハンドル
 	bool turnGraphFlag;					//	表示するか
@@ -109,10 +118,19 @@ public:
 	bool inputArrowFlag;				//矢印キー入力フラグ
 
 	bool countDownFinishFlag;		//	カウントダウンが終わったか
+	bool ultLimitFlag;				//　ウルトの制限
+	bool ultFlag;
+	bool ultSucFlag;
+
+
+	bool turnFlag;						 // ターンフラグ
 
 private:
 	int inputStartTime;
 	int inputEndTime;
+	int inputCount;						//入力回数
+
+	int countSpeed;
 
 	float addStaminaSpeed;				//加算されるスタミナによるスピード
 
@@ -125,9 +143,15 @@ private:
 
 	Evaluation	   mEvlt;				//評価
 
+	int m_stGraphHandle;				//	スタミナのグラフィックハンドル
+
 	bool startFlag;
-	bool turnFlag;						 // ターンフラグ
 	bool inputSpaceFlag;				//SPACE入力フラグ
 	bool mCheckKeyFlag;					//長押し対策フラグ
 	bool skillFlag;					  // スキルを使用したかどうか
+	bool finishFlag;					// ゴールしたかどうか
+	bool m_ultCheckFlag;					//	ラストスパートの矢印を表示し終わったかどうか
+	int m_ultFinishFlag;					//	ラストスパートで矢印を押し終わったか
+
+	class Font* m_font;					//	フォントクラスへのポインタメンバ変数
 };

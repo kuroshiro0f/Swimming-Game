@@ -10,8 +10,4 @@ SceneBase::SceneBase()
 	: m_volumePal(VOLUME_PAL)
 	, m_normalFontSize(NORMAL_FONT_SIZE)
 {
-	nowTimeHandle = CreateFontToHandle("MS –¾’©", 90, 2, DX_FONTTYPE_ANTIALIASING_4X4);
-	loadFontHandle = CreateFontToHandle("Comic Sans MS", 60, 3, DX_FONTTYPE_ANTIALIASING_4X4);
-	recordHandle = CreateFontToHandle("MS –¾’©", 80, 3, DX_FONTTYPE_ANTIALIASING_4X4);
-	startHandle = CreateFontToHandle("MS –¾’©", 150, 2, DX_FONTTYPE_ANTIALIASING_4X4);
 }
