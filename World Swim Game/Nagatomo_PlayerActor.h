@@ -6,7 +6,6 @@ class Nagatomo_PlayerActor : public Nagatomo_Actor
 {
 public:
 
-	//プレイヤーの状態
 	typedef enum PLAYER_STATE_ENUM
 	{
 		STATE_IDLE,
@@ -15,15 +14,14 @@ public:
 		STATE_NUM,
 	}PLAYER_STATE_ENUM;
 
-	//キーの状態
 	typedef enum KEY_STATE_ENUM
 	{
-		STATE_KEY_IDLE  = 0,
-		STATE_KEY_UP    = 1,
-		STATE_KEY_DOWN  = 2,
+		STATE_KEY_IDLE = 0,
+		STATE_KEY_UP = 1,
+		STATE_KEY_DOWN = 2,
 		STATE_KEY_RIGHT = 3,
-		STATE_KEY_LEFT  = 4,
-		STATE_KEY_C     = 5,
+		STATE_KEY_LEFT = 4,
+		STATE_KEY_C = 5,
 		STATE_KEY_S,
 		STATE_KEY_A,
 		STATE_KEY_SPACE,
@@ -40,9 +38,7 @@ public:
 		GOOD
 	}Evaluation;
 
-	//コンストラクタ
 	Nagatomo_PlayerActor();
-	//デストラクタ
 	~Nagatomo_PlayerActor();
 
 	//アップデート関数
@@ -62,19 +58,37 @@ public:
 	void DrawSt(int _st, int _MaxSt, int _MinSt);
 	// ゴールまでの距離の描画
 	void DrawToGoal(float _playerPos, float _goalPos);
+	//ランダムな数字を生成
+	void GenRandomKey(bool _randomFlag, bool _ultFlag);
+	//自動移動
+	void AutoMove(bool _turnFlag ,float _deltaTime);
+	// ラストスパート
+	void LastSpurt();
 
-	// 必殺技
-	void Skill(float _playerPos, float _goalPos);
+	//入力処理
+	void ProcessInput(bool _ultFlag,bool _skillFlag);
+	//入力成功時の処理
+	void SuccessInput(int _st, int _MinSt);
+	//入力失敗時の処理
+	void FailureInput(int _st, int _MinSt);
+	//入力時間を超えたときの処理
+	void InputOverTime(bool _inputArrowFlag, float _inputTime, float _inputLimitTime);
+
+	//ターン処理
+	void TurnProcess(bool _turnFlag, VECTOR _mPosition);
+
+	//ランダムな数字を生成（ult用）
 	void UltNumber(bool _randomFlag);
-	//void ProcessInput(int _randomKeyNumber);
+	//ウルトの入力処理
 	void UltProcessInput(int _arrow[], int _size);
+
+	//残りスタミナによる速度
+	void StaminaCoefficient(int _st, int _halfSt, int _quarterSt);
 
 	//turnFlagのゲッター
 	bool GetTurnFlag() { return turnFlag; };
-
 	//inputSpaceFlagのゲッター
 	bool GetInputSpaceFlag() { return inputSpaceFlag; };
-
 	//inputArrowFlagのゲッター
 	bool GetInputArrpwFlag() { return inputArrowFlag; };
 
@@ -102,6 +116,8 @@ public:
 	int skillCount;  // スキルの使用カウント
 	int skillTime;   // スキルの効果時間
 
+	int stopTime;    // 停止時間
+
 	float inputTime;			//入力時間
 	float inputLimitTime;		//入力制限時間
 
@@ -117,6 +133,9 @@ public:
 	bool countDownFinishFlag;		//	カウントダウンが終わったか
 	bool ultLimitFlag;				//　ウルトの制限
 	bool ultFlag;
+
+
+	bool turnFlag;						 // ターンフラグ
 
 private:
 	int inputStartTime;
@@ -134,9 +153,39 @@ private:
 
 	Evaluation	   mEvlt;				//評価
 
+	const float D_COUNT = 0.355f;
+
+	//	スタミナゲージの色が変わる残りゲージ量
+	const int GREEN = 300;
+	const int ORANGE = 150;
+	//const int RED = 3;
+
+	//	スタミナゲージの表示位置
+	const int ST_FIRST_X = 650;
+	const int ST_FIRST_Y = 1000;
+	const int ST_END_X = 1250;
+	const int ST_END_Y = 1035;
+
+	//	スタミナの減少量
+	const int ST_SUC_DEC = 60;
+	const int ST_FAI_DEC = 100;
+
+	//スピード関連
+	const VECTOR missSpeed = VGet(5, 0, 0);		//入力ミスしたときのスピード
+	const float addSpeed = 3.0f;				//加算されるスピード
+	const float maxSpeed = 15.0f;				//最大スピード
+
+	//入力関連
+	const float limitTime = 1.5f;				//入力制限時間
+	const float maxTime = 0.5f;					//最大時間
+
+	const int dCountUlt = 15;					//ウルトが使えるようになる残り距離
+
 	bool startFlag;
-	bool turnFlag;						 // ターンフラグ
 	bool inputSpaceFlag;				//SPACE入力フラグ
 	bool mCheckKeyFlag;					//長押し対策フラグ
 	bool skillFlag;					  // スキルを使用したかどうか
+	bool finishFlag;					// ゴールしたかどうか
+	bool m_ultCheckFlag;					//	ラストスパートの矢印を表示し終わったかどうか
+	int m_ultFinishFlag;					//	ラストスパートで矢印を押し終わったか
 };

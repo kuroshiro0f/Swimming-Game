@@ -2,34 +2,6 @@
 
 #include <random>
 
-const float D_COUNT = 0.355f;
-
-//	スタミナゲージの色が変わる残りゲージ量
-const int GREEN = 300;
-const int ORANGE = 150;
-//const int RED = 3;
-
-//	スタミナゲージの表示位置
-const int ST_FIRST_X = 650;
-const int ST_FIRST_Y = 1000;
-const int ST_END_X = 1250;
-const int ST_END_Y = 1035;
-
-//	スタミナの減少量
-const int ST_SUC_DEC = 60;
-const int ST_FAI_DEC = 100;
-
-//スピード関連
-const VECTOR missSpeed = VGet(5, 0, 0);		//入力ミスしたときのスピード
-const float addSpeed = 3.0f;				//加算されるスピード
-const float maxSpeed = 15.0f;				//最大スピード
-
-//入力関連
-const float limitTime = 1.5f;				//入力制限時間
-const float maxTime = 0.5f;					//最大時間
-
-const int dCountUlt = 15;					//ウルトが使えるようになる残り距離
-
 //コンストラクタ
 Nagatomo_PlayerActor::Nagatomo_PlayerActor()
 	:mNowPlayerState(STATE_IDLE)
@@ -42,6 +14,9 @@ Nagatomo_PlayerActor::Nagatomo_PlayerActor()
 	, countDownFinishFlag(false)
 	, skillFlag(false)
 	, turnGraphFlag(false)
+	, finishFlag(false)
+	, m_ultCheckFlag(false)
+	, m_ultFinishFlag(0)
 {
 	startFlag = false;
 	turnFlag = false;
@@ -93,6 +68,7 @@ Nagatomo_PlayerActor::Nagatomo_PlayerActor()
 	//スピード関連
 	addStaminaSpeed = 0.0f;
 
+	// 停止時間初期化
 	inputCount = 0;
 }
 
@@ -135,26 +111,17 @@ void Nagatomo_PlayerActor::UpdateActor(float _deltaTime)
 
 		mPrevPosition = mPosition;							//プレイヤーのポジションを補完
 
-		//ターン前
-		if (!turnFlag)
+		AutoMove(turnFlag, _deltaTime);
+
+		//	技が終わるまで位置を固定
+		if (skillFlag)
 		{
-			mPosition.x -= mVelosity.x * _deltaTime;			//プレイヤーの自動移動
-		}
-		//ターン後
-		else
-		{
-			mPosition.x += mVelosity.x * _deltaTime;			//プレイヤーの自動移動
+			mPosition.x = mPosition.x;
 		}
 
 		dCount -= std::sqrt((mPosition.x - mPrevPosition.x) * (mPosition.x - mPrevPosition.x)) * 0.088;		//残りの距離
 
-		if (randomFlag == false && !ultFlag)
-		{
-			randomKeyNumber = rand() % 3 + 1;				//1～4までの数字をランダムに生成
-			inputStartTime = GetNowCount() / 1000;			//ランダムに矢印を生成した時間を取得
-			randomFlag = true;
-			mCheckKeyFlag = false;
-		}
+		GenRandomKey(randomFlag, ultFlag);
 
 		// 息継ぎキーを押したら
 		if (CheckHitKey(KEY_INPUT_C))
@@ -168,262 +135,8 @@ void Nagatomo_PlayerActor::UpdateActor(float _deltaTime)
 		{
 			ultLimitFlag = true;
 		}
-		//必殺技
-		if (CheckHitKey(KEY_INPUT_A) && ultLimitFlag)
-		{
-			ultFlag = true;
-			randomFlag = false;
-		}
 
-		if (ultFlag)
-		{
-			UltNumber(randomFlag);
-			UltProcessInput(arrow, 4);
-			randomFlag = true;
-		}
-
-		if (!ultFlag)
-		{
-			//プレイヤーの処理//
-			switch (randomKeyNumber)
-			{
-			case 1:	//↑キーのとき
-				inputEndTime = GetNowCount() / 1000;			//現在の時間を取得
-				inputTime = (inputEndTime - inputStartTime);
-
-				//↑キーを押されたとき
-				if (Key & PAD_INPUT_UP && !mCheckKeyFlag)
-				{
-					if (st > MinSt)
-					{
-						if (mVelosity.x > maxSpeed)
-						{
-							mVelosity.x = maxSpeed;
-						}
-						else
-						{
-							mVelosity.x += addSpeed * addStaminaSpeed;
-						}
-						st -= ST_SUC_DEC;
-						inputTime = 0;
-						inputArrowFlag = true;
-						mCheckKeyFlag = true;
-					}
-				}
-				//↓ → ← キーが押されたとき
-				else if (!mCheckKeyFlag && Key & PAD_INPUT_DOWN || !mCheckKeyFlag && Key & PAD_INPUT_RIGHT || !mCheckKeyFlag && Key & PAD_INPUT_LEFT)
-				{
-					if (st > MinSt)
-					{
-						mVelosity.x = missSpeed.x * addStaminaSpeed;
-						st -= ST_FAI_DEC;
-						inputLimitTime = limitTime;							//入力制限時間をリセット
-						inputArrowFlag = false;
-						mCheckKeyFlag = true;
-					}
-				}
-				//キー入力がされて入力制限時間を過ぎたら
-				else if (inputArrowFlag && inputTime > inputLimitTime)
-				{
-					inputTime = 0;
-					inputArrowFlag = false;
-					randomFlag = false;
-					if (inputLimitTime < maxTime)
-					{
-						inputLimitTime = maxTime;
-					}
-					else
-					{
-						inputLimitTime -= 0.2f;
-					}
-				}
-				//キー入力がされずに入力制限時間を過ぎたら
-				else if (!inputArrowFlag && inputTime > inputLimitTime)
-				{
-
-					mVelosity.x = missSpeed.x * addStaminaSpeed;
-					inputTime = 0;
-					inputLimitTime = limitTime;							//入力制限時間をリセット
-					randomFlag = false;
-				}
-				break;
-			case 2:		//↓キーのとき
-				inputEndTime = GetNowCount() / 1000;
-				inputTime = (inputEndTime - inputStartTime);			 //入力時間をカウント
-
-				if (Key & PAD_INPUT_DOWN && !mCheckKeyFlag)
-				{
-					if (st > MinSt)
-					{
-						if (mVelosity.x > maxSpeed)
-						{
-							mVelosity.x = maxSpeed;
-						}
-						else
-						{
-							mVelosity.x += addSpeed * addStaminaSpeed;
-						}
-						st -= ST_SUC_DEC;
-						inputTime = 0;
-						inputArrowFlag = true;
-						mCheckKeyFlag = true;
-					}
-				}
-				else if (!mCheckKeyFlag && Key & PAD_INPUT_UP || !mCheckKeyFlag && Key & PAD_INPUT_RIGHT || !mCheckKeyFlag && Key & PAD_INPUT_LEFT)
-				{
-					if (st > MinSt)
-					{
-						mVelosity.x = missSpeed.x * addStaminaSpeed;
-						st -= ST_FAI_DEC;
-						inputLimitTime = limitTime;							//入力制限時間をリセット
-						inputArrowFlag = false;
-						mCheckKeyFlag = true;
-					}
-				}
-				//キー入力がされて入力制限時間を過ぎたら
-				else if (inputArrowFlag && inputTime > inputLimitTime)
-				{
-					inputTime = 0;
-					inputArrowFlag = false;
-					randomFlag = false;
-					if (inputLimitTime < maxTime)
-					{
-						inputLimitTime = maxTime;
-					}
-					else
-					{
-						inputLimitTime -= 0.2f;
-					}
-				}
-				//キー入力がされずに入力制限時間を過ぎたら
-				else if (!inputArrowFlag && inputTime > inputLimitTime)
-				{
-
-					mVelosity.x = missSpeed.x * addStaminaSpeed;
-					inputTime = 0;
-					inputLimitTime = limitTime;							//入力制限時間をリセット
-					randomFlag = false;
-				}
-				break;
-			case 3:		//→キーのとき
-				inputEndTime = GetNowCount() / 1000;
-				inputTime = (inputEndTime - inputStartTime);			//入力時間をカウント
-
-				if (Key & PAD_INPUT_RIGHT && !mCheckKeyFlag)
-				{
-					if (st > MinSt)
-					{
-						if (mVelosity.x > maxSpeed)
-						{
-							mVelosity.x = maxSpeed;
-						}
-						else
-						{
-							mVelosity.x += addSpeed * addStaminaSpeed;
-						}
-						st -= ST_SUC_DEC;
-						inputTime = 0;
-						inputArrowFlag = true;
-						mCheckKeyFlag = true;
-					}
-				}
-				else if (!mCheckKeyFlag && Key & PAD_INPUT_UP || !mCheckKeyFlag && Key & PAD_INPUT_DOWN || !mCheckKeyFlag && Key & PAD_INPUT_LEFT)
-				{
-					if (st > MinSt)
-					{
-						mVelosity.x = missSpeed.x * addStaminaSpeed;
-						st -= ST_FAI_DEC;
-						inputLimitTime = limitTime;							//入力制限時間をリセット
-						inputArrowFlag = false;
-						mCheckKeyFlag = true;
-					}
-				}
-				//キー入力がされて入力制限時間を過ぎたら
-				else if (inputArrowFlag && inputTime > inputLimitTime)
-				{
-					inputTime = 0;
-					inputArrowFlag = false;
-					randomFlag = false;
-					if (inputLimitTime < maxTime)
-					{
-						inputLimitTime = maxTime;
-					}
-					else
-					{
-						inputLimitTime -= 0.2f;
-					}
-				}
-				//キー入力がされずに入力制限時間を過ぎたら
-				else if (!inputArrowFlag && inputTime > inputLimitTime)
-				{
-					mVelosity.x = missSpeed.x * addStaminaSpeed;
-					inputTime = 0;
-					inputLimitTime = limitTime;				//入力制限時間をリセット
-					randomFlag = false;
-				}
-				break;
-			case 4:		//←キーのとき
-				inputEndTime = GetNowCount() / 1000;
-				inputTime = (inputEndTime - inputStartTime);  //入力時間をカウント
-
-				if (Key & PAD_INPUT_LEFT && !mCheckKeyFlag)
-				{
-					if (st > MinSt)
-					{
-						if (mVelosity.x > maxSpeed)
-						{
-							mVelosity.x = maxSpeed;
-						}
-						else
-						{
-							mVelosity.x += addSpeed * addStaminaSpeed;
-						}
-						st -= ST_SUC_DEC;
-						inputTime = 0;
-						inputArrowFlag = true;
-						mCheckKeyFlag = true;
-					}
-				}
-				else if (!mCheckKeyFlag && Key & PAD_INPUT_UP || !mCheckKeyFlag && Key & PAD_INPUT_DOWN || !mCheckKeyFlag && Key & PAD_INPUT_RIGHT)
-				{
-					if (st > MinSt)
-					{
-						mVelosity.x = missSpeed.x * addStaminaSpeed;
-						st -= ST_FAI_DEC;
-						inputLimitTime = limitTime;							//入力制限時間をリセット
-						inputArrowFlag = false;
-						mCheckKeyFlag = true;
-					}
-				}
-				//キー入力がされて入力制限時間を過ぎたら
-				else if (inputArrowFlag && inputTime > inputLimitTime)
-				{
-					inputTime = 0;
-					inputArrowFlag = false;
-					randomFlag = false;
-					if (inputLimitTime < maxTime)
-					{
-						inputLimitTime = maxTime;
-					}
-					else
-					{
-						inputLimitTime -= 0.2f;
-					}
-				}
-				//キー入力がされずに入力制限時間を過ぎたら
-				else if (!inputArrowFlag && inputTime > inputLimitTime)
-				{
-
-					mVelosity.x = missSpeed.x * addStaminaSpeed;
-					inputTime = 0;
-					inputLimitTime = limitTime;							//入力制限時間をリセット
-					randomFlag = false;
-				}
-				break;
-			default:
-				break;
-			}
-		}
+		ProcessInput(ultFlag, skillFlag);
 
 		// 息継ぎ処理
 		if (randomKeyNumber == STATE_KEY_C)
@@ -454,21 +167,7 @@ void Nagatomo_PlayerActor::UpdateActor(float _deltaTime)
 			}
 		}
 
-		//残りスタミナが50%以上
-		if (st >= halfSt)
-		{
-			addStaminaSpeed = 1.0f;
-		}
-		//残りスタミナが50%以下
-		if (st <= halfSt && st >= quarterSt)
-		{
-			addStaminaSpeed = 0.8f;
-		}
-		//残りスタミナが25%以下
-		if (st <= quarterSt)
-		{
-			addStaminaSpeed = 0.6f;
-		}
+		StaminaCoefficient(st, halfSt, quarterSt);
 
 		// スタミナが切れたら
 		if (!skillFlag)
@@ -512,66 +211,9 @@ void Nagatomo_PlayerActor::UpdateActor(float _deltaTime)
 			countDown = 0;
 		}
 
-		//スペースが押されたとき
-		if (Key & PAD_INPUT_M && turnFlag == false)
-		{
-			inputSpaceFlag = true;
-			inputLimitTime = limitTime;			//入力制限時間をリセット
-			mPosX = mPosition.x;				//押された時のプレイヤーの座標を補完
+		TurnProcess(turnFlag, mPosition);
 
-			if (-90 >= mPosX && mPosX > -120)
-			{
-				mEvlt = BAD;					//入力が早かったらBAD評価
-				turnGraphHandle = LoadGraph("data/img/Game/Turn1.png");
-
-			}
-			if (-120 >= mPosX && mPosX > -130)
-			{
-				mEvlt = NORMAL;					//入力が少し早かったらNORMALE評価
-				turnGraphHandle = LoadGraph("data/img/Game/Turn2.png");
-
-			}
-			if (-130 >= mPosX && mPosX > -140)
-			{
-				mEvlt = GOOD;					//入力がちょうどだったらGOOD評価
-				turnGraphHandle = LoadGraph("data/img/Game/Turn3.png");
-
-			}
-		}
-		//押されないまま端まで来たとき
-		else if (turnFlag == false && mPosition.x <= -140)
-		{
-			mEvlt = BAD;						//BAD評価に
-			turnGraphHandle = LoadGraph("data/img/Game/Turn1.png");
-			turnFlag = true;
-			inputLimitTime = limitTime;			//入力制限時間をリセット
-		}
-
-
-		//プールの端まで来たら
-		if (mPosition.x <= -136)
-		{
-			turnFlag = true;
-			mRotation = VGet(250.0f, 270.0f * DX_PI_F / 180.0f, 0.0f);							//プレイヤーの向きを反転
-			turnGraphFlag = true;
-			switch (mEvlt)
-			{
-			case BAD:
-				mVelosity = VGet(10, 0, 0);
-				st -= 15;
-
-			case NORMAL:
-				mVelosity = VGet(12, 0, 0);
-				st -= 10;
-
-			case GOOD:
-				mVelosity = VGet(15, 0, 0);
-				st -= 5;
-
-			default:
-				break;
-			}
-		}
+		LastSpurt();	// ラストスパート
 
 		PlayAnim(_deltaTime);						// アニメーション情報を取得
 		MV1SetPosition(modelHandle, mPosition);		// ポジション更新
@@ -688,25 +330,284 @@ void Nagatomo_PlayerActor::DrawToGoal(float _playerPos, float _goalPos)
 	}
 }
 
-// 必殺技
-void Nagatomo_PlayerActor::Skill(float _playerPos, float _goalPos)
+void Nagatomo_PlayerActor::AutoMove(bool _turnFlag,float _deltaTime)
 {
-	SetFontSize(40);
+	//ターン前
+	if (!_turnFlag)
+	{
+		mPosition.x -= mVelosity.x * _deltaTime;			//プレイヤーの自動移動
+	}
+	//ターン後
+	else
+	{
+		mPosition.x += mVelosity.x * _deltaTime;			//プレイヤーの自動移動
+	}
+}
 
-	// 必殺技のアイコン（枠）を表示
-	DrawBox(850, 100, 950, 200, GetColor(0, 0, 0), FALSE);
-	DrawFormatString(850, 60, GetColor(255, 0, 0), "加速技");
-	DrawFormatString(850, 200, GetColor(255, 0, 0), "PUSH A");
+void Nagatomo_PlayerActor::GenRandomKey(bool _randomFlag, bool _ultFlag)
+{
+	if (_randomFlag == false && !_ultFlag)
+	{
+		randomKeyNumber = rand() % 3 + 1;				//1～4までの数字をランダムに生成
+		inputStartTime = GetNowCount() / 1000;			//ランダムに矢印を生成した時間を取得
+		randomFlag = true;
+		mCheckKeyFlag = false;
+	}
+}
 
+void Nagatomo_PlayerActor::ProcessInput(bool _ultFlag, bool _skillFlag)
+{
+	int Key = GetJoypadInputState(DX_INPUT_KEY_PAD1);
+
+	if (!_ultFlag && !_skillFlag)
+	{
+		switch (randomKeyNumber)
+		{
+		case 1:	//↑キーのとき
+			inputEndTime = GetNowCount() / 1000;			//現在の時間を取得
+			inputTime = (inputEndTime - inputStartTime);	//入力時間をカウント
+
+			//↑キーを押されたとき
+			if (Key & PAD_INPUT_UP && !mCheckKeyFlag)
+			{
+				SuccessInput(st, MinSt);
+			}
+			//↓ → ← キーが押されたとき
+			else if (!mCheckKeyFlag && Key & PAD_INPUT_DOWN || !mCheckKeyFlag && Key & PAD_INPUT_RIGHT || !mCheckKeyFlag && Key & PAD_INPUT_LEFT)
+			{
+				FailureInput(st, MinSt);
+			}
+			InputOverTime(inputArrowFlag, inputTime, inputLimitTime);
+			break;
+
+		case 2:		//↓キーのとき
+			inputEndTime = GetNowCount() / 1000;					 //現在の時間を取得
+			inputTime = (inputEndTime - inputStartTime);			 //入力時間をカウント
+
+			if (Key & PAD_INPUT_DOWN && !mCheckKeyFlag)
+			{
+				SuccessInput(st, MinSt);
+			}
+			else if (!mCheckKeyFlag && Key & PAD_INPUT_UP || !mCheckKeyFlag && Key & PAD_INPUT_RIGHT || !mCheckKeyFlag && Key & PAD_INPUT_LEFT)
+			{
+				FailureInput(st, MinSt);
+			}
+			InputOverTime(inputArrowFlag, inputTime, inputLimitTime);
+			break;
+
+		case 3:		//→キーのとき
+			inputEndTime = GetNowCount() / 1000;					//現在の時間を取得
+			inputTime = (inputEndTime - inputStartTime);			//入力時間をカウント
+
+			if (Key & PAD_INPUT_RIGHT && !mCheckKeyFlag)
+			{
+				SuccessInput(st, MinSt);
+			}
+			else if (!mCheckKeyFlag && Key & PAD_INPUT_UP || !mCheckKeyFlag && Key & PAD_INPUT_DOWN || !mCheckKeyFlag && Key & PAD_INPUT_LEFT)
+			{
+				FailureInput(st, MinSt);
+			}
+			InputOverTime(inputArrowFlag, inputTime, inputLimitTime);
+			break;
+
+		case 4:		//←キーのとき
+			inputEndTime = GetNowCount() / 1000;					//現在の時間を取得
+			inputTime = (inputEndTime - inputStartTime);			//入力時間をカウント
+
+			if (Key & PAD_INPUT_LEFT && !mCheckKeyFlag)
+			{
+				SuccessInput(st, MinSt);
+			}
+			else if (!mCheckKeyFlag && Key & PAD_INPUT_UP || !mCheckKeyFlag && Key & PAD_INPUT_DOWN || !mCheckKeyFlag && Key & PAD_INPUT_RIGHT)
+			{
+				FailureInput(st, MinSt);
+			}
+			InputOverTime(inputArrowFlag,inputTime,inputLimitTime);
+
+			break;
+		default:
+			break;
+		}
+	}
+}
+
+void Nagatomo_PlayerActor::SuccessInput(int _st, int _MinSt)
+{
+	if (_st > _MinSt)
+	{
+		if (mVelosity.x > maxSpeed)
+		{
+			mVelosity.x = maxSpeed;
+		}
+		else
+		{
+			mVelosity.x += addSpeed * addStaminaSpeed;
+		}
+		st -= ST_SUC_DEC;
+		inputTime = 0;
+		inputArrowFlag = true;
+		mCheckKeyFlag = true;
+	}
+}
+
+void Nagatomo_PlayerActor::FailureInput(int _st, int _MinSt)
+{
+	if (st > MinSt)
+	{
+		mVelosity.x = missSpeed.x * addStaminaSpeed;
+		st -= ST_FAI_DEC;
+		inputLimitTime = limitTime;
+		inputArrowFlag = false;
+		mCheckKeyFlag = true;
+	}
+}
+
+void Nagatomo_PlayerActor::InputOverTime(bool _inputArrowFlag, float _inputTime, float _inputLimitTime)
+{
+	//キー入力がされて入力制限時間を過ぎたら
+	if (_inputArrowFlag && _inputTime > _inputLimitTime)
+	{
+		_inputTime = 0;
+		_inputArrowFlag = false;
+		randomFlag = false;
+		if (_inputLimitTime < maxTime)
+		{
+			_inputLimitTime = maxTime;
+		}
+		else
+		{
+			_inputLimitTime -= 0.2f;
+		}
+	}
+	//キー入力がされずに入力制限時間を過ぎたら
+	if (!_inputArrowFlag && _inputTime > _inputLimitTime)
+	{
+
+		mVelosity.x = missSpeed.x * addStaminaSpeed;
+		_inputTime = 0;
+		_inputLimitTime = limitTime;
+		randomFlag = false;
+	}
+}
+
+void Nagatomo_PlayerActor::TurnProcess(bool _turnFlag, VECTOR _mPosition)
+{
+	int Key = GetJoypadInputState(DX_INPUT_KEY_PAD1);
+
+	//スペースが押されたとき
+	if (Key & PAD_INPUT_M && _turnFlag == false)
+	{
+		inputSpaceFlag = true;
+		inputLimitTime = limitTime;			//入力制限時間をリセット
+		mPosX = _mPosition.x;				//押された時のプレイヤーの座標を補完
+
+		if (-90 >= mPosX && mPosX > -120)
+		{
+			mEvlt = BAD;					//入力が早かったらBAD評価
+			turnGraphHandle = LoadGraph("data/img/Game/Turn1.png");
+
+		}
+		if (-120 >= mPosX && mPosX > -130)
+		{
+			mEvlt = NORMAL;					//入力が少し早かったらNORMALE評価
+			turnGraphHandle = LoadGraph("data/img/Game/Turn2.png");
+
+		}
+		if (-130 >= mPosX && mPosX > -140)
+		{
+			mEvlt = GOOD;					//入力がちょうどだったらGOOD評価
+			turnGraphHandle = LoadGraph("data/img/Game/Turn3.png");
+
+		}
+	}
+	//押されないまま端まで来たとき
+	else if (_turnFlag == false && _mPosition.x <= -140)
+	{
+		mEvlt = BAD;						//BAD評価に
+		turnGraphHandle = LoadGraph("data/img/Game/Turn1.png");
+		turnFlag = true;
+		inputLimitTime = limitTime;			//入力制限時間をリセット
+	}
+
+
+	//プールの端まで来たら
+	if (_mPosition.x <= -136)
+	{
+		turnFlag = true;
+		mRotation = VGet(250.0f, 270.0f * DX_PI_F / 180.0f, 0.0f);							//プレイヤーの向きを反転
+		turnGraphFlag = true;
+		switch (mEvlt)
+		{
+		case BAD:
+			mVelosity = VGet(10, 0, 0);
+			st -= 15;
+
+		case NORMAL:
+			mVelosity = VGet(12, 0, 0);
+			st -= 10;
+
+		case GOOD:
+			mVelosity = VGet(15, 0, 0);
+			st -= 5;
+
+		default:
+			break;
+		}
+	}
+}
+
+// 必殺技
+void Nagatomo_PlayerActor::LastSpurt()
+{
+	// 残り15m以下になったら
+	if (dCount <= dCountUlt)
+	{
+		DrawFormatString(850, 700, GetColor(255, 0, 0), "Last Spurt");
+
+		if (!m_ultCheckFlag)
+		{
+			UltNumber(randomFlag);
+		}
+		UltProcessInput(arrow, 4);
+		m_ultCheckFlag = true;
+		ultFlag = true;
+		randomFlag = false;
+		skillFlag = true;
+		//mVelosity.x = 60.0f;
+
+		stopTime++;
+
+		// 矢印の入力終了まで停止
+		if (m_ultFinishFlag == 4)
+		{
+			skillCount = 1;
+		}
+		// 停止時間が終わったら
+		if (skillCount == 1 && !finishFlag)
+		{
+			skillFlag = false;
+			stopTime = 0;
+
+			// 再開時のズレた分を引く（足す）
+			countUP -= 3;
+		}
+		// ゴールしたら
+		if (GetPosX() >= 130 && GetTurnFlag() == true)
+		{
+			finishFlag = true;
+		}
+
+	}
 
 	// 数値表示
 	//DrawFormatString(850, 700, GetColor(255, 0, 0), "skillTime   %d", skillTime);
-
+	//DrawFormatString(0, 30, GetColor(255, 0, 255), "mVelosity.x        %f", mVelosity.x);
+	//DrawFormatString(0, 100, GetColor(255, 0, 255), "stopTime    %d", stopTime);
 }
 
 void Nagatomo_PlayerActor::UltNumber(bool _randomFlag)
 {
-	if (!_randomFlag)
+	if (_randomFlag)
 	{
 		for (int i = 0; i < 4; i++)
 		{
@@ -772,5 +673,24 @@ void Nagatomo_PlayerActor::UltProcessInput(int _arrow[], int _size)
 		}
 		mVelosity = VGet(inputCount * 2, 0, 0);
 		mCheckKeyFlag = true;
+	}
+}
+
+void Nagatomo_PlayerActor::StaminaCoefficient(int _st, int _halfSt, int _quarterSt)
+{
+	//残りスタミナが50%以上
+	if (_st >= _halfSt)
+	{
+		addStaminaSpeed = 1.0f;
+	}
+	//残りスタミナが50%以下
+	if (_st <= _halfSt && st >= _quarterSt)
+	{
+		addStaminaSpeed = 0.8f;
+	}
+	//残りスタミナが25%以下
+	if (_st <= _quarterSt)
+	{
+		addStaminaSpeed = 0.6f;
 	}
 }
