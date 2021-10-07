@@ -1,6 +1,7 @@
 #pragma once
 
 #include "SceneBase.h"
+#include "Font.h"
 
 class Result : public SceneBase
 {
@@ -31,6 +32,7 @@ public:
 	void Sound()override;			//	音楽
 	void Load()override;			//	初期化
 
+	void RankMove(int& _x, bool& _flag, bool _flag2);
 	void UpdateTransparent();			//	文字の透過量更新
 
 private:
@@ -60,6 +62,14 @@ private:
 	int m_fadeTransVal;				//	フェードアウト中の透過量
 	int m_permeationAmount;			//	毎フレーム透過量
 
+	//	ランキングの表示用
+	int m_rank1X;
+	int m_rank2X;
+	int m_rank3X;
+	bool m_rank1Flag;
+	bool m_rank2Flag;
+	bool m_rank3Flag;
+
 	//	グラフィックハンドル
 	int m_backGraphHandle;				//	背景
 	int m_logoGraphHandle;				//	ロゴ
@@ -68,6 +78,10 @@ private:
 	int m_medalGraphHandle;				//	メダル
 	int m_bigStarGraphHandle;			//	大きな星
 	int m_smallStarGraphHandle;			//	小さな星
+	int m_nowGraphHandle;				//	今のタイム
+	int m_firstGraphHandle;				//	一位のタイム
+	int m_secondGraphHandle;			//	二位のタイム
+	int m_thirdGraphHandle;				//	三位のタイム
 
 	//	サウンドハンドル
 	int m_bgmSoundHandle;				//	BGM
@@ -83,4 +97,5 @@ private:
 	bool m_fadeOutFinishFlag;			//	フェードアウト終了
 
 	class Save* m_save;
+	class Font* m_font;
 };

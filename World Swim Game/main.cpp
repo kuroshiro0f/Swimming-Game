@@ -55,13 +55,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	SceneMgr* Scene = new SceneMgr;
 
 	//	タイトルシーンをセット
-	//Scene->SetScene(new Title());
+	Scene->SetScene(new Title(false));
 
 	Volume* volume = new Volume();
 
 	//	デバッグ用
 	//Scene->SetScene(new Ueyama_GameScene());
-	Scene->SetScene(new Ueyama_Title(false));
+	//Scene->SetScene(new Ueyama_Title(false));
 	//Scene->SetScene(new Ueyama_Result(48));
 
 	// エスケープキーが押されるかウインドウが閉じられるまでループ

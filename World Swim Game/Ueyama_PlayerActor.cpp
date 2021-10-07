@@ -131,7 +131,6 @@ Ueyama_PlayerActor::Ueyama_PlayerActor()
 	countSpeed = 0;
 
 	m_font = new Font();
-	m_game = new Ueyama_GameScene();
 }
 
 //デストラクタ

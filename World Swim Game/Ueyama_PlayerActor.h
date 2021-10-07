@@ -1,7 +1,6 @@
 #pragma once
 #include "Actor.h"
 #include "Font.h"
-#include "Ueyama_GameScene.h"
 
 //-----------------------------------------------------------------------------
 // 　変更なし
@@ -161,5 +160,4 @@ private:
 	int m_ultFinishFlag;					//	ラストスパートで矢印を押し終わったか
 
 	class Font* m_font;					//	フォントクラスへのポインタメンバ変数
-	class Ueyama_GameScene* m_game;		//	ゲームシーンへのポインタメンバ変数
 };

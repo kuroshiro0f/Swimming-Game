@@ -1,5 +1,7 @@
 #include "Camera.h"
 
+const int CAMERA_ADD_Y = 7;
+
 // コンストラクタ
 Camera::Camera(const PlayerActor& playerActor)
 {
@@ -23,6 +25,7 @@ void Camera::Update(const PlayerActor& playerActor)
 {
 	mPos.x = playerActor.GetPosX();
 	mPlayerPos = playerActor.GetPos();
+	mPlayerPos.y = playerActor.GetPos().y + CAMERA_ADD_Y;
 
 	if (!playerActor.turnFlag)
 	{
