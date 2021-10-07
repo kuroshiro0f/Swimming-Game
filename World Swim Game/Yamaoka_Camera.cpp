@@ -9,7 +9,7 @@ Camera::Camera(const Yamaoka_PlayerActor& playerActor)
 	//カメラのポジション設定
 	mPos = VGet(0, 40, 50);
 	//プレイヤーのポジションをコピーする用の変数を初期化
-	mTempPos = VGet(0, 0, 0);
+	//mTempPos = VGet(0, 0, 0);
 }
 
 // デストラクタ

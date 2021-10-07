@@ -58,7 +58,7 @@ Yamaoka_PlayerActor::Yamaoka_PlayerActor()
 	ultLimitFlag = false;
 	ultFlag = false;
 
-	mPosition = VGet(150, 18, 0);								// 初期位置設定
+	mPosition = VGet(150, 17, 0);								// 初期位置設定
 	mRotation = VGet(250.0f, 90.0f * DX_PI_F / 180.0f, 0.0f);	// 回転角度
 	mDirection = VGet(0, 0, 1);									//プレイヤーの方向
 	mVelosity = VGet(8, 0, 0);									//速度
@@ -71,26 +71,24 @@ Yamaoka_PlayerActor::Yamaoka_PlayerActor()
 	animIndex = 0;
 
 	NowPos = 0;            // 現在の座標
-	// 調整中          //
 
-		// ゴールまでの距離　( 50m ) 
+	// ゴールまでの距離　( 50m )
 	dCount = 50.0f;         // 進んだ距離
-	maxdCount = 50.0f;      // ゴール  
-
+	maxdCount = 50.0f;      // ゴール
 
 	//スタミナ関連
-	st = 600;			// スタミナ初期値
+	st = 600;				// スタミナ初期値
 	MaxSt = 600;			// スタミナ最大値
 	MinSt = 0;				// スタミナ最小値
 	halfSt = 600 / 2;		//スタミナ（50%）
-	quarterSt = 600 / 4;		//スタミナ（25%）
+	quarterSt = 600 / 4;	//スタミナ（25%）
 
 	count = 30;      // 次のシーンに行くまでのカウント
 
 	countDown = 170; // カウントダウン（ 3秒 ）
 	inputTime = 0;
 
-	skillCount = 0;  // スキルの使用カウント
+	skillCount = 0;    // スキルの使用カウント
 	skillTime = 180;   // スキルの効果時間
 
 	//入力関連
@@ -128,7 +126,7 @@ void Yamaoka_PlayerActor::UpdateActor(float _deltaTime)
 {
 	int Key = GetJoypadInputState(DX_INPUT_KEY_PAD1);
 
-
+	//------------------------YAMAOKA--------------------------↓
 	// カウントダウンが終了したら開始
 	if (!startFlag && countDown <= 0)
 	{
@@ -138,10 +136,12 @@ void Yamaoka_PlayerActor::UpdateActor(float _deltaTime)
 		StartProcess(_deltaTime);
 		countDownFinishFlag = true;
 	}
+	//------------------------YAMAOKA--------------------------↑
 
 	//	ステートが泳ぎの時
 	if (mNowPlayerState == STATE_SWIM)
 	{
+		//------------------------YAMAOKA--------------------------↓
 		if (!skillFlag && !finishFlag)
 		{
 			//現在時刻を取得
@@ -150,15 +150,17 @@ void Yamaoka_PlayerActor::UpdateActor(float _deltaTime)
 			countUP = (tmpTime - startTime);
 		}
 
-		// 2秒おきにスタミナ回復
-		/*if (countUP % 2 == 0 && !skillFlag)
+		// 4秒おきにスタミナ回復
+		if (countUP % 4 == 0 && !skillFlag)
 		{
 			st += 1;
 		}
+		// 最大値より多くなると
 		if (st >= MaxSt)
 		{
 			st = MaxSt;
-		}*/
+		}
+		//------------------------YAMAOKA--------------------------↑
 
 		mPrevPosition = mPosition;							//プレイヤーのポジションを補完
 
@@ -173,22 +175,17 @@ void Yamaoka_PlayerActor::UpdateActor(float _deltaTime)
 			mPosition.x += mVelosity.x * _deltaTime;			//プレイヤーの自動移動
 		}
 
-		//	技が終わるまで位置を固定
-		/*if (skillFlag)
-		{
-			mPosition.x = mPosition.x;
-		}*/
-
 		dCount -= std::sqrt((mPosition.x - mPrevPosition.x) * (mPosition.x - mPrevPosition.x)) * 0.088;
 
 		if (randomFlag == false && skillFlag == false)
 		{
-			randomKeyNumber = rand() % 3 + 1;				//1～4までの数字をランダムに生成
+			randomKeyNumber = rand() % 4 + 1;				//1～4までの数字をランダムに生成
 			inputStartTime = GetNowCount() / 1000;			//ランダムに矢印を生成した時間を取得
 			randomFlag = true;
 			mCheckKeyFlag = false;
 		}
 
+		//------------------------YAMAOKA--------------------------↓
 		// 息継ぎキーを押したら
 		if (CheckHitKey(KEY_INPUT_C) && skillFlag == false)
 		{
@@ -196,6 +193,7 @@ void Yamaoka_PlayerActor::UpdateActor(float _deltaTime)
 			inputStartTime = GetNowCount() / 1000;			//ランダムに矢印を生成した時間を取得
 			randomFlag = true;
 		}
+		//------------------------YAMAOKA--------------------------↑
 
 		if (dCount <= dCountUlt)
 		{
@@ -464,7 +462,7 @@ void Yamaoka_PlayerActor::UpdateActor(float _deltaTime)
 			}
 		}
 
-
+		//------------------------YAMAOKA--------------------------↓
 		// 息継ぎ処理
 		if (randomKeyNumber == STATE_KEY_C)
 		{
@@ -482,17 +480,19 @@ void Yamaoka_PlayerActor::UpdateActor(float _deltaTime)
 					st = MaxSt;
 				}
 
-				mVelosity.x = missSpeed.x * addStaminaSpeed + 1;
+				mVelosity.x = 7;  // プレイヤーの速度を設定
+
 			}
 			// 現在時間とランダムに矢印を生成した時間の差が1秒たったら
 			else if (inputTime > 1)
 			{
 				randomFlag = false;
 				inputTime = 0;			// 入力可能時間を初期化
-				inputLimitTime = limitTime;							//入力制限時間をリセット
+				inputLimitTime = limitTime;				//入力制限時間をリセット
 				inputArrowFlag = false;
 			}
 		}
+		//------------------------YAMAOKA--------------------------↑
 
 		//残りスタミナが50%以上
 		if (st >= halfSt)
@@ -510,6 +510,7 @@ void Yamaoka_PlayerActor::UpdateActor(float _deltaTime)
 			addStaminaSpeed = 0.6f;
 		}
 
+		//------------------------YAMAOKA--------------------------↓
 		// スタミナが切れたら
 		if (!skillFlag)
 		{
@@ -522,7 +523,7 @@ void Yamaoka_PlayerActor::UpdateActor(float _deltaTime)
 			if (st <= MinSt)
 			{
 				// 速度を通常の半分程度に
-				mVelosity = VGet(2.0, 0, 0);
+				mVelosity = VGet(2, 0, 0);
 			}
 		}
 
@@ -535,9 +536,8 @@ void Yamaoka_PlayerActor::UpdateActor(float _deltaTime)
 		{
 			mPosition.x = 138;
 		}
-
 		// 残り距離
-		if (dCount <= 0.9)
+		if (dCount <= 0)
 		{
 			// 端までついたら距離カウントを 0 にする
 			dCount = 0;
@@ -551,9 +551,11 @@ void Yamaoka_PlayerActor::UpdateActor(float _deltaTime)
 			// 値を 0 に
 			countDown = 0;
 		}
+		//------------------------YAMAOKA--------------------------↑
+
 
 		//スペースが押されたとき
-		if (Key & PAD_INPUT_M && turnFlag == false)
+		if (Key & PAD_INPUT_M && turnFlag == false /*&& -90 >= mPosX && mPosX > -140*/)
 		{
 			inputSpaceFlag = true;
 			inputLimitTime = limitTime;			//入力制限時間をリセット
@@ -613,10 +615,12 @@ void Yamaoka_PlayerActor::UpdateActor(float _deltaTime)
 			}
 		}
 
+		//------------------------YAMAOKA--------------------------↓
 		LastSpurt();	// ラストスパート
 
 		PlayAnim(_deltaTime);						// アニメーション情報を取得
 		MV1SetPosition(modelHandle, mPosition);		// ポジション更新
+		//------------------------YAMAOKA--------------------------↑
 	}
 }
 
@@ -645,6 +649,7 @@ void Yamaoka_PlayerActor::DrawActor()
 	MV1SetRotationXYZ(modelHandle, mRotation);
 }
 
+//------------------------YAMAOKA--------------------------↓
 //アニメーション
 void Yamaoka_PlayerActor::PlayAnim(float _deltaTime)
 {
@@ -730,7 +735,7 @@ void Yamaoka_PlayerActor::DrawToGoal(float _playerPos, float _goalPos)
 	}
 }
 
-// 必殺技
+// ラストスパート
 void Yamaoka_PlayerActor::LastSpurt()
 {
 	// 残り15m以下になったら
@@ -749,10 +754,9 @@ void Yamaoka_PlayerActor::LastSpurt()
 		skillFlag = true;
 		//mVelosity.x = 60.0f;
 
-
 		stopTime++;
 
-		// 矢印の入力終了まで停止
+		// 3秒間停止
 		if (stopTime % 180 == 0)
 		{		
 			skillCount = 1;
@@ -780,8 +784,8 @@ void Yamaoka_PlayerActor::LastSpurt()
 	//DrawFormatString(850, 700, GetColor(255, 0, 0), "skillTime   %d", skillTime);
 	//DrawFormatString(0, 30, GetColor(255, 0, 255), "skillCount   %d", skillCount);
 	//DrawFormatString(0, 100, GetColor(255, 0, 255), "stopTime    %d", stopTime);
-
 }
+//------------------------YAMAOKA--------------------------↑
 
 void Yamaoka_PlayerActor::UltNumber(bool _randomFlag)
 {
@@ -800,6 +804,7 @@ void Yamaoka_PlayerActor::UltProcessInput(int _arrow[], int _size)
 	int Key = GetJoypadInputState(DX_INPUT_KEY_PAD1);
 	count = 0;
 
+	// 技を使用していないとき
 	if (skillCount == 0)
 	{
 		for (int i = 0; i < _size; i++)
@@ -863,6 +868,7 @@ void Yamaoka_PlayerActor::UltProcessInput(int _arrow[], int _size)
 				}
 				break;
 			}
+
 			//mVelosity = VGet(inputCount * 2, 0, 0);
 			mCheckKeyFlag = true;
 		}
