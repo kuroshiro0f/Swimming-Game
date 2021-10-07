@@ -40,9 +40,9 @@ const int TRANSP_MODERATION = -1;
 const int FIRST_TRANS_VAL = 100;
 
 //	•]‰¿‚ÌŠî€‚Æ‚È‚é•b”
-const int FIRST = 45;
-const int SECOND = 55;
-const int THIRD = 65;
+const int FIRST = 30;
+const int SECOND = 35;
+const int THIRD = 40;
 
 //	¯‚ÌŠg‘åk¬”ÍˆÍ
 const int STAR_MIN = -30;

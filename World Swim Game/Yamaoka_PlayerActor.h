@@ -49,19 +49,43 @@ public:
 	void StartProcess(float _deltaTime);
 	//アクターの描画関数
 	void DrawActor();
-	//アニメーション関数
+
+	//------------------------YAMAOKA--------------------------↓
+	/// <summary>
+	/// アニメーション関数
+	/// アニメーションの再生時間の処理をする関数
+	/// </summary> 
+	/// <param name="_deltaTime"> デルタタイム　</param>
 	void PlayAnim(float _deltaTime);
-	//アニメーションのアタッチ関数
+
+	/// <summary>
+	/// アニメーション関数
+	/// 何番目のアニメーションを再生するかを選択する関数
+	/// </summary>
+	/// <param name="_animPlay">　再生するアニメーションの番号　</param>
 	void attachAnim(int _animPlay);
 
-	// スタミナゲージの描画
+	/// <summary>
+	/// スタミナ描画
+	/// </summary>
+	/// <param name="_st">　現在のスタミナの値　</param>
+	/// <param name="_MaxSt">　スタミナの最大値　</param>
+	/// <param name="_MinSt">　スタミナの最小値　</param>
 	void DrawSt(int _st, int _MaxSt, int _MinSt);
-	// ゴールまでの距離の描画
+
+	/// <summary>
+	/// ゴールまでの距離の描画
+	/// </summary>
+	/// <param name="_playerPos">　プレイヤーの現在の座標の値　</param>
+	/// <param name="_goalPos">　ゴールの座標　</param>
 	void DrawToGoal(float _playerPos, float _goalPos);
 
-
-	// ラストスパート
+	/// <summary>
+	/// ラストスパートの処理
+	/// </summary>
 	void LastSpurt();
+	//------------------------YAMAOKA--------------------------↑
+
 	void UltNumber(bool _randomFlag);
 	//void ProcessInput(int _randomKeyNumber);
 	void UltProcessInput(int _arrow[], int _size);
@@ -78,18 +102,22 @@ public:
 	//リターンの評価するためのプレイヤーの座標を補完
 	float mPosX;
 
+	//------------------------YAMAOKA--------------------------↓
 	// ゴールまでの距離 //
 	float dCount;      // どれだけ進んだか        
 	float maxdCount;   // どこまで進めるのか
 	int NowPos;    // プレイヤーの現在座標
 
-//スタミナ関連
+	//スタミナ関連
 	int st;						// スタミナ
 	int MaxSt;					// スタミナ最大値
 	int MinSt;					// スタミナ最小値
+	//------------------------YAMAOKA--------------------------↑
+
 	int halfSt;					//スタミナ（50%）
 	int quarterSt;				//スタミナ（25%）
-
+	
+	//------------------------YAMAOKA--------------------------↓
 	int startTime;   // ゲーム開始時間
 	int tmpTime;     // 現在時間を一時保存
 	int countUP;     // 経過時間
@@ -100,34 +128,35 @@ public:
 	int skillTime;   // スキルの効果時間
 
 	int stopTime;    // 停止時間
+	//------------------------YAMAOKA--------------------------↑
 
 	float inputTime;			//入力時間
 	float inputLimitTime;		//入力制限時間
 
-	int arrow[4];					//ラストスパートのキー
+	int arrow[4];				//ラストスパートのキー
 
-	int turnGraphHandle;				//	グラフィックハンドル
-	bool turnGraphFlag;					//	表示するか
+	int turnGraphHandle;		//	グラフィックハンドル
+	bool turnGraphFlag;			//	表示するか
 
 	int randomKeyNumber;
 	bool randomFlag;
-	bool inputArrowFlag;				//矢印キー入力フラグ
+	bool inputArrowFlag;			//矢印キー入力フラグ
 
 	bool countDownFinishFlag;		//	カウントダウンが終わったか
 	bool ultLimitFlag;				//　ウルトの制限
 	bool ultFlag;
 
-
-	bool turnFlag;						 // ターンフラグ
-
+	//------------------------YAMAOKA--------------------------↓
+	bool turnFlag;					// ターンフラグ
+	//------------------------YAMAOKA--------------------------↑
 private:
 	int inputStartTime;
 	int inputEndTime;
-	int inputCount;						//入力回数
+	int inputCount;					//入力回数
 
 	int countSpeed;
 
-	float addStaminaSpeed;				//加算されるスタミナによるスピード
+	float addStaminaSpeed;			//加算されるスタミナによるスピード
 
 	VECTOR mPrevPosition;
 
@@ -138,11 +167,14 @@ private:
 
 	Evaluation	   mEvlt;				//評価
 
-	bool startFlag;
 	bool inputSpaceFlag;				//SPACE入力フラグ
 	bool mCheckKeyFlag;					//長押し対策フラグ
-	bool skillFlag;					  // スキルを使用したかどうか
-	bool finishFlag;					// ゴールしたかどうか
 	bool m_ultCheckFlag;					//	ラストスパートの矢印を表示し終わったかどうか
 	int m_ultFinishFlag;					//	ラストスパートで矢印を押し終わったか
+
+	//------------------------YAMAOKA--------------------------↓
+	bool skillFlag;					  // スキルを使用したかどうか
+	bool startFlag;
+	bool finishFlag;					// ゴールしたかどうか
+	//------------------------YAMAOKA--------------------------↑
 };

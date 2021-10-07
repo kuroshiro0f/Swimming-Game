@@ -504,10 +504,10 @@ void GameScene::Draw()
 			m_actor->inputArrowFlag = true;
 			DrawBox(600, 800, 700, 900, GetColor(255, 255, 255), TRUE);
 		}
-		else if (CheckHitKey(KEY_INPUT_UP) || CheckHitKey(KEY_INPUT_DOWN) || CheckHitKey(KEY_INPUT_RIGHT) || CheckHitKey(KEY_INPUT_LEFT))
+		/*else if (CheckHitKey(KEY_INPUT_UP) || CheckHitKey(KEY_INPUT_DOWN) || CheckHitKey(KEY_INPUT_RIGHT) || CheckHitKey(KEY_INPUT_LEFT))
 		{
 			DrawBox(600, 800, 700, 900, GetColor(255, 0, 0), TRUE);
-		}
+		}*/
 		DrawFormatString(625, 800, GetColor(0, 0, 0), "C");
 
 		//スペースキーのBOX描画
@@ -548,8 +548,8 @@ void GameScene::Draw()
 		// 残り距離の表示
 		m_actor->DrawToGoal(m_actor->dCount, m_actor->maxdCount);
 
-		// スキル
-		m_actor->LastSpurt();
+		// ラストスパート
+		//m_actor->LastSpurt();
 
 		//	スタミナ減少時の汗の表示
 		if (m_actor->st <= ORANGE)
