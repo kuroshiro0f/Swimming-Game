@@ -1,6 +1,7 @@
 #pragma once
 #include "Actor.h"
 #include "Font.h"
+#include "Ueyama_GameScene.h"
 
 //-----------------------------------------------------------------------------
 // 　変更なし
@@ -79,6 +80,8 @@ public:
 	//inputArrowFlagのゲッター
 	bool GetInputArrpwFlag() { return inputArrowFlag; };
 
+	void UltArrowMotion(int _ult1, int _ult2, int _ult3, int _ult4);
+
 	//リターンの評価するためのプレイヤーの座標を補完
 	float mPosX;
 
@@ -120,8 +123,11 @@ public:
 	bool countDownFinishFlag;		//	カウントダウンが終わったか
 	bool ultLimitFlag;				//　ウルトの制限
 	bool ultFlag;
-	bool ultSucFlag;
+	int ultSucFlag[4];
 
+	bool arrowFailFlag;				//	矢印の入力に成功したか
+
+	int arrowAngle[4];				//	矢印の角度
 
 	bool turnFlag;						 // ターンフラグ
 
@@ -144,6 +150,7 @@ private:
 	Evaluation	   mEvlt;				//評価
 
 	int m_stGraphHandle;				//	スタミナのグラフィックハンドル
+	int m_failGraphHandle;				//	失敗
 
 	bool startFlag;
 	bool inputSpaceFlag;				//SPACE入力フラグ
@@ -154,4 +161,5 @@ private:
 	int m_ultFinishFlag;					//	ラストスパートで矢印を押し終わったか
 
 	class Font* m_font;					//	フォントクラスへのポインタメンバ変数
+	class Ueyama_GameScene* m_game;		//	ゲームシーンへのポインタメンバ変数
 };

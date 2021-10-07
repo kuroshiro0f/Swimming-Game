@@ -48,5 +48,30 @@ void Ueyama_Camera::Update(const Ueyama_PlayerActor& playerActor)
 
 	}
 
+	/*if (CheckHitKey(KEY_INPUT_1))
+	{
+		mPos.x--;
+	}
+	if (CheckHitKey(KEY_INPUT_2))
+	{
+		mPos.x++;
+	}
+	if (CheckHitKey(KEY_INPUT_3))
+	{
+		mPos.y--;
+	}
+	if (CheckHitKey(KEY_INPUT_4))
+	{
+		mPos.y++;
+	}
+	if (CheckHitKey(KEY_INPUT_5))
+	{
+		mPos.z--;
+	}
+	if (CheckHitKey(KEY_INPUT_6))
+	{
+		mPos.z++;
+	}*/
+
 	SetCameraPositionAndTarget_UpVecY(mPos, mPlayerPos);	// ÉJÉÅÉâÇ…à íuÇîΩâf.
 }

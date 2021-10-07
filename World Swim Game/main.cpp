@@ -10,6 +10,7 @@
 #include "Ueyama_GameScene.h"
 #include "Ueyama_Result.h"
 #include "Save.h"
+#include "Volume.h"
 #include "EffekseerForDXLib.h"
 
 //-----------------------------------------------------------------------------
@@ -56,10 +57,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	//	タイトルシーンをセット
 	//Scene->SetScene(new Title());
 
+	Volume* volume = new Volume();
+
 	//	デバッグ用
-	Scene->SetScene(new Ueyama_GameScene());
-	//Scene->SetScene(new Ueyama_Title());
-	//Scene->SetScene(new Ueyama_Result(100));
+	//Scene->SetScene(new Ueyama_GameScene());
+	Scene->SetScene(new Ueyama_Title(false));
+	//Scene->SetScene(new Ueyama_Result(48));
 
 	// エスケープキーが押されるかウインドウが閉じられるまでループ
 	while (ProcessMessage() == 0 && CheckHitKey(KEY_INPUT_ESCAPE) == 0)
@@ -76,6 +79,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		UpdateEffekseer3D();
 		// Effekseerの描画
 		DrawEffekseer3D();
+
+		//	音量調整
+		volume->Update();
+		volume->Draw();
 
 		// BGM処理
 		Scene->Sound();

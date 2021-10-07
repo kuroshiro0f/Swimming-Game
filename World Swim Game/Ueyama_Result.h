@@ -36,6 +36,7 @@ public:
 	void Sound()override;			//	音楽
 	void Load()override;			//	初期化
 
+	void RankMove(int &_x , bool &_flag,bool _flag2);
 	void UpdateTransparent();			//	文字の透過量更新
 
 private:
@@ -64,6 +65,14 @@ private:
 	int m_transpVal;				//	透過量
 	int m_fadeTransVal;				//	フェードアウト中の透過量
 	int m_permeationAmount;			//	毎フレーム透過量
+
+	//	ランキングの表示用
+	int m_rank1X;
+	int m_rank2X;
+	int m_rank3X;
+	bool m_rank1Flag;
+	bool m_rank2Flag;
+	bool m_rank3Flag;
 
 	//	グラフィックハンドル
 	int m_backGraphHandle;				//	背景

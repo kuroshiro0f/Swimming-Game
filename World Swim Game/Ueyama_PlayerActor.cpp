@@ -20,10 +20,10 @@ const int ST_END_Y = 1035;
 const int ST_HEIGHT = 62;
 
 //	スタミナの減少量
-//const int ST_SUC_DEC = 60;
-//const int ST_FAI_DEC = 100;
-const int ST_SUC_DEC = 10;
-const int ST_FAI_DEC = 20;
+const int ST_SUC_DEC = 60;
+const int ST_FAI_DEC = 100;
+//const int ST_SUC_DEC = 4;
+//const int ST_FAI_DEC = 6;
 
 //スピード関連
 const VECTOR missSpeed = VGet(5, 0, 0);		//入力ミスしたときのスピード
@@ -31,7 +31,7 @@ const float addSpeed = 3.0f;				//加算されるスピード
 const float maxSpeed = 15.0f;				//最大スピード
 
 //	距離の表示場所
-const int DISTANCE_X = 1752;
+const int DISTANCE_X = 1700;
 const int DISTANCE_Y = 857;
 
 //入力関連
@@ -39,6 +39,12 @@ const float limitTime = 1.5f;				//入力制限時間
 const float maxTime = 0.5f;					//最大時間
 
 const int dCountUlt = 15;					//ウルトが使えるようになる残り距離
+
+//	ラストスパートでの矢印の位置調整
+const int FIRST_ARROW_X = -210;
+const int SECOND_ARROW_X = -70;
+const int THIRD_ARROW_X = 70;
+const int FORTH_ARROW_X = 210;
 
 //コンストラクタ
 Ueyama_PlayerActor::Ueyama_PlayerActor()
@@ -54,6 +60,7 @@ Ueyama_PlayerActor::Ueyama_PlayerActor()
 	, turnGraphFlag(false)
 	, finishFlag(false)
 	, m_ultCheckFlag(false)
+	, arrowFailFlag(false)
 	, m_ultFinishFlag(0)
 {
 	startFlag = false;
@@ -65,6 +72,12 @@ Ueyama_PlayerActor::Ueyama_PlayerActor()
 	ultLimitFlag = false;
 	ultFlag = false;
 
+	for (int i = 0; i < 4; i++)
+	{
+		ultSucFlag[i] = 0;
+		arrowAngle[i] = 0;
+	}
+
 	mPosition = VGet(150, 18, 0);								// 初期位置設定
 	mRotation = VGet(250.0f, 90.0f * DX_PI_F / 180.0f, 0.0f);	// 回転角度
 	mDirection = VGet(0, 0, 1);									//プレイヤーの方向
@@ -75,6 +88,7 @@ Ueyama_PlayerActor::Ueyama_PlayerActor()
 
 	//	画像のロード
 	//m_stGraphHandle = LoadGraph("data/Game/Game_st.png");
+	m_failGraphHandle = LoadGraph("data/img/Game/Game_fail.png");				//	失敗
 
 	animTotal = 0.0f;
 	animNowTime = 0.0f;
@@ -117,6 +131,7 @@ Ueyama_PlayerActor::Ueyama_PlayerActor()
 	countSpeed = 0;
 
 	m_font = new Font();
+	m_game = new Ueyama_GameScene();
 }
 
 //デストラクタ
@@ -125,6 +140,7 @@ Ueyama_PlayerActor::~Ueyama_PlayerActor()
 	// モデルのアンロード
 	MV1DeleteModel(modelHandle);
 	DeleteGraph(turnGraphHandle);
+	DeleteGraph(m_failGraphHandle);
 
 	delete m_font;
 }
@@ -279,6 +295,7 @@ void Ueyama_PlayerActor::UpdateActor(float _deltaTime)
 					inputTime = 0;
 					inputArrowFlag = false;
 					randomFlag = false;
+					arrowFailFlag = false;
 					if (inputLimitTime < maxTime)
 					{
 						inputLimitTime = maxTime;
@@ -294,6 +311,7 @@ void Ueyama_PlayerActor::UpdateActor(float _deltaTime)
 
 					mVelosity.x = missSpeed.x * addStaminaSpeed;
 					inputTime = 0;
+					arrowFailFlag = false;
 					inputLimitTime = limitTime;							//入力制限時間をリセット
 					randomFlag = false;
 				}
@@ -337,6 +355,7 @@ void Ueyama_PlayerActor::UpdateActor(float _deltaTime)
 					inputTime = 0;
 					inputArrowFlag = false;
 					randomFlag = false;
+					arrowFailFlag = false;
 					if (inputLimitTime < maxTime)
 					{
 						inputLimitTime = maxTime;
@@ -353,6 +372,7 @@ void Ueyama_PlayerActor::UpdateActor(float _deltaTime)
 					mVelosity.x = missSpeed.x * addStaminaSpeed;
 					inputTime = 0;
 					inputLimitTime = limitTime;							//入力制限時間をリセット
+					arrowFailFlag = false;
 					randomFlag = false;
 				}
 				break;
@@ -395,6 +415,7 @@ void Ueyama_PlayerActor::UpdateActor(float _deltaTime)
 					inputTime = 0;
 					inputArrowFlag = false;
 					randomFlag = false;
+					arrowFailFlag = false;
 					if (inputLimitTime < maxTime)
 					{
 						inputLimitTime = maxTime;
@@ -410,6 +431,7 @@ void Ueyama_PlayerActor::UpdateActor(float _deltaTime)
 					mVelosity.x = missSpeed.x * addStaminaSpeed;
 					inputTime = 0;
 					inputLimitTime = limitTime;				//入力制限時間をリセット
+					arrowFailFlag = false;
 					randomFlag = false;
 				}
 				break;
@@ -452,6 +474,7 @@ void Ueyama_PlayerActor::UpdateActor(float _deltaTime)
 					inputTime = 0;
 					inputArrowFlag = false;
 					randomFlag = false;
+					arrowFailFlag = false;
 					if (inputLimitTime < maxTime)
 					{
 						inputLimitTime = maxTime;
@@ -468,6 +491,7 @@ void Ueyama_PlayerActor::UpdateActor(float _deltaTime)
 					mVelosity.x = missSpeed.x * addStaminaSpeed;
 					inputTime = 0;
 					inputLimitTime = limitTime;							//入力制限時間をリセット
+					arrowFailFlag = false;
 					randomFlag = false;
 				}
 				break;
@@ -726,9 +750,6 @@ void Ueyama_PlayerActor::attachAnim(int _animPlay)
 // ゴールまでの距離
 void Ueyama_PlayerActor::DrawToGoal(float _playerPos, float _goalPos)
 {
-	// 残りの距離の表示
-	DrawFormatStringToHandle(DISTANCE_X, DISTANCE_Y, GetColor(255, 255, 255), m_font->gameSceneScoreHandle, " %d", (int)(_goalPos * _playerPos / _goalPos));
-
 	// 一往復したら
 	if (_playerPos <= 0)
 	{
@@ -736,6 +757,8 @@ void Ueyama_PlayerActor::DrawToGoal(float _playerPos, float _goalPos)
 		SetFontSize(100);
 		DrawFormatString(900, 450, GetColor(255, 0, 0), "GOAL");
 	}
+	// 残りの距離の表示
+	DrawFormatStringToHandle(DISTANCE_X, DISTANCE_Y, GetColor(255, 255, 255), m_font->gameSceneScoreHandle, " %d", (int)(_goalPos * _playerPos / _goalPos));
 }
 
 //	必殺技
@@ -760,17 +783,21 @@ void Ueyama_PlayerActor::LastSpurt()
 
 		stopTime++;
 
-		// ３秒間停止
-		if (stopTime % 180 == 0)
+		if (stopTime % 200 == 0)
 		{
 			skillCount = 1;
 		}
+		// ３秒間停止
+		if (/*stopTime % 240 == 0*/stopTime % 500 == 0 && skillCount == 1)
+		{
+			skillCount = 2;
+		}
 		// 停止時間が終わったら
-		if (skillCount == 1 && !finishFlag)
+		if (skillCount == 2 && !finishFlag)
 		{
 			skillFlag = false;
 			stopTime = 0;
-			mVelosity = VGet(inputCount * 2, 0, 0);
+			mVelosity = VGet(inputCount * 20, 0, 0);
 
 			// 再開時のズレた分を引く（足す）
 			countUP -= 2;
@@ -779,7 +806,7 @@ void Ueyama_PlayerActor::LastSpurt()
 		if (GetPosX() >= 130 && GetTurnFlag() == true)
 		{
 			finishFlag = true;
-			skillCount = 0;
+			skillCount = 1;
 		}
 
 	}
@@ -808,79 +835,123 @@ void Ueyama_PlayerActor::UltProcessInput(int _arrow[], int _size)
 	int Key = GetJoypadInputState(DX_INPUT_KEY_PAD1);
 	count = 0;
 
-	if (skillCount == 0)
+	if (skillCount == 1)
 	{
 		for (int i = 0; i < _size; i++)
 		{
-			switch (_arrow[i])
+			if (ultSucFlag[i] == 0)
 			{
-			case STATE_KEY_UP:
-				if (CheckHitKey(KEY_INPUT_UP) && mCheckKeyFlag)
+				switch (_arrow[i])
 				{
-					inputCount += 1;
-					m_ultFinishFlag++;
-					ultSucFlag = true;
-					mCheckKeyFlag = false;
+				case STATE_KEY_UP:
+					if (CheckHitKey(KEY_INPUT_UP) && mCheckKeyFlag)
+					{
+						inputCount++;
+						m_ultFinishFlag++;
+						ultSucFlag[i] = 1;
+						mCheckKeyFlag = false;
+					}
+					else if (CheckHitKey(KEY_INPUT_DOWN) && mCheckKeyFlag || CheckHitKey(KEY_INPUT_RIGHT) && mCheckKeyFlag
+						|| CheckHitKey(KEY_INPUT_LEFT) && mCheckKeyFlag)
+					{
+						m_ultCheckFlag++;
+						ultSucFlag[i] = 2;
+						mCheckKeyFlag = false;
+					}
+					break;
+				case STATE_KEY_DOWN:
+					if (CheckHitKey(KEY_INPUT_DOWN) && mCheckKeyFlag)
+					{
+						inputCount++;
+						m_ultFinishFlag++;
+						ultSucFlag[i] = 1;
+						mCheckKeyFlag = false;
+					}
+					else if (CheckHitKey(KEY_INPUT_UP) && mCheckKeyFlag || CheckHitKey(KEY_INPUT_RIGHT) && mCheckKeyFlag
+						|| CheckHitKey(KEY_INPUT_LEFT) && mCheckKeyFlag)
+					{
+						m_ultCheckFlag++;
+						ultSucFlag[i] = 2;
+						mCheckKeyFlag = false;
+					}
+					break;
+				case STATE_KEY_RIGHT:
+					if (CheckHitKey(KEY_INPUT_RIGHT) && mCheckKeyFlag)
+					{
+						inputCount++;
+						m_ultFinishFlag++;
+						ultSucFlag[i] = 1;
+						mCheckKeyFlag = false;
+					}
+					else if (CheckHitKey(KEY_INPUT_UP) && mCheckKeyFlag || CheckHitKey(KEY_INPUT_DOWN) && mCheckKeyFlag
+						|| CheckHitKey(KEY_INPUT_LEFT) && mCheckKeyFlag)
+					{
+						m_ultCheckFlag++;
+						ultSucFlag[i] = 2;
+						mCheckKeyFlag = false;
+					}
+					break;
+				case STATE_KEY_LEFT:
+					if (CheckHitKey(KEY_INPUT_LEFT) && mCheckKeyFlag)
+					{
+						inputCount++;
+						m_ultFinishFlag++;
+						ultSucFlag[i] = 1;
+						mCheckKeyFlag = false;
+					}
+					else if (CheckHitKey(KEY_INPUT_UP) && mCheckKeyFlag || CheckHitKey(KEY_INPUT_DOWN) && mCheckKeyFlag
+						|| CheckHitKey(KEY_INPUT_RIGHT) && mCheckKeyFlag)
+					{
+						m_ultCheckFlag++;
+						ultSucFlag[i] = 2;
+						mCheckKeyFlag = false;
+					}
+					break;
 				}
-				else if (CheckHitKey(KEY_INPUT_DOWN) && mCheckKeyFlag || CheckHitKey(KEY_INPUT_RIGHT) && mCheckKeyFlag
-					|| CheckHitKey(KEY_INPUT_LEFT) && mCheckKeyFlag)
-				{
-					m_ultCheckFlag++;
-					ultSucFlag = false;
-					mCheckKeyFlag = false;
-				}
-				break;
-			case STATE_KEY_DOWN:
-				if (CheckHitKey(KEY_INPUT_DOWN) && mCheckKeyFlag)
-				{
-					inputCount += 1;
-					m_ultFinishFlag++;
-					ultSucFlag = true;
-					mCheckKeyFlag = false;
-				}
-				else if (CheckHitKey(KEY_INPUT_UP) && mCheckKeyFlag || CheckHitKey(KEY_INPUT_RIGHT) && mCheckKeyFlag
-					|| CheckHitKey(KEY_INPUT_LEFT) && mCheckKeyFlag)
-				{
-					m_ultCheckFlag++;
-					ultSucFlag = false;
-					mCheckKeyFlag = false;
-				}
-				break;
-			case STATE_KEY_RIGHT:
-				if (CheckHitKey(KEY_INPUT_RIGHT) && mCheckKeyFlag)
-				{
-					inputCount += 1;
-					m_ultFinishFlag++;
-					ultSucFlag = true;
-					mCheckKeyFlag = false;
-				}
-				else if (CheckHitKey(KEY_INPUT_UP) && mCheckKeyFlag || CheckHitKey(KEY_INPUT_DOWN) && mCheckKeyFlag
-					|| CheckHitKey(KEY_INPUT_LEFT) && mCheckKeyFlag)
-				{
-					m_ultCheckFlag++;
-					ultSucFlag = false;
-					mCheckKeyFlag = false;
-				}
-				break;
-			case STATE_KEY_LEFT:
-				if (CheckHitKey(KEY_INPUT_LEFT) && mCheckKeyFlag)
-				{
-					inputCount += 1;
-					m_ultFinishFlag++;
-					ultSucFlag = true;
-					mCheckKeyFlag = false;
-				}
-				else if (CheckHitKey(KEY_INPUT_UP) && mCheckKeyFlag || CheckHitKey(KEY_INPUT_DOWN) && mCheckKeyFlag
-					|| CheckHitKey(KEY_INPUT_RIGHT) && mCheckKeyFlag)
-				{
-					m_ultCheckFlag++;
-					ultSucFlag = false;
-					mCheckKeyFlag = false;
-				}
-				break;
+			}
+			
+
+			if (!CheckHitKey(KEY_INPUT_UP) && !CheckHitKey(KEY_INPUT_DOWN) && !CheckHitKey(KEY_INPUT_RIGHT) && !CheckHitKey(KEY_INPUT_LEFT))
+			{
+				mCheckKeyFlag = true;
 			}
 			//mVelosity = VGet(inputCount * 2, 0, 0);
-			mCheckKeyFlag = true;
 		}
+	}
+}
+
+void Ueyama_PlayerActor::UltArrowMotion(int _ult1, int _ult2, int _ult3, int _ult4)
+{
+	if (_ult1 == 1)
+	{
+		arrowAngle[0]++;
+	}
+	else if (_ult1 == 2)
+	{
+		DrawGraph(FIRST_ARROW_X, 0, m_failGraphHandle, TRUE);
+	}
+	if (_ult2 == 1)
+	{
+		arrowAngle[1]++;
+	}
+	else if (_ult2 == 2)
+	{
+		DrawGraph(SECOND_ARROW_X, 0, m_failGraphHandle, TRUE);
+	}
+	if (_ult3 == 1)
+	{
+		arrowAngle[2]++;
+	}
+	else if (_ult3 == 2)
+	{
+		DrawGraph(THIRD_ARROW_X, 0, m_failGraphHandle, TRUE);
+	}
+	if (_ult4 == 1)
+	{
+		arrowAngle[3]++;
+	}
+	else if (_ult4 == 2)
+	{
+		DrawGraph(FORTH_ARROW_X, 0, m_failGraphHandle, TRUE);
 	}
 }

@@ -83,33 +83,47 @@ private:
 	double m_arrow3Angle;		//	角度
 	double m_arrow4Angle;		//	角度
 
+	//	息継ぎの拡大縮小
+	int m_breathX, m_breathY;
+	int m_breathX2, m_breathY2;
+	int m_breathCount;
+	bool m_breathFlag;
+
 	//	汗の移動
 	int m_sweat1X, m_sweat1Y;	//	汗1
 	int m_sweat2X, m_sweat2Y;	//	汗2
 
+	//	ラストの演出用
+	int m_lastX, m_lastY;
+
 	//	グラフィックハンドル
-	int m_backGraphHandle;			//	背景
-	int m_loadGraphHandle;			//	ロード
-	int m_tips1GraphHandle;			//	TIPS1
-	int m_tips2GraphHandle;			//	TIPS2
-	int m_tips3GraphHandle;			//	TIPS3
-	int m_boyGraphHandle;			//	男の子
-	int m_boy2GraphHandle;			//	男の子2
-	int m_starGraphHandle;			//	星
-	int m_sweat1GraphHandle;		//	汗1
-	int m_sweat2GraphHandle;		//	汗2
-	int m_heartGraphHandle;			//	ハート
-	int m_upArrowGraphHandle;		//	上矢印
-	int m_rightArrowGraphHandle;	//	右矢印
-	int m_downArrowGraphHandle;		//	下矢印
-	int m_leftArrowGraphHandle;		//	左矢印
-	int m_spaceGraphHandle;			//	スペース
-	int m_stGraphHandle;			//	スタミナ
-	int m_breathGraphHandle;		//	息継ぎ
-	int m_arrowBaseGraphHandle;		//	矢印の土台
-	int m_scoreBaseGraphHandle;		//	スコアの土台
-	int m_spaceBaseGraphHandle;		//	スペースの土台
-	int m_stBaseGraphHandle;		//	スタミナの土台
+	int m_backGraphHandle;				//	背景
+	int m_loadGraphHandle;				//	ロード
+	int m_tips1GraphHandle;				//	TIPS1
+	int m_tips2GraphHandle;				//	TIPS2
+	int m_tips3GraphHandle;				//	TIPS3
+	int m_boyGraphHandle;				//	男の子
+	int m_boy2GraphHandle;				//	男の子2
+	int m_starGraphHandle;				//	星
+	int m_sweat1GraphHandle;			//	汗1
+	int m_sweat2GraphHandle;			//	汗2
+	int m_heartGraphHandle;				//	ハート
+	int m_upArrowGraphHandle;			//	上矢印
+	int m_rightArrowGraphHandle;		//	右矢印
+	int m_downArrowGraphHandle;			//	下矢印
+	int m_leftArrowGraphHandle;			//	左矢印
+	int m_failGraphHandle;				//	失敗
+	int m_spaceGraphHandle;				//	スペース
+	int m_stGraphHandle;				//	スタミナ
+	int m_st2GraphHandle;				//	スタミナ2
+	int m_st3GraphHandle;				//	スタミナ3
+	int m_breathGraphHandle;			//	息継ぎ
+	int m_arrowBaseGraphHandle;			//	矢印の土台
+	int m_scoreBaseGraphHandle;			//	スコアの土台
+	int m_spaceBaseGraphHandle;			//	スペースの土台
+	int m_stBaseGraphHandle;			//	スタミナの土台
+	int m_finishArrowBaseGraphHandle;	//	ラストの矢印の土台
+	int m_lastGraphHandle;				//	ラストの演出
 
 
 	//	サウンドハンドル

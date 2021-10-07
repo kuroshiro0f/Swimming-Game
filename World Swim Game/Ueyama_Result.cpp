@@ -31,10 +31,16 @@ const int SECOND_TIME_Y = 790;			//	二位の場所
 const int THIRD_TIME_Y = 950;			//	三位の場所
 
 //	リザルトの遷移する時間
+//const int TIME = 100;
+//const int MEDAL = 150;
+//const int EVA = 200;
+//const int ENTER = 250;
 const int TIME = 100;
 const int MEDAL = 150;
-const int EVA = 200;
-const int ENTER = 250;
+const int EVA = 250;
+const int ENTER = 300;
+const int END = 350;
+
 
 //	最大透過量
 const int MAX_TRANSP_VAL = 255;
@@ -47,6 +53,11 @@ const int FIRST_TRANS_VAL = 100;
 const int FIRST = 45;
 const int SECOND = 55;
 const int THIRD = 65;
+
+//	ランクの表示用
+const int RANK_FIRST_X = -300;
+const int RANK_END_X = 60;
+const int RANK_SPEED = 20;
 
 //	星の拡大縮小範囲
 const int STAR_MIN = -30;
@@ -68,7 +79,13 @@ Ueyama_Result::Ueyama_Result(const int _time)
 	, m_smallStarX2(SCREEN_SIZE_W)
 	, m_smallStarY1(0)
 	, m_smallStarY2(SCREEN_SIZE_H)
+	, m_rank1X(RANK_FIRST_X)
+	, m_rank2X(RANK_FIRST_X)
+	, m_rank3X(RANK_FIRST_X)
 	, m_starScallFlag(TRUE)
+	, m_rank1Flag(false)
+	, m_rank2Flag(false)
+	, m_rank3Flag(false)
 {
 	// ※キー入力重複対策のフラグ
 	// ENTERキーが押されている間、次のENTERの入力を無効に
@@ -95,24 +112,14 @@ Ueyama_Result::~Ueyama_Result()
 	DeleteGraph(m_backGraphHandle);
 	DeleteGraph(m_logoGraphHandle);
 	DeleteGraph(m_guidanceGraphHandle);
-	if (m_time <= FIRST)
-	{
-		DeleteGraph(m_medalGraphHandle);
-		DeleteGraph(m_evaluationGraphHandle);
-
-	}
-	if (m_time > FIRST && m_time <= SECOND)
-	{
-		DeleteGraph(m_medalGraphHandle);
-		DeleteGraph(m_evaluationGraphHandle);
-	}
-	if (m_time > SECOND)
-	{
-		DeleteGraph(m_medalGraphHandle);
-		DeleteGraph(m_evaluationGraphHandle);
-	}
+	DeleteGraph(m_medalGraphHandle);
+	DeleteGraph(m_evaluationGraphHandle);
 	DeleteGraph(m_bigStarGraphHandle);
 	DeleteGraph(m_smallStarGraphHandle);
+	DeleteGraph(m_nowGraphHandle);
+	DeleteGraph(m_firstGraphHandle);
+	DeleteGraph(m_secondGraphHandle);
+	DeleteGraph(m_thirdGraphHandle);
 	DeleteSoundMem(m_bgmSoundHandle);
 	DeleteSoundMem(m_se1SoundHandle);
 	DeleteSoundMem(m_se2SoundHandle);
@@ -217,7 +224,6 @@ SceneBase* Ueyama_Result::Update(float _deltaTime)
 
 		break;
 	case RESULT_SCENE_STATE::EVA:
-		m_resultFlag++;
 		// ※キー入力重複対策のフラグ
 		// ENTERキーから指を離したら、次のENTERの入力を有効に
 		if (!CheckHitKey(KEY_INPUT_RETURN))
@@ -264,12 +270,17 @@ SceneBase* Ueyama_Result::Update(float _deltaTime)
 			m_state = RESULT_SCENE_STATE::FADE_OUT;
 		}
 
+		if (m_resultTime >= END)
+		{
+			m_resultFlag++;
+		}
+
 		break;
 	case RESULT_SCENE_STATE::FADE_OUT:
 		//	フェードアウトが終わったらタイトルへ
 		if (m_fadeOutFinishFlag)
 		{
-			return new Ueyama_Title();
+			return new Ueyama_Title(true);
 		}
 		break;
 	default:
@@ -297,25 +308,52 @@ void Ueyama_Result::Draw()
 	{
 		//	クリアタイムを表示
 		DrawGraph(0, 0, m_nowGraphHandle, TRUE);
-		DrawGraph(0, 0, m_firstGraphHandle, TRUE);
-		DrawGraph(0, 0, m_secondGraphHandle, TRUE);
-		DrawGraph(0, 0, m_thirdGraphHandle, TRUE);
 
 		DrawFormatStringToHandle(TIME_X, TIME_Y, GetColor(255, 255, 255), m_font->recordHandle, "%d", m_time);
+	}
+	if (m_resultFlag == 2)
+	{
+		DrawGraph(m_rank1X, 0, m_firstGraphHandle, TRUE);
+		DrawFormatStringToHandle(m_rank1X + RECORD_TIME_X, FIRST_TIME_Y, GetColor(255, 255, 255), m_font->recordHandle, "%d", SAVE->GetFirstTime());
+
+		RankMove(m_rank1X, m_rank1Flag, false);
+	}
+	if (m_resultFlag == 3)
+	{
+		DrawGraph(m_rank1X, 0, m_firstGraphHandle, TRUE);
+		DrawFormatStringToHandle(m_rank1X + RECORD_TIME_X, FIRST_TIME_Y, GetColor(255, 255, 255), m_font->recordHandle, "%d", SAVE->GetFirstTime());
+		DrawGraph(m_rank2X, 0, m_secondGraphHandle, TRUE);
+		DrawFormatStringToHandle(m_rank2X + RECORD_TIME_X, SECOND_TIME_Y, GetColor(255, 255, 255), m_font->recordHandle, "%d", SAVE->GetSecondTime());
+
+		RankMove(m_rank2X, m_rank2Flag, false);
+	}
+	if (m_resultFlag == 4)
+	{
+		DrawGraph(m_rank1X, 0, m_firstGraphHandle, TRUE);
+		DrawFormatStringToHandle(m_rank1X + RECORD_TIME_X, FIRST_TIME_Y, GetColor(255, 255, 255), m_font->recordHandle, "%d", SAVE->GetFirstTime());
+		DrawGraph(m_rank2X, 0, m_secondGraphHandle, TRUE);
+		DrawFormatStringToHandle(m_rank2X + RECORD_TIME_X, SECOND_TIME_Y, GetColor(255, 255, 255), m_font->recordHandle, "%d", SAVE->GetSecondTime());
+		DrawGraph(m_rank3X, 0, m_thirdGraphHandle, TRUE);
+		DrawFormatStringToHandle(m_rank3X + RECORD_TIME_X, THIRD_TIME_Y, GetColor(255, 255, 255), m_font->recordHandle, "%d", SAVE->GetThirdTime());
+
+		RankMove(m_rank3X, m_rank3Flag, false);
+	}
+	if (m_resultFlag >= 5)
+	{
+		DrawGraph(0, 0, m_firstGraphHandle, TRUE);
 		DrawFormatStringToHandle(RECORD_TIME_X, FIRST_TIME_Y, GetColor(255, 255, 255), m_font->recordHandle, "%d", SAVE->GetFirstTime());
+		DrawGraph(0, 0, m_secondGraphHandle, TRUE);
 		DrawFormatStringToHandle(RECORD_TIME_X, SECOND_TIME_Y, GetColor(255, 255, 255), m_font->recordHandle, "%d", SAVE->GetSecondTime());
+		DrawGraph(0, 0, m_thirdGraphHandle, TRUE);
 		DrawFormatStringToHandle(RECORD_TIME_X, THIRD_TIME_Y, GetColor(255, 255, 255), m_font->recordHandle, "%d", SAVE->GetThirdTime());
 	}
-	if (m_resultFlag >= 2)
+	if (m_resultFlag >= 6)
 	{
 		DrawGraph(0, 0, m_medalGraphHandle, TRUE);			//	メダル
 	}
-	if (m_resultFlag >= 3)
+	if (m_resultFlag >= 7)
 	{
 		DrawGraph(0, 0, m_evaluationGraphHandle, TRUE);		//	評価
-	}
-	if (m_resultFlag >= 4)
-	{
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, m_transpVal);	//	透過して描画
 		DrawGraph(0, 0, m_guidanceGraphHandle, TRUE);		//	案内
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);			//	透過を元に戻す
@@ -418,15 +456,28 @@ void Ueyama_Result::Sound()
 	case 2:
 		//	効果音を流す
 		PlaySoundMem(m_se2SoundHandle, DX_PLAYTYPE_BACK, FALSE);
+		StopSoundMem(m_se1SoundHandle);
 		break;
 	case 3:
 		//	効果音を流す
-		PlaySoundMem(m_se3SoundHandle, DX_PLAYTYPE_BACK, FALSE);
+		PlaySoundMem(m_se2SoundHandle, DX_PLAYTYPE_BACK, FALSE);
 		break;
 	case 4:
 		//	効果音を流す
-		PlaySoundMem(m_se4SoundHandle, DX_PLAYTYPE_BACK, FALSE);
+		PlaySoundMem(m_se2SoundHandle, DX_PLAYTYPE_BACK, FALSE);
 		break;
+	case 6:
+		//	効果音を流す
+		PlaySoundMem(m_se3SoundHandle, DX_PLAYTYPE_BACK, FALSE);
+		StopSoundMem(m_se2SoundHandle);
+		break;
+	case 7:
+		//	効果音を流す
+		PlaySoundMem(m_se4SoundHandle, DX_PLAYTYPE_BACK, FALSE);
+		StopSoundMem(m_se3SoundHandle);
+		break;
+	case 9:
+		StopSoundMem(m_se4SoundHandle);
 	default:
 		break;
 	}
@@ -442,24 +493,26 @@ void Ueyama_Result::Load()
 	{
 		m_medalGraphHandle = LoadGraph("data/img/Result/Result_gold.png");			//	金メダル
 		m_evaluationGraphHandle = LoadGraph("data/img/Result/Result_best.png");		//　CONGRATURATION
+		m_bigStarGraphHandle = LoadGraph("data/img/Result/bigStar.png");			//	大きな星
+		m_smallStarGraphHandle = LoadGraph("data/img/Result/smallStar.png");		//	小さな星
 	}
 	if (m_time > SAVE->GetFirstTime() && m_time <= SAVE->GetSecondTime())
 	{
 		m_medalGraphHandle = LoadGraph("data/img/Result/Result_silver.png");		//	銀メダル
 		m_evaluationGraphHandle = LoadGraph("data/img/Result/Result_great.png");	//	GREAT
+		m_bigStarGraphHandle = LoadGraph("data/img/Result/bigStar.png");			//	大きな星
 	}
 	if (m_time > SAVE->GetSecondTime() && m_time <= SAVE->GetThirdTime())
 	{
 		m_medalGraphHandle = LoadGraph("data/img/Result/Result_copper.png");		//	銅メダル
 		m_evaluationGraphHandle = LoadGraph("data/img/Result/Result_good.png");		//　GOOD
+		m_smallStarGraphHandle = LoadGraph("data/img/Result/smallStar.png");		//	小さな星
 	}
 	if (m_time > SAVE->GetThirdTime())
 	{
 		//m_medalGraphHandle = LoadGraph("data/img/Result/Result_copper.png");		//	銅メダル
 		m_evaluationGraphHandle = LoadGraph("data/img/Result/Result_ngu.png");		//　GOOD
 	}
-	m_bigStarGraphHandle = LoadGraph("data/img/Result/bigStar.png");				//	大きな星
-	m_smallStarGraphHandle = LoadGraph("data/img/Result/smallStar.png");			//	小さな星
 	m_nowGraphHandle = LoadGraph("data/img/Result/Result_timeBase.png");			//	今回のタイム
 	m_firstGraphHandle = LoadGraph("data/img/Result/Result_first.png");				//	一位のタイム
 	m_secondGraphHandle = LoadGraph("data/img/Result/Result_second.png");			//	二位のタイム
@@ -481,6 +534,44 @@ void Ueyama_Result::Load()
 	ChangeVolumeSoundMem(m_volumePal, m_se4SoundHandle);
 
 	m_font = new Font();
+}
+
+void Ueyama_Result::RankMove(int& _x, bool& _flag, bool _flag2)
+{
+	if (_x >= RANK_END_X)
+	{
+		_flag = true;
+	}
+	
+	/*_x += RANK_SPEED;
+	if (_x >= 0)
+	{
+		_x = 0;
+		_flag = true;
+	}
+	if (_flag == true && _flag2 == false)
+	{
+		m_resultFlag++;
+		_flag2 = true;
+	}*/
+
+	if (_flag == false)
+	{
+		_x += RANK_SPEED;
+	}
+	else if (_flag == true)
+	{
+		_x -= RANK_SPEED / 2;
+		if (_x <= 0)
+		{
+			_x = 0;
+			if (_flag2 == false)
+			{
+				m_resultFlag++;
+				_flag2 = true;
+			}
+		}
+	}
 }
 
 void Ueyama_Result::UpdateTransparent()
