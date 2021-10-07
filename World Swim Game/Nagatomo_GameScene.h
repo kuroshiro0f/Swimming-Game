@@ -4,12 +4,12 @@
 #include "Nagatomo_PlayerActor.h"
 #include "Nagatomo_Camera.h"
 
-class Nagatomo_PlayerActor;			//PlayerActorへの参照
-class Camera;						//Cameraへの参照
+class PlayerActor;			//PlayerActorへの参照
+class Camera;				//Cameraへの参照
 
-class GameScene : public SceneBase
+class GameScene :public SceneBase
 {
-	Nagatomo_PlayerActor* player;
+	PlayerActor* player;
 	Camera* camera;
 
 public:
@@ -23,15 +23,13 @@ public:
 		FADE_OUT
 	};
 
-	GameScene();				//	コンストラクタ
-	~GameScene();			    //	デストラクタ
+	GameScene();			//	コンストラクタ
+	~GameScene();			//	デストラクタ
 
 	SceneBase* Update(float _deltaTime)override;	//	更新
 	void Draw()override;			//	描画
 	void Sound()override;			//	音楽
 	void Load()override;			//	初期化
-
-
 
 private:
 	GAME_SCENE_STATE m_state;
@@ -97,9 +95,11 @@ private:
 	bool m_whistleFinishFlag;		//	笛を鳴らし終わったか
 	bool m_gameFinishFlag;			//	ゲームが終わったか
 	bool m_fadeOutFlag;				//	フェードアウトを始めるか
+	bool m_sweat1Flag;				//	汗1を表示するか
+	bool m_sweat2Flag;				//	汗2を表示するか
 
 	class Stage* m_stage;   // ステージクラスへのポインタメンバ変数
-	class Camera* m_camera; // カメラクラスへのポインタメンバ変数
+	class Nagatomo_Camera* m_camera;	// カメラクラスへのポインタメンバ変数
 	class Nagatomo_PlayerActor* m_actor;   // アクタークラスへのポインタメンバ変数
 	class PlayEffect* m_effect;				//	エフェクトプレーヤー
 };

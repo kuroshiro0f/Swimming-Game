@@ -6,13 +6,13 @@
 
 class Nagatomo_PlayerActor;      //プレイヤークラスへの参照
 
-class Camera
+class Nagatomo_Camera
 {
 public:
 	// コンストラクタ
-	Camera(const Nagatomo_PlayerActor& playerActor);
+	Nagatomo_Camera(const Nagatomo_PlayerActor& playerActor);
 	// デストラクタ
-	~Camera();
+	~Nagatomo_Camera();
 
 	// 更新
 	void Update(const Nagatomo_PlayerActor& playerActor);
@@ -25,6 +25,10 @@ public:
 
 private:
 	VECTOR mPos;    // ポジション
+	VECTOR mTempPos;
+	VECTOR mPlayerPos;
+
+	const int mCorrection = 12;	//補正値
 };
 
 #endif // !_CAMERA_H_

@@ -1,32 +1,45 @@
 #include "Nagatomo_Camera.h"
 
 // コンストラクタ
-Camera::Camera(const Nagatomo_PlayerActor& playerActor)
+Nagatomo_Camera::Nagatomo_Camera(const Nagatomo_PlayerActor& playerActor)
 {
 	// 奥行 1.0～10000 までをカメラの描画範囲とする
 	SetCameraNearFar(1.0f, 10000.0f);
 
-	//カメラの初期ポジション設定
-	mPos = VGet(0, 60, 80);
+	//カメラのポジション設定
+	mPos = VGet(0, 40, 50);
+	//プレイヤーのポジションをコピーする用の変数を初期化
+	mTempPos = VGet(0, 0, 0);
 }
 
 // デストラクタ
-Camera::~Camera()
+Nagatomo_Camera::~Nagatomo_Camera()
 {
 
 }
 
 // 更新
-void Camera::Update(const Nagatomo_PlayerActor& playerActor)
-{							
-	//プレイヤーのポジションをmTempPosにコピー
-	mPos.x = playerActor.GetPosX();									//mTempPos(プレイヤー)のx座標をカメラのx座標に代入
+void Nagatomo_Camera::Update(const Nagatomo_PlayerActor& playerActor)
+{
+	mPos.x = playerActor.GetPosX();	
+	mPlayerPos = playerActor.GetPos();
 
-	/*VECTOR aimPos = VGet(playerActor.GetPos().x, 60, 80);		//b
-	VECTOR posToAim = VSub(aimPos, mPos);	//(b - a)
-	VECTOR scaledPosToAim = VScale(posToAim, 0.5f);	//((b-a)*t)
-	mPos = VAdd(mPos, scaledPosToAim);*/
+	if (!playerActor.turnFlag)
+	{
+		mPlayerPos.x -= mCorrection;
+		mPos.x -= mCorrection;
+	}
+	if (playerActor.turnFlag)
+	{
+		mPlayerPos.x += mCorrection;
+		mPos.x += mCorrection;
+	}
 
-	SetCameraPositionAndTarget_UpVecY(mPos, playerActor.GetPos());	// カメラに位置を反映.
+	if (playerActor.dCount <= 15)
+	{
+		mPos.x = playerActor.GetPosX() - 25 + mCorrection;
 
+	}
+
+	SetCameraPositionAndTarget_UpVecY(mPos, mPlayerPos);	// カメラに位置を反映.
 }
