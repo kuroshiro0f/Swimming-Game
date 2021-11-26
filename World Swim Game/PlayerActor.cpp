@@ -57,6 +57,8 @@ PlayerActor::PlayerActor()
 	, finishFlag(false)
 	, m_ultCheckFlag(false)
 	, arrowFailFlag(false)
+	, arrowSoundFlag(false)
+	, arrowFailSoundFlag(false)
 	, m_ultFinishFlag(0)
 {
 	startFlag = false;
@@ -267,6 +269,7 @@ void PlayerActor::UpdateActor(float _deltaTime)
 						st -= ST_SUC_DEC;
 						inputTime = 0;
 						inputArrowFlag = true;
+						arrowSoundFlag = true;
 						mCheckKeyFlag = true;
 					}
 
@@ -280,6 +283,7 @@ void PlayerActor::UpdateActor(float _deltaTime)
 						st -= ST_FAI_DEC;
 						inputLimitTime = limitTime;							//入力制限時間をリセット
 						inputArrowFlag = false;
+						arrowFailSoundFlag = true;
 						mCheckKeyFlag = true;
 					}
 
@@ -330,6 +334,7 @@ void PlayerActor::UpdateActor(float _deltaTime)
 						st -= ST_SUC_DEC;
 						inputTime = 0;
 						inputArrowFlag = true;
+						arrowSoundFlag = true;
 						mCheckKeyFlag = true;
 					}
 				}
@@ -341,6 +346,7 @@ void PlayerActor::UpdateActor(float _deltaTime)
 						st -= ST_FAI_DEC;
 						inputLimitTime = limitTime;							//入力制限時間をリセット
 						inputArrowFlag = false;
+						arrowFailSoundFlag = true;
 						mCheckKeyFlag = true;
 					}
 				}
@@ -390,6 +396,7 @@ void PlayerActor::UpdateActor(float _deltaTime)
 						st -= ST_SUC_DEC;
 						inputTime = 0;
 						inputArrowFlag = true;
+						arrowSoundFlag = true;
 						mCheckKeyFlag = true;
 					}
 				}
@@ -401,6 +408,7 @@ void PlayerActor::UpdateActor(float _deltaTime)
 						st -= ST_FAI_DEC;
 						inputLimitTime = limitTime;							//入力制限時間をリセット
 						inputArrowFlag = false;
+						arrowFailSoundFlag = true;
 						mCheckKeyFlag = true;
 					}
 				}
@@ -449,6 +457,7 @@ void PlayerActor::UpdateActor(float _deltaTime)
 						st -= ST_SUC_DEC;
 						inputTime = 0;
 						inputArrowFlag = true;
+						arrowSoundFlag = true;
 						mCheckKeyFlag = true;
 					}
 				}
@@ -460,6 +469,7 @@ void PlayerActor::UpdateActor(float _deltaTime)
 						st -= ST_FAI_DEC;
 						inputLimitTime = limitTime;							//入力制限時間をリセット
 						inputArrowFlag = false;
+						arrowFailSoundFlag = true;
 						mCheckKeyFlag = true;
 					}
 				}

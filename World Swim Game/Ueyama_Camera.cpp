@@ -27,28 +27,28 @@ Ueyama_Camera::~Ueyama_Camera()
 // 更新
 void Ueyama_Camera::Update(const Ueyama_PlayerActor& playerActor)
 {
-	mPos.x = playerActor.GetPosX();
+	//mPos.x = playerActor.GetPosX();
 	mPlayerPos = playerActor.GetPos();
 	mPlayerPos.y = playerActor.GetPos().y + CAMERA_ADD_Y;
 
 	if (!playerActor.turnFlag)
 	{
 		mPlayerPos.x -= mCorrection;
-		mPos.x -= mCorrection;
+		//mPos.x -= mCorrection;
 	}
 	if (playerActor.turnFlag)
 	{
 		mPlayerPos.x += mCorrection;
-		mPos.x += mCorrection;
+		//mPos.x += mCorrection;
 	}
 
 	if (playerActor.dCount <= 15)
 	{
-		mPos.x = playerActor.GetPosX() - 25 + mCorrection;
+		//mPos.x = playerActor.GetPosX() - 25 + mCorrection;
 
 	}
 
-	/*if (CheckHitKey(KEY_INPUT_1))
+	if (CheckHitKey(KEY_INPUT_1))
 	{
 		mPos.x--;
 	}
@@ -71,7 +71,12 @@ void Ueyama_Camera::Update(const Ueyama_PlayerActor& playerActor)
 	if (CheckHitKey(KEY_INPUT_6))
 	{
 		mPos.z++;
-	}*/
+	}
+
+	if (CheckHitKey(KEY_INPUT_9))
+	{
+		mPos.x = playerActor.GetPosX();
+	}
 
 	SetCameraPositionAndTarget_UpVecY(mPos, mPlayerPos);	// カメラに位置を反映.
 }

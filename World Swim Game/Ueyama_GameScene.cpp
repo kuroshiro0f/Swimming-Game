@@ -382,13 +382,13 @@ void Ueyama_GameScene::Draw()
 		DrawGraph(0, 0, m_backGraphHandle, TRUE);
 
 		// ƒXƒe[ƒW‚Ì•`‰æ
-		m_stage->Draw();
+		//m_stage->Draw();
 		//SetFontSize(40);
 
 		if (!m_actor->ultFlag)
 		{
 			//	–îˆó‚Ì“y‘ä‚Ì•`‰æ
-			DrawGraph(0, 0, m_arrowBaseGraphHandle, TRUE);
+			//DrawGraph(0, 0, m_arrowBaseGraphHandle, TRUE);
 		}
 
 		if (m_actor->st > ORANGE)

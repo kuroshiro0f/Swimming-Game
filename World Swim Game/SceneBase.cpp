@@ -1,7 +1,7 @@
 #include "SceneBase.h"
 
 //	初期音量
-const int VOLUME_PAL = 40;
+const int VOLUME_PAL = 150;
 
 //	フォントサイズ
 const int NORMAL_FONT_SIZE = 17;

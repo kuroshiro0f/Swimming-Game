@@ -102,6 +102,7 @@ private:
 	int m_arrowBaseGraphHandle;			//	矢印の土台
 	int m_scoreBaseGraphHandle;			//	スコアの土台
 	int m_spaceBaseGraphHandle;			//	スペースの土台
+	int m_spaceBase2GraphHandle;		//	スペースの土台2
 	int m_stBaseGraphHandle;			//	スタミナの土台
 	int m_finishArrowBaseGraphHandle;	//	ラストの矢印の土台
 	int m_lastGraphHandle;				//	ラストの演出
@@ -112,6 +113,11 @@ private:
 	int m_whistleSoundHandle;		//	笛
 	int m_countDownSoundHandle;		//	カウントダウン
 	int m_goalSoundHandle;			//	ゴール
+	int m_arrowSoundHandle;			//	矢印
+	int m_arrowFailSoundHandle;		//	矢印の失敗
+	int m_spaceSoundHandle;			//	スペース
+	int m_breathSoundHandle;		//	息継ぎ
+	int m_loadSoundHandle;			//	ロード
 
 	//	時間の経過
 	int m_timeElapsed;

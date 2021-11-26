@@ -127,6 +127,9 @@ public:
 
 	bool turnFlag;						 // ターンフラグ
 
+	bool arrowSoundFlag;			//	矢印の効果音用フラグ
+	bool arrowFailSoundFlag;		//	矢印失敗の効果音用フラグ
+
 private:
 	int inputStartTime;
 	int inputEndTime;

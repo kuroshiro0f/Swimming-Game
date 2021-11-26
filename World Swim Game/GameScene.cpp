@@ -186,6 +186,7 @@ GameScene::~GameScene()
 	DeleteGraph(m_arrowBaseGraphHandle);
 	DeleteGraph(m_scoreBaseGraphHandle);
 	DeleteGraph(m_spaceBaseGraphHandle);
+	DeleteGraph(m_spaceBase2GraphHandle);
 	DeleteGraph(m_upArrowGraphHandle);
 	DeleteGraph(m_rightArrowGraphHandle);
 	DeleteGraph(m_downArrowGraphHandle);
@@ -202,6 +203,11 @@ GameScene::~GameScene()
 	DeleteSoundMem(m_whistleFinishFlag);
 	DeleteSoundMem(m_countDownSoundHandle);
 	DeleteSoundMem(m_goalSoundHandle);
+	DeleteSoundMem(m_arrowSoundHandle);
+	DeleteSoundMem(m_arrowFailSoundHandle);
+	DeleteSoundMem(m_spaceSoundHandle);
+	DeleteSoundMem(m_breathSoundHandle);
+	DeleteSoundMem(m_loadSoundHandle);
 
 	delete m_stage;   // ステージのポインタメンバ変数を消去
 	delete m_camera;  // カメラのポインタメンバ変数を消去
@@ -233,10 +239,16 @@ SceneBase* GameScene::Update(float _deltaTime)
 				m_checkKeyFlag = false;
 			}
 
-			if (CheckHitKey(KEY_INPUT_RETURN))
+			if (CheckHitKey(KEY_INPUT_RETURN) && !m_checkKeyFlag)
 			{
-				//	非同期読み込みを終了し、次のステートへ
+				//	※キー入力重複対策のフラグ
+				m_checkKeyFlag == true;
+				//	非同期読み込みを終了
 				SetUseASyncLoadFlag(FALSE);
+				//	効果音を鳴らす
+				PlaySoundMem(m_loadSoundHandle, DX_PLAYTYPE_BACK, FALSE);
+				ChangeVolumeSoundMem(m_volumePal + SE_VOLUME_PAL, m_loadSoundHandle);
+				//	次のステートへ
 				m_state = GAME_SCENE_STATE::FADE_IN;
 			}
 		}
@@ -280,6 +292,7 @@ SceneBase* GameScene::Update(float _deltaTime)
 		//{
 		//	m_state = GAME_SCENE_STATE::FADE_OUT;
 		//}
+
 		break;
 	case GAME_SCENE_STATE::FADE_OUT:
 		if (m_fadeOutFinishFlag)
@@ -378,12 +391,13 @@ void GameScene::Draw()
 		m_stage->Draw();
 		//SetFontSize(40);
 
-		if (!m_actor->ultFlag)
+		//	矢印の土台の描画
+		if (!m_actor->ultFlag && m_actor->countDown <= 0)
 		{
-			//	矢印の土台の描画
 			DrawGraph(0, 0, m_arrowBaseGraphHandle, TRUE);
 		}
 
+		//	ハートの動き
 		if (m_actor->st > ORANGE)
 		{
 			m_heartSpeed1 = HEART_SPEED_2;
@@ -403,6 +417,7 @@ void GameScene::Draw()
 		//	ハートの表示
 		DrawRotaGraph(SCREEN_SIZE_W / 2, SCREEN_SIZE_H / 2, m_heartRate, 0, m_heartGraphHandle, TRUE, FALSE);
 
+		//	ハートの動き
 		if (m_heartFlag)
 		{
 			m_heartSpeed1 = m_heartSpeed2;
@@ -482,6 +497,7 @@ void GameScene::Draw()
 		// プレイヤー描画
 		m_actor->DrawActor();
 
+		//	矢印の表示
 		if (m_actor->st > m_actor->MinSt && m_actor->ultLimitFlag == false)
 		{
 			//ランダムに矢印を表示
@@ -491,18 +507,12 @@ void GameScene::Draw()
 				DrawRotaGraph2(SCREEN_SIZE_W / 2 + ARROW_ADJUST_X, SCREEN_SIZE_H / 2 + ARROW_ADJUST_Y, ARROW_CENTER_X, ARROW_CENTER_Y, m_arrowRate, m_arrowAngle, m_upArrowGraphHandle, TRUE, FALSE);
 				if (m_actor->inputArrowFlag && m_actor->randomFlag)
 				{
-					//DrawBox(900, 800, 1000, 900, GetColor(255, 255, 255), TRUE);
-					/*DrawRotaGraph(m_starX, m_starY, 1.0, m_starAngle, m_starGraphHandle, TRUE, FALSE);
-					m_starX++;
-					m_starY--;
-					m_starAngle += STAR_ROTA_SPEED;*/
-
-					/*if (m_starX >= STAR_END_X)
+					if (m_actor->arrowSoundFlag)
 					{
-						m_starX = STAR_FIRST_X;
-						m_starY = STAR_FIRST_Y;
-					}*/
-
+						PlaySoundMem(m_arrowSoundHandle, DX_PLAYTYPE_BACK, FALSE);
+						ChangeVolumeSoundMem(m_volumePal + SE_VOLUME_PAL, m_arrowSoundHandle);
+						m_actor->arrowSoundFlag = false;
+					}
 					//	矢印を回す
 					m_arrowAngle++;
 
@@ -522,6 +532,12 @@ void GameScene::Draw()
 				}
 				if (m_actor->arrowFailFlag)
 				{
+					if (m_actor->arrowFailSoundFlag)
+					{
+						PlaySoundMem(m_arrowFailSoundHandle, DX_PLAYTYPE_BACK, FALSE);
+						ChangeVolumeSoundMem(m_volumePal + SE_VOLUME_PAL, m_arrowFailSoundHandle);
+						m_actor->arrowFailSoundFlag = false;
+					}
 					DrawGraph(0, 0, m_failGraphHandle, TRUE);
 				}
 				//DrawFormatString(900, 800, GetColor(0, 0, 0), "↑");
@@ -531,18 +547,12 @@ void GameScene::Draw()
 				DrawRotaGraph2(SCREEN_SIZE_W / 2 + ARROW_ADJUST_X, SCREEN_SIZE_H / 2 + ARROW_ADJUST_Y, ARROW_CENTER_X, ARROW_CENTER_Y, m_arrowRate, m_arrowAngle, m_downArrowGraphHandle, TRUE, FALSE);
 				if (m_actor->inputArrowFlag && m_actor->randomFlag)
 				{
-					//DrawBox(900, 800, 1000, 900, GetColor(255, 255, 255), TRUE);
-					/*DrawRotaGraph(m_starX, m_starY, 1.0, m_starAngle, m_starGraphHandle, TRUE, FALSE);
-					m_starX++;
-					m_starY--;
-					m_starAngle += STAR_ROTA_SPEED;
-
-					if (m_starX >= STAR_END_X)
+					if (m_actor->arrowSoundFlag)
 					{
-						m_starX = STAR_FIRST_X;
-						m_starY = STAR_FIRST_Y;
-					}*/
-
+						PlaySoundMem(m_arrowSoundHandle, DX_PLAYTYPE_BACK, FALSE);
+						ChangeVolumeSoundMem(m_volumePal + SE_VOLUME_PAL, m_arrowSoundHandle);
+						m_actor->arrowSoundFlag = false;
+					}
 					//	矢印を回す
 					m_arrowAngle++;
 
@@ -562,6 +572,12 @@ void GameScene::Draw()
 				}
 				if (m_actor->arrowFailFlag)
 				{
+					if (m_actor->arrowFailSoundFlag)
+					{
+						PlaySoundMem(m_arrowFailSoundHandle, DX_PLAYTYPE_BACK, FALSE);
+						ChangeVolumeSoundMem(m_volumePal + SE_VOLUME_PAL, m_arrowFailSoundHandle);
+						m_actor->arrowFailSoundFlag = false;
+					}
 					DrawGraph(0, 0, m_failGraphHandle, TRUE);
 				}
 				//DrawFormatString(900, 800, GetColor(0, 0, 0), "↓");
@@ -571,18 +587,12 @@ void GameScene::Draw()
 				DrawRotaGraph2(SCREEN_SIZE_W / 2 + ARROW_ADJUST_X, SCREEN_SIZE_H / 2 + ARROW_ADJUST_Y, ARROW_CENTER_X, ARROW_CENTER_Y, m_arrowRate, m_arrowAngle, m_rightArrowGraphHandle, TRUE, FALSE);
 				if (m_actor->inputArrowFlag && m_actor->randomFlag)
 				{
-					////DrawBox(900, 800, 1000, 900, GetColor(255, 255, 255), TRUE);
-					//DrawRotaGraph(m_starX, m_starY, 1.0, m_starAngle, m_starGraphHandle, TRUE, FALSE);
-					//m_starX++;
-					//m_starY--;
-					//m_starAngle += STAR_ROTA_SPEED;
-
-					//if (m_starX >= STAR_END_X)
-					//{
-					//	m_starX = STAR_FIRST_X;
-					//	m_starY = STAR_FIRST_Y;
-					//}
-
+					if (m_actor->arrowSoundFlag)
+					{
+						PlaySoundMem(m_arrowSoundHandle, DX_PLAYTYPE_BACK, FALSE);
+						ChangeVolumeSoundMem(m_volumePal + SE_VOLUME_PAL, m_arrowSoundHandle);
+						m_actor->arrowSoundFlag = false;
+					}
 					//	矢印を回す
 					m_arrowAngle++;
 
@@ -602,6 +612,12 @@ void GameScene::Draw()
 				}
 				if (m_actor->arrowFailFlag)
 				{
+					if (m_actor->arrowFailSoundFlag)
+					{
+						PlaySoundMem(m_arrowFailSoundHandle, DX_PLAYTYPE_BACK, FALSE);
+						ChangeVolumeSoundMem(m_volumePal + SE_VOLUME_PAL, m_arrowFailSoundHandle);
+						m_actor->arrowFailSoundFlag = false;
+					}
 					DrawGraph(0, 0, m_failGraphHandle, TRUE);
 				}
 				//DrawFormatString(900, 800, GetColor(0, 0, 0), "→");
@@ -611,18 +627,12 @@ void GameScene::Draw()
 				DrawRotaGraph2(SCREEN_SIZE_W / 2 + ARROW_ADJUST_X, SCREEN_SIZE_H / 2 + ARROW_ADJUST_Y, ARROW_CENTER_X, ARROW_CENTER_Y, m_arrowRate, m_arrowAngle, m_leftArrowGraphHandle, TRUE, FALSE);
 				if (m_actor->inputArrowFlag && m_actor->randomFlag)
 				{
-					//DrawBox(900, 800, 1000, 900, GetColor(255, 255, 255), TRUE);
-				/*	DrawRotaGraph(m_starX, m_starY, 1.0, m_starAngle, m_starGraphHandle, TRUE, FALSE);
-					m_starX++;
-					m_starY--;
-					m_starAngle += STAR_ROTA_SPEED;
-
-					if (m_starX >= STAR_END_X)
+					if (m_actor->arrowSoundFlag)
 					{
-						m_starX = STAR_FIRST_X;
-						m_starY = STAR_FIRST_Y;
-					}*/
-
+						PlaySoundMem(m_arrowSoundHandle, DX_PLAYTYPE_BACK, FALSE);
+						ChangeVolumeSoundMem(m_volumePal + SE_VOLUME_PAL, m_arrowSoundHandle);
+						m_actor->arrowSoundFlag = false;
+					}
 					//	矢印を回す
 					m_arrowAngle++;
 
@@ -642,6 +652,12 @@ void GameScene::Draw()
 				}
 				if (m_actor->arrowFailFlag)
 				{
+					if (m_actor->arrowFailSoundFlag)
+					{
+						PlaySoundMem(m_arrowFailSoundHandle, DX_PLAYTYPE_BACK, FALSE);
+						ChangeVolumeSoundMem(m_volumePal + SE_VOLUME_PAL, m_arrowFailSoundHandle);
+						m_actor->arrowFailSoundFlag = false;
+					}
 					DrawGraph(0, 0, m_failGraphHandle, TRUE);
 				}
 				//DrawFormatString(900, 800, GetColor(0, 0, 0), "←");
@@ -758,18 +774,13 @@ void GameScene::Draw()
 		if (-100 >= m_actor->GetPosX() && m_actor->GetPosX() > -136 && m_actor->GetInputSpaceFlag() == false && m_actor->GetTurnFlag() == false)
 		{
 			//ターンの評価が NORMAL の範囲
-			if (-100 >= m_actor->GetPosX() && m_actor->GetPosX() > -120 || -120 >= m_actor->GetPosX() && m_actor->GetPosX() > -140)
+			if (-100 >= m_actor->GetPosX() && m_actor->GetPosX() > -130 || -130 >= m_actor->GetPosX() && m_actor->GetPosX() > -140)
 			{
-				////DrawBox(810, 900, 1100, 1000, GetColor(255, 255, 0), TRUE);
-				// 透過して描画
-				SetDrawBlendMode(DX_BLENDMODE_ALPHA, TURN_TRANSPAL);
-				DrawGraph(0, 0, m_spaceBaseGraphHandle, TRUE);
+				DrawGraph(0, 0, m_spaceBase2GraphHandle, TRUE);
 				DrawGraph(0, 0, m_spaceGraphHandle, TRUE);
-				// 透過を元に戻す
-				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 			}
 			//ターンの評価が GOOD の範囲
-			if (-120 >= m_actor->GetPosX() && m_actor->GetPosX() > -140)
+			if (-130 >= m_actor->GetPosX() && m_actor->GetPosX() > -140)
 			{
 				DrawGraph(0, 0, m_spaceBaseGraphHandle, TRUE);
 				DrawGraph(0, 0, m_spaceGraphHandle, TRUE);
@@ -783,7 +794,7 @@ void GameScene::Draw()
 		m_actor->LastSpurt();
 
 		//	スタミナ減少時の汗の表示
-		if (m_actor->st <= ORANGE)
+		if (m_actor->st <= ORANGE && !m_actor->ultFlag)
 		{
 			if (!m_actor->turnFlag)
 			{
@@ -961,7 +972,7 @@ void GameScene::Sound()
 	//	笛が鳴り終わったら、BGMを流す
 	if (m_state == GAME_SCENE_STATE::GAME && m_whistleFinishFlag)
 	{
-		PlaySoundMem(m_bgmSoundHandle, DX_PLAYTYPE_BACK, FALSE);
+		//PlaySoundMem(m_bgmSoundHandle, DX_PLAYTYPE_BACK, FALSE);
 		ChangeVolumeSoundMem(m_volumePal, m_bgmSoundHandle);
 	}
 	if (m_gameFinishFlag)
@@ -974,18 +985,19 @@ void GameScene::Sound()
 			StopSoundMem(m_goalSoundHandle);
 		}
 	}
+
 }
 
 void GameScene::Load()
 {
 	//	非同期読み込みしないファイル
 
-		// グラフィックハンドルにセット
+	// グラフィックハンドルにセット
 	m_tips1GraphHandle = LoadGraph("data/img/Load/TIPS1.png");
 	m_tips2GraphHandle = LoadGraph("data/img/Load/TIPS2.png");
 	m_tips3GraphHandle = LoadGraph("data/img/Load/TIPS3.png");
 	m_boyGraphHandle = LoadGraph("data/img/Load/boy.png");
-
+	
 	//	エフェクト生成
 	m_effect = new PlayEffect("data/effects/water4.efk", 3.0f);
 
@@ -1015,15 +1027,21 @@ void GameScene::Load()
 	m_arrowBaseGraphHandle = LoadGraph("data/img/Game/Game_arrowBase.png");						//	矢印の土台
 	m_scoreBaseGraphHandle = LoadGraph("data/img/Game/Game_score.png");							//	スコアの土台
 	m_spaceBaseGraphHandle = LoadGraph("data/img/Game/Game_spaceBase.png");						//	スペースの土台
+	m_spaceBase2GraphHandle = LoadGraph("data/img/Game/Game_spaceBase2.png");					//	スペースの土台2
 	m_stBaseGraphHandle = LoadGraph("data/img/Game/Game_stBase.png");							//	スタミナの土台
 	m_finishArrowBaseGraphHandle = LoadGraph("data/img/Game/Game_finishArrowBase.png");			//	ラストの矢印の土台
 	m_lastGraphHandle = LoadGraph("data/img/Game/Game_last.png");								//	ラストの演出
 
 	//	サウンドハンドルにセット
-	m_bgmSoundHandle = LoadSoundMem("data/sound/Game/Game.ogg");				//	BGM
-	m_whistleSoundHandle = LoadSoundMem("data/sound/Game/whistle.ogg");			//	笛
-	m_countDownSoundHandle = LoadSoundMem("data/sound/Game/Countdown2.ogg");	//	カウントダウン
-	m_goalSoundHandle = LoadSoundMem("data/sound/Game/goalWhistle.ogg");		//	ゴール
+	m_bgmSoundHandle = LoadSoundMem("data/sound/Game/Game.ogg");								//	BGM
+	m_whistleSoundHandle = LoadSoundMem("data/sound/Game/whistle.ogg");							//	笛
+	m_countDownSoundHandle = LoadSoundMem("data/sound/Game/Countdown2.ogg");					//	カウントダウン
+	m_goalSoundHandle = LoadSoundMem("data/sound/Game/goalWhistle.ogg");						//	ゴール
+	m_arrowSoundHandle = LoadSoundMem("data/sound/Game/arrow.ogg");								//	矢印
+	m_arrowFailSoundHandle = LoadSoundMem("data/sound/Game/arrowFail.ogg");						//	矢印の失敗
+	m_spaceSoundHandle = LoadSoundMem("data/sound/Game/space.ogg");								//	スペース
+	m_breathSoundHandle = LoadSoundMem("data/sound/Game/breath.ogg");							//	息継ぎ
+	m_loadSoundHandle = LoadSoundMem("data/sound/Game/load.ogg");								//	ロード
 
 	// ステージクラスのインスタンスを生成
 	m_stage = new Stage();
